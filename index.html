@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Smudge Busters CRM</title>
+<style>
+  :root {
+    --green: #2a7d4f;
+    --green-light: #e8f5ee;
+    --green-mid: #4caf80;
+    --blue: #1a6fa8;
+    --blue-light: #e6f2fb;
+    --blue-mid: #4a9fd4;
+    --orange: #e07b2a;
+    --orange-light: #fef3e8;
+    --orange-mid: #f0a060;
+    --bg: #f4f7f5;
+    --surface: #ffffff;
+    --border: #e0e8e4;
+    --text: #1a2e24;
+    --text-muted: #6b8c7a;
+    --text-light: #9ab5a5;
+    --danger: #c0392b;
+    --danger-light: #fdecea;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --nav-height: 64px;
+    --topbar-height: 56px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* TOPBAR */
+  .topbar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    height: var(--topbar-height);
+    background: var(--green);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  .topbar-brand { display: flex; align-items: center; gap: 10px; }
+  .topbar-logo {
+    width: 34px; height: 34px; border-radius: 10px;
+    background: rgba(255,255,255,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .topbar-name { font-size: 18px; font-weight: 700; color: #fff; letter-spacing: -0.3px; }
+  .topbar-sub { font-size: 11px; color: rgba(255,255,255,0.75); }
+  .topbar-date { font-size: 12px; color: rgba(255,255,255,0.8); text-align: right; }
+
+  /* NAV */
+  .nav {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+    height: var(--nav-height);
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    display: flex;
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+  .nav-btn {
+    flex: 1; border: none; background: none; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 3px; padding: 8px 2px;
+    color: var(--text-muted); font-size: 10px; font-weight: 500;
+    transition: color 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .nav-btn svg { width: 22px; height: 22px; stroke-width: 1.8; }
+  .nav-btn.active { color: var(--green); }
+  .nav-btn.active svg { stroke-width: 2.2; }
+
+  /* CONTENT */
+  .content {
+    padding-top: calc(var(--topbar-height) + 12px);
+    padding-bottom: calc(var(--nav-height) + 16px);
+    padding-left: 14px; padding-right: 14px;
+    min-height: 100vh;
+  }
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* CARDS */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 14px;
+    margin-bottom: 10px;
+  }
+  .card-sm { padding: 10px 14px; }
+
+  /* STAT GRID */
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+  .stat-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 14px;
+  }
+  .stat-label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat-value { font-size: 24px; font-weight: 700; color: var(--text); }
+  .stat-sub { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+  .stat-card.accent-green { border-top: 3px solid var(--green); }
+  .stat-card.accent-blue { border-top: 3px solid var(--blue); }
+  .stat-card.accent-orange { border-top: 3px solid var(--orange); }
+  .stat-card.accent-red { border-top: 3px solid var(--danger); }
+
+  /* SECTION HEADER */
+  .sec-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .sec-title { font-size: 18px; font-weight: 700; color: var(--text); }
+
+  /* BUTTONS */
+  .btn-primary {
+    background: var(--green); color: #fff; border: none;
+    border-radius: var(--radius-sm); padding: 9px 16px;
+    font-size: 13px; font-weight: 600; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 6px;
+    transition: opacity 0.15s;
+  }
+  .btn-primary:active { opacity: 0.85; }
+  .btn-secondary {
+    background: var(--surface); color: var(--text); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 8px 14px;
+    font-size: 13px; font-weight: 500; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn-orange { background: var(--orange); color: #fff; border: none; border-radius: var(--radius-sm); padding: 9px 16px; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .btn-blue { background: var(--blue); color: #fff; border: none; border-radius: var(--radius-sm); padding: 9px 16px; font-size: 13px; font-weight: 600; cursor: pointer; }
+
+  /* BADGES */
+  .badge { font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 20px; white-space: nowrap; }
+  .badge-green { background: var(--green-light); color: var(--green); }
+  .badge-blue { background: var(--blue-light); color: var(--blue); }
+  .badge-orange { background: var(--orange-light); color: var(--orange); }
+  .badge-red { background: var(--danger-light); color: var(--danger); }
+
+  /* ROWS */
+  .data-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px;
+  }
+  .data-row:last-child { border-bottom: none; }
+  .data-row-label { color: var(--text-muted); }
+  .data-row-value { color: var(--text); font-weight: 500; }
+
+  /* AVATAR */
+  .avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: var(--green-light); color: var(--green);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; flex-shrink: 0;
+  }
+
+  /* CUSTOMER CARD */
+  .cust-row { display: flex; align-items: center; gap: 12px; }
+  .cust-info { flex: 1; min-width: 0; }
+  .cust-name { font-size: 15px; font-weight: 600; color: var(--text); }
+  .cust-detail { font-size: 12px; color: var(--text-muted); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  /* JOB CARD */
+  .job-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
+  .job-title { font-size: 15px; font-weight: 600; color: var(--text); }
+  .job-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+  /* CALENDAR */
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; margin-bottom: 16px; }
+  .cal-day-label { font-size: 10px; color: var(--text-muted); text-align: center; padding: 4px 0; font-weight: 600; }
+  .cal-day { font-size: 12px; text-align: center; padding: 7px 2px; border-radius: var(--radius-sm); color: var(--text-muted); cursor: pointer; }
+  .cal-day.empty { cursor: default; }
+  .cal-day.has-job { background: var(--green-light); color: var(--green); font-weight: 600; }
+  .cal-day.today { background: var(--green); color: #fff; font-weight: 700; }
+
+  /* FORM */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; z-index: 200;
+    background: rgba(0,0,0,0.45); align-items: flex-end; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface); border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    padding: 20px 16px 32px; width: 100%; max-height: 90vh; overflow-y: auto;
+  }
+  .modal-title { font-size: 17px; font-weight: 700; margin-bottom: 16px; }
+  .form-group { margin-bottom: 14px; }
+  .form-label { font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 5px; display: block; text-transform: uppercase; letter-spacing: 0.4px; }
+  .form-input {
+    width: 100%; padding: 10px 12px; border: 1px solid var(--border);
+    border-radius: var(--radius-sm); font-size: 15px; color: var(--text);
+    background: var(--surface); outline: none;
+    transition: border-color 0.15s;
+  }
+  .form-input:focus { border-color: var(--green); }
+  select.form-input { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b8c7a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+  .modal-actions .btn-primary { flex: 1; justify-content: center; }
+  .modal-actions .btn-secondary { flex: 1; justify-content: center; }
+
+  /* ACTIVITY */
+  .activity-item { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .activity-item:last-child { border-bottom: none; }
+  .activity-dot { width: 9px; height: 9px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
+  .activity-text { font-size: 13px; color: var(--text); font-weight: 500; }
+  .activity-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+  /* QUICK ACTIONS */
+  .quick-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  .quick-btn {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 14px 10px;
+    text-align: center; cursor: pointer; font-size: 12px;
+    color: var(--text-muted); font-weight: 500;
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .quick-btn:active { background: var(--bg); }
+  .quick-btn .qicon { width: 32px; height: 32px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; }
+
+  /* EXPENSE */
+  .exp-total { display: flex; justify-content: space-between; align-items: center; padding: 12px 0 0; border-top: 1px solid var(--border); margin-top: 6px; }
+
+  /* PHOTO PLACEHOLDER */
+  .photo-strip { display: flex; gap: 8px; margin-top: 8px; }
+  .photo-thumb { width: 56px; height: 56px; border-radius: var(--radius-sm); background: var(--bg); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 10px; text-align: center; cursor: pointer; }
+
+  /* EMPTY STATE */
+  .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); }
+  .empty-state svg { width: 48px; height: 48px; margin: 0 auto 12px; opacity: 0.35; }
+  .empty-state p { font-size: 14px; }
+
+  /* DETAIL VIEW */
+  .detail-overlay { display: none; position: fixed; inset: 0; z-index: 150; background: var(--bg); overflow-y: auto; }
+  .detail-overlay.open { display: block; }
+  .detail-topbar { background: var(--green); color: #fff; padding: 14px 16px; display: flex; align-items: center; gap: 12px; }
+  .detail-back { background: none; border: none; color: #fff; cursor: pointer; padding: 4px; }
+  .detail-title { font-size: 16px; font-weight: 700; }
+  .detail-content { padding: 14px; }
+
+  .tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 20px; font-weight: 600; }
+
+  @media (max-width: 380px) {
+    .stat-value { font-size: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-brand">
+    <div class="topbar-logo">🪟</div>
+    <div>
+      <div class="topbar-name">Smudge Busters</div>
+      <div class="topbar-sub">Window &amp; Pressure Washing</div>
+    </div>
+  </div>
+  <div class="topbar-date" id="topbarDate"></div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="content">
+
+  <!-- DASHBOARD -->
+  <div class="section active" id="sec-dashboard">
+    <div class="stat-grid">
+      <div class="stat-card accent-green">
+        <div class="stat-label">Monthly revenue</div>
+        <div class="stat-value" id="dash-revenue">$0</div>
+        <div class="stat-sub" id="dash-revenue-sub">This month</div>
+      </div>
+      <div class="stat-card accent-blue">
+        <div class="stat-label">Jobs this week</div>
+        <div class="stat-value" id="dash-jobs-week">0</div>
+        <div class="stat-sub" id="dash-jobs-sub">Scheduled & done</div>
+      </div>
+      <div class="stat-card accent-red">
+        <div class="stat-label">Unpaid invoices</div>
+        <div class="stat-value" id="dash-unpaid" style="color:var(--danger)">$0</div>
+        <div class="stat-sub" id="dash-unpaid-sub">Outstanding</div>
+      </div>
+      <div class="stat-card accent-orange">
+        <div class="stat-label">Customers</div>
+        <div class="stat-value" id="dash-customers">0</div>
+        <div class="stat-sub">Total active</div>
+      </div>
+    </div>
+
+    <div class="quick-grid">
+      <div class="quick-btn" onclick="openModal('customer')">
+        <div class="qicon" style="background:var(--green-light)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" width="20" height="20"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+        </div>
+        New customer
+      </div>
+      <div class="quick-btn" onclick="openModal('job')">
+        <div class="qicon" style="background:var(--blue-light)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" width="20" height="20"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
+        </div>
+        New job
+      </div>
+      <div class="quick-btn" onclick="openModal('quote')">
+        <div class="qicon" style="background:var(--orange-light)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2" width="20" height="20"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        </div>
+        New quote
+      </div>
+      <div class="quick-btn" onclick="openModal('payment')">
+        <div class="qicon" style="background:var(--green-light)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" width="20" height="20"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        </div>
+        Log payment
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="font-size:14px;font-weight:700;margin-bottom:10px">Recent activity</div>
+      <div id="dash-activity">
+        <div class="empty-state" style="padding:20px">
+          <p>No activity yet. Add a customer to get started!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CUSTOMERS -->
+  <div class="section" id="sec-customers">
+    <div class="sec-header">
+      <div class="sec-title">Customers</div>
+      <button class="btn-primary" onclick="openModal('customer')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add
+      </button>
+    </div>
+    <div id="customer-list"></div>
+  </div>
+
+  <!-- JOBS -->
+  <div class="section" id="sec-jobs">
+    <div class="sec-header">
+      <div class="sec-title">Jobs</div>
+      <button class="btn-primary" onclick="openModal('job')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add
+      </button>
+    </div>
+    <div id="job-list"></div>
+  </div>
+
+  <!-- QUOTES -->
+  <div class="section" id="sec-quotes">
+    <div class="sec-header">
+      <div class="sec-title">Quotes</div>
+      <button class="btn-primary" onclick="openModal('quote')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New
+      </button>
+    </div>
+    <div id="quote-list"></div>
+  </div>
+
+  <!-- PAYMENTS -->
+  <div class="section" id="sec-payments">
+    <div class="sec-header">
+      <div class="sec-title">Payments</div>
+      <button class="btn-primary" onclick="openModal('payment')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Log
+      </button>
+    </div>
+    <div id="payment-list"></div>
+  </div>
+
+  <!-- EXPENSES -->
+  <div class="section" id="sec-expenses">
+    <div class="sec-header">
+      <div class="sec-title">Expenses</div>
+      <button class="btn-primary" onclick="openModal('expense')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add
+      </button>
+    </div>
+    <div id="expense-list"></div>
+  </div>
+
+  <!-- SCHEDULE -->
+  <div class="section" id="sec-schedule">
+    <div class="sec-header">
+      <div class="sec-title" id="cal-month-title">June 2026</div>
+      <button class="btn-primary" onclick="openModal('job')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Job
+      </button>
+    </div>
+    <div class="card">
+      <div class="cal-grid" id="cal-grid"></div>
+    </div>
+    <div style="font-size:13px;font-weight:700;color:var(--text-muted);margin:14px 0 8px;text-transform:uppercase;letter-spacing:0.5px">Upcoming jobs</div>
+    <div id="upcoming-jobs"></div>
+  </div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="nav">
+  <button class="nav-btn active" onclick="showSection('dashboard',this)" aria-label="Dashboard">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    Home
+  </button>
+  <button class="nav-btn" onclick="showSection('customers',this)" aria-label="Customers">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    Customers
+  </button>
+  <button class="nav-btn" onclick="showSection('jobs',this)" aria-label="Jobs">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+    Jobs
+  </button>
+  <button class="nav-btn" onclick="showSection('quotes',this)" aria-label="Quotes">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    Quotes
+  </button>
+  <button class="nav-btn" onclick="showSection('payments',this)" aria-label="Payments">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+    Pay
+  </button>
+  <button class="nav-btn" onclick="showSection('expenses',this)" aria-label="Expenses">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+    Expenses
+  </button>
+  <button class="nav-btn" onclick="showSection('schedule',this)" aria-label="Schedule">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    Schedule
+  </button>
+</nav>
+
+<!-- MODALS -->
+
+<!-- Customer Modal -->
+<div class="modal-overlay" id="modal-customer">
+  <div class="modal">
+    <div class="modal-title">New customer</div>
+    <div class="form-group">
+      <label class="form-label">Full name</label>
+      <input class="form-input" id="cust-name" type="text" placeholder="Jane Smith" autocomplete="off">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Phone</label>
+        <input class="form-input" id="cust-phone" type="tel" placeholder="(618) 555-0100">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input class="form-input" id="cust-email" type="email" placeholder="jane@email.com">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Address</label>
+      <input class="form-input" id="cust-address" type="text" placeholder="123 Main St, Venedy IL">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Service type</label>
+      <select class="form-input" id="cust-service">
+        <option>Window cleaning</option>
+        <option>Pressure washing</option>
+        <option>Both services</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Notes</label>
+      <input class="form-input" id="cust-notes" type="text" placeholder="Gate code, dog, etc.">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('customer')">Cancel</button>
+      <button class="btn-primary" onclick="saveCustomer()">Save customer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Job Modal -->
+<div class="modal-overlay" id="modal-job">
+  <div class="modal">
+    <div class="modal-title">New job</div>
+    <div class="form-group">
+      <label class="form-label">Customer</label>
+      <select class="form-input" id="job-customer"></select>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Service</label>
+        <select class="form-input" id="job-service">
+          <option>Window cleaning</option>
+          <option>Pressure washing</option>
+          <option>Both services</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select class="form-input" id="job-status">
+          <option>Scheduled</option>
+          <option>In progress</option>
+          <option>Completed</option>
+          <option>Invoiced</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Date</label>
+        <input class="form-input" id="job-date" type="date">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Price ($)</label>
+        <input class="form-input" id="job-price" type="number" placeholder="0.00" step="0.01">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Notes</label>
+      <input class="form-input" id="job-notes" type="text" placeholder="Access info, special instructions...">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Photos (before/after)</label>
+      <input class="form-input" id="job-photos" type="file" accept="image/*" multiple style="padding:8px">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('job')">Cancel</button>
+      <button class="btn-primary" onclick="saveJob()">Save job</button>
+    </div>
+  </div>
+</div>
+
+<!-- Quote Modal -->
+<div class="modal-overlay" id="modal-quote">
+  <div class="modal">
+    <div class="modal-title">New quote</div>
+    <div class="form-group">
+      <label class="form-label">Customer</label>
+      <select class="form-input" id="quote-customer"></select>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Service</label>
+        <select class="form-input" id="quote-service">
+          <option>Window cleaning</option>
+          <option>Pressure washing</option>
+          <option>Both services</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Amount ($)</label>
+        <input class="form-input" id="quote-amount" type="number" placeholder="0.00" step="0.01">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Status</label>
+      <select class="form-input" id="quote-status">
+        <option>Pending</option>
+        <option>Accepted</option>
+        <option>Declined</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Notes</label>
+      <input class="form-input" id="quote-notes" type="text" placeholder="Scope details, conditions...">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('quote')">Cancel</button>
+      <button class="btn-primary" onclick="saveQuote()">Save quote</button>
+    </div>
+  </div>
+</div>
+
+<!-- Payment Modal -->
+<div class="modal-overlay" id="modal-payment">
+  <div class="modal">
+    <div class="modal-title">Log payment</div>
+    <div class="form-group">
+      <label class="form-label">Customer</label>
+      <select class="form-input" id="pay-customer"></select>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Amount ($)</label>
+        <input class="form-input" id="pay-amount" type="number" placeholder="0.00" step="0.01">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Date</label>
+        <input class="form-input" id="pay-date" type="date">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Method</label>
+        <select class="form-input" id="pay-method">
+          <option>Cash</option>
+          <option>Check</option>
+          <option>Venmo</option>
+          <option>Zelle</option>
+          <option>Card</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select class="form-input" id="pay-status">
+          <option>Paid</option>
+          <option>Unpaid</option>
+          <option>Partial</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Notes</label>
+      <input class="form-input" id="pay-notes" type="text" placeholder="Invoice #, job reference...">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('payment')">Cancel</button>
+      <button class="btn-primary" onclick="savePayment()">Save payment</button>
+    </div>
+  </div>
+</div>
+
+<!-- Expense Modal -->
+<div class="modal-overlay" id="modal-expense">
+  <div class="modal">
+    <div class="modal-title">Add expense</div>
+    <div class="form-group">
+      <label class="form-label">Category</label>
+      <select class="form-input" id="exp-category">
+        <option>Fuel</option>
+        <option>Cleaning supplies</option>
+        <option>Equipment</option>
+        <option>Equipment repair</option>
+        <option>Advertising</option>
+        <option>Insurance</option>
+        <option>Other</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Amount ($)</label>
+        <input class="form-input" id="exp-amount" type="number" placeholder="0.00" step="0.01">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Date</label>
+        <input class="form-input" id="exp-date" type="date">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Description</label>
+      <input class="form-input" id="exp-desc" type="text" placeholder="What was it for?">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('expense')">Cancel</button>
+      <button class="btn-primary" onclick="saveExpense()">Save expense</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ---- DATA STORE ----
+let data = {
+  customers: [],
+  jobs: [],
+  quotes: [],
+  payments: [],
+  expenses: [],
+  activity: []
+};
+
+function save() {
+  localStorage.setItem('smudge-busters-crm', JSON.stringify(data));
+}
+
+function load() {
+  const raw = localStorage.getItem('smudge-busters-crm');
+  if (raw) {
+    try { data = JSON.parse(raw); } catch(e) {}
+  }
+}
+
+function uid() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+}
+
+// ---- NAVIGATION ----
+function showSection(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('active');
+  btn.classList.add('active');
+  renderSection(id);
+}
+
+function renderSection(id) {
+  if (id === 'dashboard') renderDashboard();
+  else if (id === 'customers') renderCustomers();
+  else if (id === 'jobs') renderJobs();
+  else if (id === 'quotes') renderQuotes();
+  else if (id === 'payments') renderPayments();
+  else if (id === 'expenses') renderExpenses();
+  else if (id === 'schedule') renderSchedule();
+}
+
+// ---- MODALS ----
+function openModal(type) {
+  const overlay = document.getElementById('modal-' + type);
+  overlay.classList.add('open');
+  // set today's date on date fields
+  const today = new Date().toISOString().split('T')[0];
+  const df = overlay.querySelector('input[type="date"]');
+  if (df && !df.value) df.value = today;
+  // populate customer dropdowns
+  if (['job','quote','payment'].includes(type)) {
+    populateCustomerDropdown(type);
+  }
+}
+
+function closeModal(type) {
+  document.getElementById('modal-' + type).classList.remove('open');
+  resetForm(type);
+}
+
+function resetForm(type) {
+  const m = document.getElementById('modal-' + type);
+  m.querySelectorAll('input[type="text"], input[type="number"], input[type="email"], input[type="tel"], input[type="date"]').forEach(i => i.value = '');
+  m.querySelectorAll('select').forEach(s => s.selectedIndex = 0);
+}
+
+function populateCustomerDropdown(type) {
+  const prefixes = { job: 'job', quote: 'quote', payment: 'pay' };
+  const prefix = prefixes[type];
+  const sel = document.getElementById(prefix + '-customer');
+  sel.innerHTML = data.customers.length === 0
+    ? '<option>No customers yet — add one first</option>'
+    : data.customers.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+}
+
+// Close modal on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) {
+      const type = overlay.id.replace('modal-', '');
+      closeModal(type);
+    }
+  });
+});
+
+// ---- SAVE FUNCTIONS ----
+function saveCustomer() {
+  const name = document.getElementById('cust-name').value.trim();
+  if (!name) { alert('Please enter a name.'); return; }
+  const c = {
+    id: uid(),
+    name,
+    phone: document.getElementById('cust-phone').value.trim(),
+    email: document.getElementById('cust-email').value.trim(),
+    address: document.getElementById('cust-address').value.trim(),
+    service: document.getElementById('cust-service').value,
+    notes: document.getElementById('cust-notes').value.trim(),
+    created: new Date().toISOString()
+  };
+  data.customers.push(c);
+  addActivity(`New customer added: ${c.name}`, c.service);
+  save();
+  closeModal('customer');
+  renderDashboard();
+}
+
+function saveJob() {
+  const custId = document.getElementById('job-customer').value;
+  const price = parseFloat(document.getElementById('job-price').value) || 0;
+  const date = document.getElementById('job-date').value;
+  if (!custId || custId.length < 5) { alert('Please select a customer.'); return; }
+  const cust = data.customers.find(c => c.id === custId);
+  const j = {
+    id: uid(),
+    customerId: custId,
+    customerName: cust ? cust.name : 'Unknown',
+    service: document.getElementById('job-service').value,
+    status: document.getElementById('job-status').value,
+    date,
+    price,
+    notes: document.getElementById('job-notes').value.trim(),
+    photoCount: document.getElementById('job-photos').files.length,
+    created: new Date().toISOString()
+  };
+  data.jobs.push(j);
+  addActivity(`Job scheduled: ${j.customerName}`, `${j.service} · $${j.price.toFixed(2)}`);
+  save();
+  closeModal('job');
+  renderDashboard();
+}
+
+function saveQuote() {
+  const custId = document.getElementById('quote-customer').value;
+  const amount = parseFloat(document.getElementById('quote-amount').value) || 0;
+  if (!custId || custId.length < 5) { alert('Please select a customer.'); return; }
+  const cust = data.customers.find(c => c.id === custId);
+  const q = {
+    id: uid(),
+    customerId: custId,
+    customerName: cust ? cust.name : 'Unknown',
+    service: document.getElementById('quote-service').value,
+    amount,
+    status: document.getElementById('quote-status').value,
+    notes: document.getElementById('quote-notes').value.trim(),
+    date: new Date().toISOString().split('T')[0],
+    created: new Date().toISOString()
+  };
+  data.quotes.push(q);
+  addActivity(`Quote sent: ${q.customerName}`, `${q.service} · $${q.amount.toFixed(2)}`);
+  save();
+  closeModal('quote');
+  renderDashboard();
+}
+
+function savePayment() {
+  const custId = document.getElementById('pay-customer').value;
+  const amount = parseFloat(document.getElementById('pay-amount').value) || 0;
+  if (!custId || custId.length < 5) { alert('Please select a customer.'); return; }
+  const cust = data.customers.find(c => c.id === custId);
+  const p = {
+    id: uid(),
+    customerId: custId,
+    customerName: cust ? cust.name : 'Unknown',
+    amount,
+    date: document.getElementById('pay-date').value,
+    method: document.getElementById('pay-method').value,
+    status: document.getElementById('pay-status').value,
+    notes: document.getElementById('pay-notes').value.trim(),
+    created: new Date().toISOString()
+  };
+  data.payments.push(p);
+  addActivity(`Payment logged: ${p.customerName}`, `$${p.amount.toFixed(2)} · ${p.method}`);
+  save();
+  closeModal('payment');
+  renderDashboard();
+}
+
+function saveExpense() {
+  const amount = parseFloat(document.getElementById('exp-amount').value) || 0;
+  const e = {
+    id: uid(),
+    category: document.getElementById('exp-category').value,
+    amount,
+    date: document.getElementById('exp-date').value,
+    desc: document.getElementById('exp-desc').value.trim(),
+    created: new Date().toISOString()
+  };
+  data.expenses.push(e);
+  addActivity(`Expense logged: ${e.category}`, `-$${e.amount.toFixed(2)}`);
+  save();
+  closeModal('expense');
+  renderDashboard();
+}
+
+// ---- ACTIVITY ----
+function addActivity(text, sub) {
+  data.activity.unshift({ text, sub, time: new Date().toISOString() });
+  if (data.activity.length > 20) data.activity = data.activity.slice(0, 20);
+}
+
+function timeAgo(iso) {
+  const diff = (Date.now() - new Date(iso)) / 1000;
+  if (diff < 60) return 'Just now';
+  if (diff < 3600) return Math.floor(diff/60) + 'm ago';
+  if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
+  return Math.floor(diff/86400) + 'd ago';
+}
+
+// ---- RENDER ----
+function initials(name) {
+  return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+}
+
+function avatarColor(name) {
+  const colors = [
+    {bg:'var(--green-light)',c:'var(--green)'},
+    {bg:'var(--blue-light)',c:'var(--blue)'},
+    {bg:'var(--orange-light)',c:'var(--orange)'}
+  ];
+  let h = 0; for (let ch of name) h += ch.charCodeAt(0);
+  return colors[h % 3];
+}
+
+function statusBadge(status) {
+  const map = {
+    'Completed': 'badge-green', 'Paid': 'badge-green', 'Accepted': 'badge-green',
+    'Scheduled': 'badge-blue', 'In progress': 'badge-blue',
+    'Pending': 'badge-orange', 'Invoiced': 'badge-orange', 'Partial': 'badge-orange',
+    'Declined': 'badge-red', 'Unpaid': 'badge-red'
+  };
+  return map[status] || 'badge-orange';
+}
+
+function fmtDate(d) {
+  if (!d) return '';
+  const dt = new Date(d + 'T00:00:00');
+  return dt.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+}
+
+function renderDashboard() {
+  // Stats
+  const now = new Date();
+  const monthJobs = data.jobs.filter(j => {
+    if (!j.date) return false;
+    const d = new Date(j.date + 'T00:00:00');
+    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+  });
+  const monthRevenue = monthJobs.reduce((s,j) => s + (parseFloat(j.price)||0), 0);
+  document.getElementById('dash-revenue').textContent = '$' + monthRevenue.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+
+  const weekStart = new Date(now); weekStart.setDate(now.getDate() - now.getDay());
+  const weekEnd = new Date(weekStart); weekEnd.setDate(weekStart.getDate() + 6);
+  const weekJobs = data.jobs.filter(j => {
+    if (!j.date) return false;
+    const d = new Date(j.date + 'T00:00:00');
+    return d >= weekStart && d <= weekEnd;
+  });
+  document.getElementById('dash-jobs-week').textContent = weekJobs.length;
+  const done = weekJobs.filter(j => j.status === 'Completed').length;
+  document.getElementById('dash-jobs-sub').textContent = `${done} done · ${weekJobs.length - done} upcoming`;
+
+  const unpaid = data.payments.filter(p => p.status === 'Unpaid');
+  const unpaidTotal = unpaid.reduce((s,p) => s + (parseFloat(p.amount)||0), 0);
+  document.getElementById('dash-unpaid').textContent = '$' + unpaidTotal.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+  document.getElementById('dash-unpaid-sub').textContent = unpaid.length + ' outstanding';
+
+  document.getElementById('dash-customers').textContent = data.customers.length;
+
+  // Activity
+  const actEl = document.getElementById('dash-activity');
+  if (data.activity.length === 0) {
+    actEl.innerHTML = '<div class="empty-state" style="padding:20px"><p>No activity yet. Add a customer to get started!</p></div>';
+  } else {
+    const dotColors = {'New customer':'var(--green)','Job':'var(--blue)','Quote':'var(--orange)','Payment':'var(--green)','Expense':'var(--danger)'};
+    actEl.innerHTML = data.activity.slice(0,6).map(a => {
+      let dc = 'var(--green)';
+      for (const [k,v] of Object.entries(dotColors)) { if (a.text.startsWith(k)) { dc = v; break; } }
+      return `<div class="activity-item">
+        <div class="activity-dot" style="background:${dc}"></div>
+        <div><div class="activity-text">${a.text}</div><div class="activity-sub">${a.sub} · ${timeAgo(a.time)}</div></div>
+      </div>`;
+    }).join('');
+  }
+}
+
+function renderCustomers() {
+  const el = document.getElementById('customer-list');
+  if (data.customers.length === 0) {
+    el.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><p>No customers yet.<br>Tap <strong>Add</strong> to create your first one.</p></div>`;
+    return;
+  }
+  el.innerHTML = data.customers.map(c => {
+    const ac = avatarColor(c.name);
+    const lastJob = data.jobs.filter(j => j.customerId === c.id).sort((a,b) => new Date(b.date) - new Date(a.date))[0];
+    return `<div class="card card-sm">
+      <div class="cust-row">
+        <div class="avatar" style="background:${ac.bg};color:${ac.c}">${initials(c.name)}</div>
+        <div class="cust-info">
+          <div class="cust-name">${c.name}</div>
+          <div class="cust-detail">${c.phone || c.email || c.address || 'No contact info'}</div>
+          <div class="cust-detail">${c.service}${lastJob ? ' · Last job ' + fmtDate(lastJob.date) : ''}</div>
+        </div>
+        ${c.notes ? `<span class="badge badge-blue" style="flex-shrink:0">Note</span>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderJobs() {
+  const el = document.getElementById('job-list');
+  if (data.jobs.length === 0) {
+    el.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg><p>No jobs yet.<br>Tap <strong>Add</strong> to log your first job.</p></div>`;
+    return;
+  }
+  const sorted = [...data.jobs].sort((a,b) => new Date(b.date) - new Date(a.date));
+  el.innerHTML = sorted.map(j => `
+    <div class="card">
+      <div class="job-header">
+        <div>
+          <div class="job-title">${j.customerName}</div>
+          <div class="job-sub">${j.service} · ${fmtDate(j.date)}</div>
+        </div>
+        <span class="badge ${statusBadge(j.status)}">${j.status}</span>
+      </div>
+      <div class="data-row"><span class="data-row-label">Price</span><span class="data-row-value">$${(parseFloat(j.price)||0).toFixed(2)}</span></div>
+      ${j.photoCount > 0 ? `<div class="data-row"><span class="data-row-label">Photos</span><span class="data-row-value" style="color:var(--blue)">${j.photoCount} attached</span></div>` : ''}
+      ${j.notes ? `<div class="data-row"><span class="data-row-label">Notes</span><span class="data-row-value" style="font-weight:400;color:var(--text-muted)">${j.notes}</span></div>` : ''}
+    </div>`).join('');
+}
+
+function renderQuotes() {
+  const el = document.getElementById('quote-list');
+  if (data.quotes.length === 0) {
+    el.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><p>No quotes yet.<br>Tap <strong>New</strong> to create one.</p></div>`;
+    return;
+  }
+  el.innerHTML = [...data.quotes].sort((a,b) => new Date(b.created) - new Date(a.created)).map(q => `
+    <div class="card">
+      <div class="job-header">
+        <div>
+          <div class="job-title">${q.customerName}</div>
+          <div class="job-sub">Sent ${fmtDate(q.date)}</div>
+        </div>
+        <span class="badge ${statusBadge(q.status)}">${q.status}</span>
+      </div>
+      <div class="data-row"><span class="data-row-label">Service</span><span class="data-row-value">${q.service}</span></div>
+      <div class="data-row"><span class="data-row-label">Amount</span><span class="data-row-value">$${(parseFloat(q.amount)||0).toFixed(2)}</span></div>
+      ${q.notes ? `<div class="data-row"><span class="data-row-label">Notes</span><span class="data-row-value" style="font-weight:400;color:var(--text-muted)">${q.notes}</span></div>` : ''}
+    </div>`).join('');
+}
+
+function renderPayments() {
+  const el = document.getElementById('payment-list');
+  if (data.payments.length === 0) {
+    el.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><p>No payments logged yet.</p></div>`;
+    return;
+  }
+  el.innerHTML = [...data.payments].sort((a,b) => new Date(b.created) - new Date(a.created)).map(p => `
+    <div class="card card-sm">
+      <div class="data-row"><span class="data-row-label">${p.customerName}</span><span class="data-row-value" style="color:${p.status==='Paid'?'var(--green)':'var(--danger)'}">$${(parseFloat(p.amount)||0).toFixed(2)}</span></div>
+      <div class="data-row"><span class="data-row-label">${fmtDate(p.date)} · ${p.method}</span><span class="data-row-value"><span class="badge ${statusBadge(p.status)}">${p.status}</span></span></div>
+      ${p.notes ? `<div class="data-row"><span class="data-row-label">Note</span><span class="data-row-value" style="font-weight:400;color:var(--text-muted)">${p.notes}</span></div>` : ''}
+    </div>`).join('');
+}
+
+function renderExpenses() {
+  const el = document.getElementById('expense-list');
+  if (data.expenses.length === 0) {
+    el.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg><p>No expenses logged yet.</p></div>`;
+    return;
+  }
+  const now = new Date();
+  const monthExp = data.expenses.filter(e => {
+    if (!e.date) return true;
+    const d = new Date(e.date + 'T00:00:00');
+    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+  });
+  const total = monthExp.reduce((s,e) => s + (parseFloat(e.amount)||0), 0);
+  const sorted = [...data.expenses].sort((a,b) => new Date(b.created) - new Date(a.created));
+  el.innerHTML = `<div class="card">` +
+    sorted.map(e => `
+      <div class="data-row">
+        <span class="data-row-label">${e.category}${e.desc ? ' · ' + e.desc : ''}</span>
+        <span class="data-row-value" style="color:var(--danger)">-$${(parseFloat(e.amount)||0).toFixed(2)}</span>
+      </div>`).join('') +
+    `<div class="exp-total"><span style="font-size:14px;font-weight:700">This month</span><span style="font-size:16px;font-weight:700;color:var(--danger)">-$${total.toFixed(2)}</span></div>
+    </div>`;
+}
+
+function renderSchedule() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('cal-month-title').textContent = months[month] + ' ' + year;
+
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const today = now.getDate();
+
+  // job dates this month
+  const jobDates = new Set(data.jobs.filter(j => {
+    if (!j.date) return false;
+    const d = new Date(j.date + 'T00:00:00');
+    return d.getMonth() === month && d.getFullYear() === year;
+  }).map(j => parseInt(j.date.split('-')[2])));
+
+  const days = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+  let html = days.map(d => `<div class="cal-day-label">${d}</div>`).join('');
+  for (let i = 0; i < firstDay; i++) html += `<div class="cal-day empty"></div>`;
+  for (let d = 1; d <= daysInMonth; d++) {
+    let cls = 'cal-day';
+    if (d === today) cls += ' today';
+    else if (jobDates.has(d)) cls += ' has-job';
+    html += `<div class="${cls}">${d}</div>`;
+  }
+  document.getElementById('cal-grid').innerHTML = html;
+
+  // Upcoming jobs
+  const upcoming = data.jobs.filter(j => {
+    if (!j.date) return false;
+    return new Date(j.date + 'T00:00:00') >= new Date(now.toDateString());
+  }).sort((a,b) => new Date(a.date) - new Date(b.date)).slice(0, 5);
+
+  const upEl = document.getElementById('upcoming-jobs');
+  if (upcoming.length === 0) {
+    upEl.innerHTML = `<div class="card card-sm" style="color:var(--text-muted);font-size:13px;text-align:center;padding:20px">No upcoming jobs scheduled</div>`;
+  } else {
+    upEl.innerHTML = upcoming.map(j => `
+      <div class="card card-sm">
+        <div class="data-row">
+          <span class="data-row-label">${fmtDate(j.date)}</span>
+          <span class="badge ${statusBadge(j.status)}">${j.status}</span>
+        </div>
+        <div class="data-row">
+          <span class="data-row-label">${j.customerName}</span>
+          <span class="data-row-value">$${(parseFloat(j.price)||0).toFixed(2)}</span>
+        </div>
+        <div style="font-size:12px;color:var(--text-muted);padding-top:4px">${j.service}</div>
+      </div>`).join('');
+  }
+}
+
+// ---- TOPBAR DATE ----
+function setDate() {
+  const now = new Date();
+  document.getElementById('topbarDate').innerHTML =
+    now.toLocaleDateString('en-US', {weekday:'short', month:'short', day:'numeric'});
+}
+
+// ---- INIT ----
+load();
+setDate();
+renderDashboard();
+</script>
+</body>
+</html>
