@@ -645,7 +645,12 @@
 <div class="modal-overlay" id="modal-send-referral">
   <div class="modal">
     <div class="modal-title">Send referral form</div>
-    <div class="form-group"><label class="form-label">Customer to send to</label><select class="form-input" id="ref-customer"></select></div>
+    <div class="form-group" style="position:relative">
+      <label class="form-label">Customer to send to</label>
+      <input class="form-input" id="ref-customer-search" type="text" placeholder="Type a name..." autocomplete="off" oninput="filterRefCustomers(this.value)" onfocus="filterRefCustomers(this.value)">
+      <input type="hidden" id="ref-customer">
+      <div id="ref-customer-results" style="display:none;position:absolute;top:100%;left:0;right:0;z-index:50;background:var(--bg);border:1px solid var(--green);border-radius:var(--radius-sm);box-shadow:var(--glow-green);max-height:180px;overflow-y:auto;margin-top:4px"></div>
+    </div>
     <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.5">This sends a link where your customer can list up to 10 friends/family (name + phone) they'd refer you to. Submissions land directly in your Leads tab.</div>
     <div class="modal-actions"><button class="btn-secondary" onclick="closeModal('send-referral')">Cancel</button><button class="btn-primary" onclick="sendReferralForm()">Send form</button></div>
   </div>
@@ -805,8 +810,9 @@ window.openModal=function(type){
   if(df&&!df.value)df.value=today;
   if(['schedule-job','payment'].includes(type))populateCustomerDropdown(type);
   if(type==='send-referral'){
-    const sel=document.getElementById('ref-customer');
-    sel.innerHTML=data.customers.length===0?'<option>No customers yet</option>':data.customers.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');
+    document.getElementById('ref-customer-search').value='';
+    document.getElementById('ref-customer').value='';
+    document.getElementById('ref-customer-results').style.display='none';
   }
 };
 window.closeModal=function(type){
@@ -1084,6 +1090,35 @@ window.switchHomeTab=function(tab){
   if(tab==='rev')renderRevenue();
 };
 
+// REFERRAL CUSTOMER SEARCH
+window.filterRefCustomers=function(query){
+  const resultsEl=document.getElementById('ref-customer-results');
+  const q=query.trim().toLowerCase();
+  if(!q){resultsEl.style.display='none';resultsEl.innerHTML='';return;}
+  const matches=data.customers.filter(c=>c.name.toLowerCase().includes(q));
+  if(matches.length===0){
+    resultsEl.innerHTML=`<div style="padding:10px 12px;font-size:12px;color:var(--text-muted)">No matching customers</div>`;
+    resultsEl.style.display='block';
+    return;
+  }
+  resultsEl.innerHTML=matches.map(c=>`<div onclick="selectRefCustomer('${c.id}','${esc(c.name).replace(/'/g,"\\'")}')" style="padding:10px 12px;font-size:13px;color:var(--text);cursor:pointer;border-bottom:1px solid var(--border)">${esc(c.name)}${c.email?`<span style="color:var(--text-muted);font-size:11px"> · ${esc(c.email)}</span>`:''}</div>`).join('');
+  resultsEl.style.display='block';
+};
+
+window.selectRefCustomer=function(id,name){
+  document.getElementById('ref-customer-search').value=name;
+  document.getElementById('ref-customer').value=id;
+  document.getElementById('ref-customer-results').style.display='none';
+};
+
+document.addEventListener('click',e=>{
+  const wrap=document.getElementById('ref-customer-search');
+  const results=document.getElementById('ref-customer-results');
+  if(wrap&&results&&!wrap.contains(e.target)&&!results.contains(e.target)){
+    results.style.display='none';
+  }
+});
+
 // REFERRAL FORM SEND
 window.sendReferralForm=async function(){
   const custId=document.getElementById('ref-customer').value;
@@ -1123,7 +1158,19 @@ function leadStatusColor(s){const m={'No Answer':'orange','2nd Call':'blue','3rd
 function renderLeads(){
   const el=document.getElementById('leads-list');if(!el)return;
   if(data.leads.length===0){el.innerHTML=`<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><p>No leads yet.<br>Send a referral form to get started.</p></div>`;return;}
-  el.innerHTML=[...data.leads].sort((a,b)=>new Date(b.created)-new Date(a.created)).map(batch=>{
+
+  // Bulk delete-by-status bar
+  const bulkBar=`<div class="card" style="padding:10px 12px;margin-bottom:10px">
+    <div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px">Bulk delete by status</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+      ${LEAD_STATUSES.map(s=>{
+        const cls=leadStatusColor(s);
+        return`<button class="btn-secondary" style="font-size:10px;padding:6px 10px;border-color:var(--${cls});color:var(--${cls})" onclick="deleteLeadsByStatus('${s}')">Clear ${s}</button>`;
+      }).join('')}
+    </div>
+  </div>`;
+
+  const cards=[...data.leads].sort((a,b)=>new Date(b.created)-new Date(a.created)).map(batch=>{
     const names=batch.names||[];
     return`<div class="lead-card">
       <div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:8px;text-shadow:0 0 5px rgba(74,159,212,0.4)">Referred by ${esc(batch.fromName||'Unknown')} · ${timeAgo(batch.created)}</div>
@@ -1136,14 +1183,49 @@ function renderLeads(){
             <div class="lead-phone">${esc(n.phone||'No number')}</div>
             ${status==='Call Back'&&n.callbackDate?`<div class="lead-callback-row"><span style="font-size:10px;color:var(--purple)">📅 ${fmtDate(n.callbackDate)}</span></div>`:''}
           </div>
-          <select class="lead-status-select" style="border-color:var(--${cls});color:var(--${cls})" onchange="updateLeadStatus('${batch.id}',${i},this.value)">
-            ${LEAD_STATUSES.map(s=>`<option ${status===s?'selected':''}>${s}</option>`).join('')}
-          </select>
+          <div style="display:flex;align-items:center;gap:6px">
+            <select class="lead-status-select" style="border-color:var(--${cls});color:var(--${cls})" onchange="updateLeadStatus('${batch.id}',${i},this.value)">
+              ${LEAD_STATUSES.map(s=>`<option ${status===s?'selected':''}>${s}</option>`).join('')}
+            </select>
+            <button onclick="deleteLead('${batch.id}',${i})" style="background:var(--red-dim);border:1px solid var(--red);color:var(--red);border-radius:6px;width:26px;height:26px;font-size:14px;cursor:pointer;flex-shrink:0;box-shadow:var(--glow-red)">✕</button>
+          </div>
         </div>`;
       }).join('')}
     </div>`;
   }).join('');
+
+  el.innerHTML=bulkBar+cards;
 }
+
+window.deleteLead=async function(batchId,idx){
+  if(!confirm('Delete this lead?'))return;
+  const batch=data.leads.find(b=>b.id===batchId);if(!batch)return;
+  const names=[...(batch.names||[])];
+  names.splice(idx,1);
+  if(names.length===0){
+    await fbDelete('leads',batchId);
+  }else{
+    await fbUpdate('leads',batchId,{names});
+  }
+  toast('Lead deleted');
+};
+
+window.deleteLeadsByStatus=async function(status){
+  let count=0;
+  data.leads.forEach(b=>{(b.names||[]).forEach(n=>{if((n.status||'No Answer')===status)count++;});});
+  if(count===0){toast('No leads with that status');return;}
+  if(!confirm(`Delete all ${count} lead(s) marked "${status}"?`))return;
+  for(const batch of data.leads){
+    const names=(batch.names||[]).filter(n=>(n.status||'No Answer')!==status);
+    if(names.length===(batch.names||[]).length)continue;
+    if(names.length===0){
+      await fbDelete('leads',batch.id);
+    }else{
+      await fbUpdate('leads',batch.id,{names});
+    }
+  }
+  toast(`Cleared ${count} "${status}" lead(s)`);
+};
 
 window.updateLeadStatus=async function(batchId,idx,newStatus){
   const batch=data.leads.find(b=>b.id===batchId);if(!batch)return;
