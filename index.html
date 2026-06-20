@@ -6,327 +6,474 @@
 <title>Smudge Busters CRM</title>
 <style>
   :root {
-    --green: #2a7d4f;
-    --green-light: #e8f5ee;
-    --green-mid: #4caf80;
-    --blue: #1a6fa8;
-    --blue-light: #e6f2fb;
-    --blue-mid: #4a9fd4;
-    --orange: #e07b2a;
-    --orange-light: #fef3e8;
-    --orange-mid: #f0a060;
-    --bg: #f4f7f5;
-    --surface: #ffffff;
-    --border: #e0e8e4;
-    --text: #1a2e24;
-    --text-muted: #6b8c7a;
-    --text-light: #9ab5a5;
-    --danger: #c0392b;
-    --danger-light: #fdecea;
-    --radius-sm: 8px;
-    --radius-md: 12px;
-    --radius-lg: 16px;
-    --nav-height: 64px;
-    --topbar-height: 56px;
+    --green:#4caf80;--green-dark:#2a7d4f;--green-dim:#0d1f0f;--green-border:#1e3d1e;
+    --blue:#4a9fd4;--blue-dark:#1a6fa8;--blue-dim:#0d1520;--blue-border:#1e2d40;
+    --orange:#f0a060;--orange-dark:#e07b2a;--orange-dim:#1a0d00;--orange-border:#3d2010;
+    --red:#e57373;--red-dark:#c0392b;--red-dim:#1a0d0d;--red-border:#3d1e1e;
+    --purple:#b388ff;--purple-dim:#110d1a;--purple-border:#2d1e3d;
+    --bg:#0a0f0a;--surface:#0d1a0f;--border:#1e3528;
+    --text:#e8f5ee;--text-muted:#4a7a5a;--text-dim:#2a4a3a;
+    --glow-green:0 0 8px rgba(76,175,128,0.4);
+    --glow-blue:0 0 8px rgba(74,159,212,0.4);
+    --glow-orange:0 0 8px rgba(240,160,96,0.4);
+    --glow-red:0 0 8px rgba(229,115,115,0.4);
+    --glow-purple:0 0 8px rgba(179,136,255,0.4);
+    --nav-height:60px;--topbar-height:52px;
+    --radius-sm:8px;--radius-md:12px;--radius-lg:14px;
   }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+  .app-wrap{width:100%;max-width:100%;background:var(--bg);position:relative;min-height:100vh;}
 
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
+  /* LOADING */
+  #loading-screen{position:absolute;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;transition:opacity 0.4s;}
+  #loading-screen.fade-out{opacity:0;pointer-events:none;}
+  .loading-logo{font-size:48px;margin-bottom:12px;}
+  .loading-name-wrap{margin-bottom:6px;}
+  .loading-smudge{font-size:28px;font-weight:900;font-style:italic;color:var(--blue);text-shadow:0 0 12px var(--blue),0 0 30px rgba(74,159,212,0.5);}
+  .loading-busters{font-size:28px;font-weight:900;font-style:italic;color:var(--orange);text-shadow:0 0 12px var(--orange),0 0 30px rgba(240,160,96,0.5);}
+  .loading-sub{font-size:11px;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:32px;}
+  .loading-spinner{width:28px;height:28px;border:2px solid var(--border);border-top-color:var(--green);border-radius:50%;animation:spin 0.8s linear infinite;box-shadow:var(--glow-green);}
+  .loading-status{font-size:11px;color:var(--text-muted);margin-top:12px;}
+  @keyframes spin{to{transform:rotate(360deg);}}
 
   /* TOPBAR */
-  .topbar {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-    height: var(--topbar-height);
-    background: var(--green);
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 0 16px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-  }
-  .topbar-brand { display: flex; align-items: center; gap: 10px; }
-  .topbar-logo {
-    width: 34px; height: 34px; border-radius: 10px;
-    background: rgba(255,255,255,0.2);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px;
-  }
-  .topbar-name { font-size: 18px; font-weight: 700; color: #fff; letter-spacing: -0.3px; }
-  .topbar-sub { font-size: 11px; color: rgba(255,255,255,0.75); }
-  .topbar-date { font-size: 12px; color: rgba(255,255,255,0.8); text-align: right; }
+  .topbar{position:sticky;top:0;left:0;right:0;z-index:100;height:var(--topbar-height);background:var(--bg);display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-bottom:1px solid var(--green);box-shadow:0 1px 12px rgba(76,175,128,0.25),0 2px 24px rgba(76,175,128,0.1);}
+  .topbar-name{font-size:20px;font-weight:900;font-style:italic;letter-spacing:-1.5px;line-height:1;}
+  .topbar-smudge{color:var(--blue);text-shadow:0 0 8px var(--blue),0 0 20px rgba(74,159,212,0.5);}
+  .topbar-busters{color:var(--orange);text-shadow:0 0 8px var(--orange),0 0 20px rgba(240,160,96,0.5);}
+  .topbar-sub{font-size:7px;color:var(--text-muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:1px;}
+  .topbar-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;}
+  .sync-dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green),0 0 14px rgba(76,175,128,0.4);}
+  .sync-dot.syncing{background:var(--orange);box-shadow:0 0 6px var(--orange);animation:pulse 1s infinite;}
+  .sync-dot.error{background:var(--red);box-shadow:0 0 6px var(--red);}
+  .topbar-date{font-size:9px;color:var(--text-muted);}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
 
   /* NAV */
-  .nav {
-    position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
-    height: var(--nav-height);
-    background: var(--surface);
-    border-top: 1px solid var(--border);
-    display: flex;
-    padding-bottom: env(safe-area-inset-bottom, 0);
-  }
-  .nav-btn {
-    flex: 1; border: none; background: none; cursor: pointer;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 3px; padding: 8px 2px;
-    color: var(--text-muted); font-size: 10px; font-weight: 500;
-    transition: color 0.15s;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .nav-btn svg { width: 22px; height: 22px; stroke-width: 1.8; }
-  .nav-btn.active { color: var(--green); }
-  .nav-btn.active svg { stroke-width: 2.2; }
+  .nav{position:sticky;bottom:0;z-index:100;height:var(--nav-height);background:var(--bg);border-top:1px solid var(--green);box-shadow:0 -1px 12px rgba(76,175,128,0.2);display:flex;padding-bottom:env(safe-area-inset-bottom,0);}
+  .nav-btn{flex:1;border:none;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:8px 2px;color:var(--text-muted);font-size:10px;font-weight:500;}
+  .nav-btn svg{width:20px;height:20px;stroke-width:1.8;}
+  .nav-btn.active{color:var(--green);text-shadow:0 0 6px rgba(76,175,128,0.6);}
+  .nav-btn.active svg{stroke-width:2.2;filter:drop-shadow(0 0 4px rgba(76,175,128,0.6));}
+  .nb-line{width:18px;height:2px;border-radius:2px;background:var(--border);margin:0 auto 1px;}
+  .nav-btn.active .nb-line{background:var(--green);box-shadow:0 0 6px var(--green),0 0 12px rgba(76,175,128,0.4);}
 
   /* CONTENT */
-  .content {
-    padding-top: calc(var(--topbar-height) + 12px);
-    padding-bottom: calc(var(--nav-height) + 16px);
-    padding-left: 14px; padding-right: 14px;
-    min-height: 100vh;
-  }
-  .section { display: none; }
-  .section.active { display: block; }
+  .content{padding:12px 12px 16px;min-height:calc(100vh - var(--topbar-height) - var(--nav-height));overflow-y:auto;}
+  .section{display:none;}.section.active{display:block;}
 
   /* CARDS */
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 14px;
-    margin-bottom: 10px;
-  }
-  .card-sm { padding: 10px 14px; }
+  .card{background:var(--surface);border:1px solid var(--green);border-radius:var(--radius-lg);padding:13px;margin-bottom:8px;box-shadow:var(--glow-green);}
+  .card.blue{border-color:var(--blue);box-shadow:var(--glow-blue);}
+  .card.orange{border-color:var(--orange);box-shadow:var(--glow-orange);}
+  .card.red{border-color:var(--red);box-shadow:var(--glow-red);}
+  .card.purple{border-color:var(--purple);box-shadow:var(--glow-purple);}
+  .card-tap{cursor:pointer;transition:opacity 0.15s;}
+  .card-tap:active{opacity:0.8;}
 
-  /* STAT GRID */
-  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
-  .stat-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius-md); padding: 14px;
+  /* GAUGE GRID */
+  .gauge-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;}
+  .content{padding:12px 12px 16px;min-height:calc(100vh - var(--topbar-height) - var(--nav-height));overflow-y:auto;}
+  @media(min-width:600px){
+    .gauge-grid{grid-template-columns:repeat(4,1fr);}
+    .quick-grid{grid-template-columns:repeat(4,1fr);}
+    .content{padding:16px 20px 20px;}
+    .gc{height:110px;}
   }
-  .stat-label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
-  .stat-value { font-size: 24px; font-weight: 700; color: var(--text); }
-  .stat-sub { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
-  .stat-card.accent-green { border-top: 3px solid var(--green); }
-  .stat-card.accent-blue { border-top: 3px solid var(--blue); }
-  .stat-card.accent-orange { border-top: 3px solid var(--orange); }
-  .stat-card.accent-red { border-top: 3px solid var(--danger); }
+  @media(min-width:900px){
+    .content{padding:20px 32px 24px;}
+  }
+  .gc{border-radius:var(--radius-md);overflow:hidden;position:relative;height:86px;}
+  .gc-rev{background:var(--green-dim);border:1px solid var(--green);box-shadow:var(--glow-green),inset 0 0 12px rgba(76,175,128,0.05);}
+  .gc-job{background:var(--blue-dim);border:1px solid var(--blue);box-shadow:var(--glow-blue),inset 0 0 12px rgba(74,159,212,0.05);}
+  .gc-unp{background:var(--red-dim);border:1px solid var(--red);box-shadow:var(--glow-red),inset 0 0 12px rgba(229,115,115,0.05);}
+  .gc-cus{background:var(--purple-dim);border:1px solid var(--purple);box-shadow:var(--glow-purple),inset 0 0 12px rgba(179,136,255,0.05);}
+  .cash-bg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0.07;font-size:48px;font-weight:900;overflow:hidden;}
+  .gi{position:relative;z-index:2;padding:9px;height:100%;display:flex;flex-direction:column;justify-content:space-between;}
+  .gl{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;}
+  .gv{font-size:20px;font-weight:900;letter-spacing:-1px;}
+  .gbar{height:3px;border-radius:2px;margin-top:3px;position:relative;}
+  .gneedle{position:absolute;top:-3px;width:2px;height:9px;background:#fff;border-radius:1px;}
+  .gs{font-size:8px;margin-top:3px;}
 
-  /* SECTION HEADER */
-  .sec-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-  .sec-title { font-size: 18px; font-weight: 700; color: var(--text); }
+  /* SEC HEADER */
+  .sec-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+  .sec-title{font-size:20px;font-weight:900;color:var(--text);letter-spacing:-0.5px;}
 
   /* BUTTONS */
-  .btn-primary {
-    background: var(--green); color: #fff; border: none;
-    border-radius: var(--radius-sm); padding: 9px 16px;
-    font-size: 13px; font-weight: 600; cursor: pointer;
-    display: inline-flex; align-items: center; gap: 6px;
-    transition: opacity 0.15s;
-  }
-  .btn-primary:active { opacity: 0.85; }
-  .btn-secondary {
-    background: var(--surface); color: var(--text); border: 1px solid var(--border);
-    border-radius: var(--radius-sm); padding: 8px 14px;
-    font-size: 13px; font-weight: 500; cursor: pointer;
-    display: inline-flex; align-items: center; gap: 6px;
-  }
-  .btn-orange { background: var(--orange); color: #fff; border: none; border-radius: var(--radius-sm); padding: 9px 16px; font-size: 13px; font-weight: 600; cursor: pointer; }
-  .btn-blue { background: var(--blue); color: #fff; border: none; border-radius: var(--radius-sm); padding: 9px 16px; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .btn-primary{background:var(--green-dark);color:#fff;border:1px solid var(--green);border-radius:var(--radius-sm);padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:5px;box-shadow:var(--glow-green);}
+  .btn-primary:active{opacity:0.8;}
+  .btn-secondary{background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:5px;}
+  .btn-danger{background:var(--red-dim);color:var(--red);border:1px solid var(--red);border-radius:var(--radius-sm);padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;box-shadow:var(--glow-red);}
+  .btn-blue{background:var(--blue-dim);color:var(--blue);border:1px solid var(--blue);border-radius:var(--radius-sm);padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;box-shadow:var(--glow-blue);}
+  .btn-orange{background:var(--orange-dim);color:var(--orange);border:1px solid var(--orange);border-radius:var(--radius-sm);padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;box-shadow:var(--glow-orange);}
 
   /* BADGES */
-  .badge { font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 20px; white-space: nowrap; }
-  .badge-green { background: var(--green-light); color: var(--green); }
-  .badge-blue { background: var(--blue-light); color: var(--blue); }
-  .badge-orange { background: var(--orange-light); color: var(--orange); }
-  .badge-red { background: var(--danger-light); color: var(--danger); }
+  .badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;white-space:nowrap;}
+  .badge-green{background:rgba(76,175,128,0.15);color:var(--green);box-shadow:var(--glow-green);}
+  .badge-blue{background:rgba(74,159,212,0.15);color:var(--blue);box-shadow:var(--glow-blue);}
+  .badge-orange{background:rgba(240,160,96,0.15);color:var(--orange);box-shadow:var(--glow-orange);}
+  .badge-red{background:rgba(229,115,115,0.15);color:var(--red);box-shadow:var(--glow-red);}
+  .badge-purple{background:rgba(179,136,255,0.15);color:var(--purple);box-shadow:var(--glow-purple);}
 
-  /* ROWS */
-  .data-row {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px;
-  }
-  .data-row:last-child { border-bottom: none; }
-  .data-row-label { color: var(--text-muted); }
-  .data-row-value { color: var(--text); font-weight: 500; }
+  /* DATA ROWS */
+  .data-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;}
+  .data-row:last-child{border-bottom:none;}
+  .data-row-label{color:var(--text-muted);}
+  .data-row-value{color:var(--text);font-weight:600;}
 
   /* AVATAR */
-  .avatar {
-    width: 40px; height: 40px; border-radius: 50%;
-    background: var(--green-light); color: var(--green);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 13px; font-weight: 700; flex-shrink: 0;
-  }
+  .avatar{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;}
 
-  /* CUSTOMER CARD */
-  .cust-row { display: flex; align-items: center; gap: 12px; }
-  .cust-info { flex: 1; min-width: 0; }
-  .cust-name { font-size: 15px; font-weight: 600; color: var(--text); }
-  .cust-detail { font-size: 12px; color: var(--text-muted); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  /* CONTACT BUTTONS */
+  .contact-actions{display:flex;gap:8px;margin-top:10px;}
+  .contact-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 4px;border-radius:var(--radius-sm);background:var(--surface);cursor:pointer;font-size:10px;font-weight:700;text-decoration:none;}
+  .contact-btn svg{width:18px;height:18px;}
+  .contact-btn.call{color:var(--green);border:1px solid var(--green);box-shadow:var(--glow-green);}
+  .contact-btn.sms{color:var(--blue);border:1px solid var(--blue);box-shadow:var(--glow-blue);}
+  .contact-btn.email{color:var(--orange);border:1px solid var(--orange);box-shadow:var(--glow-orange);}
 
-  /* JOB CARD */
-  .job-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
-  .job-title { font-size: 15px; font-weight: 600; color: var(--text); }
-  .job-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  /* SERVICE CHECKS */
+  .service-checks{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .check-item{display:flex;align-items:center;gap:8px;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;font-size:12px;color:var(--text-muted);background:var(--surface);}
+  .check-item.checked{border-color:var(--green);color:var(--green);font-weight:700;box-shadow:var(--glow-green);}
+  .check-box{width:18px;height:18px;border:1px solid var(--border);border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .check-item.checked .check-box{background:var(--green-dark);border-color:var(--green);box-shadow:var(--glow-green);}
+  .check-mark{display:none;color:#fff;font-size:11px;font-weight:800;}
+  .check-item.checked .check-mark{display:block;}
+
+  /* QUOTE SERVICE ROWS */
+  .qsvc-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);}
+  .qsvc-row:last-child{border-bottom:none;}
+  .qsvc-name{flex:1;font-size:13px;color:var(--text-muted);}
+  .qsvc-name.sel{color:var(--green);font-weight:700;text-shadow:0 0 6px rgba(76,175,128,0.3);}
+  .qsvc-price{width:80px;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-weight:700;color:var(--text);text-align:right;background:var(--bg);}
+  .qsvc-price:focus{outline:none;border-color:var(--green);box-shadow:var(--glow-green);}
+
+  /* MODAL */
+  .modal-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.7);align-items:flex-end;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:#0d1a0f;border-radius:var(--radius-lg) var(--radius-lg) 0 0;border:1px solid var(--green);border-bottom:none;box-shadow:0 -4px 24px rgba(76,175,128,0.2);padding:20px 16px 32px;width:100%;max-height:90vh;overflow-y:auto;}
+  .modal-title{font-size:18px;font-weight:900;color:var(--text);margin-bottom:16px;letter-spacing:-0.3px;}
+  .form-group{margin-bottom:13px;}
+  .form-label{font-size:10px;font-weight:700;color:var(--text-muted);margin-bottom:5px;display:block;text-transform:uppercase;letter-spacing:0.5px;}
+  .form-input{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;color:var(--text);background:var(--bg);outline:none;transition:border-color 0.15s,box-shadow 0.15s;}
+  .form-input:focus{border-color:var(--green);box-shadow:var(--glow-green);}
+  select.form-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%234a7a5a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px;}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .modal-actions{display:flex;gap:10px;margin-top:18px;}
+  .modal-actions .btn-primary{flex:1;justify-content:center;}
+  .modal-actions .btn-secondary{flex:1;justify-content:center;}
+
+  /* DETAIL SHEETS */
+  .detail-sheet{display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.7);align-items:flex-end;}
+  .detail-sheet.open{display:flex;}
+  .detail-body{background:#0d1a0f;border-radius:var(--radius-lg) var(--radius-lg) 0 0;border:1px solid var(--green);border-bottom:none;box-shadow:0 -4px 24px rgba(76,175,128,0.2);width:100%;max-height:88vh;overflow-y:auto;}
+  .detail-handle{width:40px;height:3px;background:var(--green);border-radius:2px;margin:12px auto 0;box-shadow:var(--glow-green);}
+  .detail-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 12px;border-bottom:1px solid var(--border);}
+  .detail-title{font-size:17px;font-weight:900;color:var(--text);}
+  .detail-close{background:var(--surface);border:1px solid var(--border);border-radius:50%;width:30px;height:30px;cursor:pointer;font-size:16px;color:var(--text-muted);display:flex;align-items:center;justify-content:center;}
+  .detail-content{padding:14px;}
+  .detail-section{margin-bottom:18px;}
+  .detail-section-title{font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;text-shadow:0 0 6px rgba(76,175,128,0.4);}
+  .detail-field{display:flex;justify-content:space-between;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;}
+  .detail-field:last-child{border-bottom:none;}
+  .detail-field-label{color:var(--text-muted);flex-shrink:0;margin-right:12px;}
+  .detail-field-value{color:var(--text);font-weight:600;text-align:right;}
+  .detail-actions{display:flex;gap:10px;padding:0 16px 24px;}
+  .detail-actions .btn-primary{flex:1;justify-content:center;}
+  .detail-actions .btn-danger{flex:1;justify-content:center;}
+  .edit-input{width:100%;padding:8px 10px;border:1px solid var(--green);border-radius:var(--radius-sm);font-size:13px;color:var(--text);background:var(--bg);outline:none;box-shadow:var(--glow-green);}
+  select.edit-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%234a7a5a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:30px;}
+
+  /* JOB ROWS */
+  .jrow{background:var(--surface);border:1px solid var(--green);border-radius:var(--radius-md);padding:10px 12px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;box-shadow:var(--glow-green);cursor:pointer;}
+  .jrow.blue{border-color:var(--blue);box-shadow:var(--glow-blue);}
+  .jrow.orange{border-color:var(--orange);box-shadow:var(--glow-orange);}
+  .jrow:active{opacity:0.8;}
+  .jname{font-size:13px;font-weight:700;color:var(--text);}
+  .jdet{font-size:10px;color:var(--text-muted);margin-top:2px;}
+  .jtime{font-size:11px;font-weight:800;color:var(--green);text-align:right;text-shadow:0 0 6px rgba(76,175,128,0.5);}
+  .jtime.blue{color:var(--blue);text-shadow:0 0 6px rgba(74,159,212,0.5);}
+  .jdot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green),0 0 12px rgba(76,175,128,0.4);flex-shrink:0;margin-right:8px;margin-top:3px;}
+  .jdot.blue{background:var(--blue);box-shadow:0 0 6px var(--blue),0 0 12px rgba(74,159,212,0.4);}
+  .jdot.orange{background:var(--orange);box-shadow:0 0 6px var(--orange);}
+
+  /* DAY LABEL */
+  .day-label{font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:0.8px;margin:12px 0 6px;text-shadow:0 0 6px rgba(76,175,128,0.4);}
+
+  /* SERVICE TAGS */
+  .svc-tag{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin:2px 2px 2px 0;}
+  .svc-tag.green{background:rgba(76,175,128,0.15);color:var(--green);box-shadow:0 0 4px rgba(76,175,128,0.2);}
+  .svc-tag.blue{background:rgba(74,159,212,0.15);color:var(--blue);box-shadow:0 0 4px rgba(74,159,212,0.2);}
+  .svc-tag.orange{background:rgba(240,160,96,0.15);color:var(--orange);box-shadow:0 0 4px rgba(240,160,96,0.2);}
 
   /* CALENDAR */
-  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; margin-bottom: 16px; }
-  .cal-day-label { font-size: 10px; color: var(--text-muted); text-align: center; padding: 4px 0; font-weight: 600; }
-  .cal-day { font-size: 12px; text-align: center; padding: 7px 2px; border-radius: var(--radius-sm); color: var(--text-muted); cursor: pointer; }
-  .cal-day.empty { cursor: default; }
-  .cal-day.has-job { background: var(--green-light); color: var(--green); font-weight: 600; }
-  .cal-day.today { background: var(--green); color: #fff; font-weight: 700; }
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:14px;}
+  .cal-day-label{font-size:10px;color:var(--text-muted);text-align:center;padding:3px 0;font-weight:700;}
+  .cal-day{font-size:12px;text-align:center;padding:8px 2px;border-radius:var(--radius-sm);color:var(--text-muted);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;min-height:36px;}
+  .cal-day.empty{cursor:default;}
+  .cal-day.has-job{background:rgba(76,175,128,0.1);color:var(--green);font-weight:700;border:1px solid rgba(76,175,128,0.3);}
+  .cal-day.today{background:var(--green-dark);color:#fff;font-weight:900;box-shadow:var(--glow-green);}
+  .cal-dot{width:4px;height:4px;border-radius:50%;background:var(--green);box-shadow:0 0 4px var(--green);}
+  .cal-day.today .cal-dot{background:rgba(255,255,255,0.7);}
 
-  /* FORM */
-  .modal-overlay {
-    display: none; position: fixed; inset: 0; z-index: 200;
-    background: rgba(0,0,0,0.45); align-items: flex-end; justify-content: center;
-  }
-  .modal-overlay.open { display: flex; }
-  .modal {
-    background: var(--surface); border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-    padding: 20px 16px 32px; width: 100%; max-height: 90vh; overflow-y: auto;
-  }
-  .modal-title { font-size: 17px; font-weight: 700; margin-bottom: 16px; }
-  .form-group { margin-bottom: 14px; }
-  .form-label { font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 5px; display: block; text-transform: uppercase; letter-spacing: 0.4px; }
-  .form-input {
-    width: 100%; padding: 10px 12px; border: 1px solid var(--border);
-    border-radius: var(--radius-sm); font-size: 15px; color: var(--text);
-    background: var(--surface); outline: none;
-    transition: border-color 0.15s;
-  }
-  .form-input:focus { border-color: var(--green); }
-  select.form-input { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b8c7a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px; }
-  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
-  .modal-actions .btn-primary { flex: 1; justify-content: center; }
-  .modal-actions .btn-secondary { flex: 1; justify-content: center; }
+  /* CAL DAY SHEET */
+  .cal-job-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);cursor:pointer;}
+  .cal-job-row:last-child{border-bottom:none;}
+  .cal-job-name{font-size:13px;font-weight:700;color:var(--text);}
+  .cal-job-sub{font-size:11px;color:var(--text-muted);margin-top:2px;}
+
+  /* QUICK GRID */
+  .quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+  .quick-btn{background:var(--surface);border:1px solid var(--green);border-radius:var(--radius-md);padding:12px 8px;text-align:center;cursor:pointer;font-size:11px;color:var(--text-muted);font-weight:600;display:flex;flex-direction:column;align-items:center;gap:5px;box-shadow:var(--glow-green);}
+  .quick-btn.blue{border-color:var(--blue);box-shadow:var(--glow-blue);}
+  .quick-btn.orange{border-color:var(--orange);box-shadow:var(--glow-orange);}
+  .quick-btn:active{opacity:0.8;}
+  .qicon{width:30px;height:30px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;}
 
   /* ACTIVITY */
-  .activity-item { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
-  .activity-item:last-child { border-bottom: none; }
-  .activity-dot { width: 9px; height: 9px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
-  .activity-text { font-size: 13px; color: var(--text); font-weight: 500; }
-  .activity-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .activity-item{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);}
+  .activity-item:last-child{border-bottom:none;}
+  .activity-dot{width:8px;height:8px;border-radius:50%;margin-top:4px;flex-shrink:0;}
+  .activity-text{font-size:12px;color:var(--text);font-weight:600;}
+  .activity-sub{font-size:11px;color:var(--text-muted);margin-top:1px;}
 
-  /* QUICK ACTIONS */
-  .quick-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
-  .quick-btn {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius-md); padding: 14px 10px;
-    text-align: center; cursor: pointer; font-size: 12px;
-    color: var(--text-muted); font-weight: 500;
-    display: flex; flex-direction: column; align-items: center; gap: 6px;
-    transition: border-color 0.15s, background 0.15s;
-  }
-  .quick-btn:active { background: var(--bg); }
-  .quick-btn .qicon { width: 32px; height: 32px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; }
+  /* MONEY TABS */
+  .money-tab-bar{display:flex;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:3px;margin-bottom:12px;}
+  .money-tab{flex:1;border:none;background:none;border-radius:var(--radius-sm);padding:8px;font-size:12px;font-weight:700;color:var(--text-muted);cursor:pointer;}
+  .money-tab.active-pay{background:var(--green-dim);color:var(--green);border:1px solid var(--green);box-shadow:var(--glow-green);}
+  .money-tab.active-exp{background:var(--orange-dim);color:var(--orange);border:1px solid var(--orange);box-shadow:var(--glow-orange);}
 
-  /* EXPENSE */
-  .exp-total { display: flex; justify-content: space-between; align-items: center; padding: 12px 0 0; border-top: 1px solid var(--border); margin-top: 6px; }
+  /* HOME SUB-TABS */
+  .home-tab-bar{display:flex;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:3px;margin-bottom:12px;}
+  .home-tab{flex:1;border:none;background:none;border-radius:var(--radius-sm);padding:9px;font-size:12px;font-weight:700;color:var(--text-muted);cursor:pointer;}
+  .home-tab.active-home{background:var(--green-dim);color:var(--green);border:1px solid var(--green);box-shadow:var(--glow-green);}
+  .home-tab.active-leads{background:var(--blue-dim);color:var(--blue);border:1px solid var(--blue);box-shadow:var(--glow-blue);}
+  .home-tab.active-rev{background:var(--purple-dim);color:var(--purple);border:1px solid var(--purple);box-shadow:var(--glow-purple);}
 
-  /* PHOTO PLACEHOLDER */
-  .photo-strip { display: flex; gap: 8px; margin-top: 8px; }
-  .photo-thumb { width: 56px; height: 56px; border-radius: var(--radius-sm); background: var(--bg); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 10px; text-align: center; cursor: pointer; }
+  /* LEADS */
+  .lead-card{background:var(--surface);border:1px solid var(--blue);border-radius:var(--radius-lg);padding:13px;margin-bottom:8px;box-shadow:var(--glow-blue);}
+  .lead-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);}
+  .lead-row:last-child{border-bottom:none;}
+  .lead-name{font-size:13px;font-weight:700;color:var(--text);}
+  .lead-phone{font-size:11px;color:var(--text-muted);margin-top:1px;}
+  .lead-status-select{padding:6px 8px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:11px;font-weight:700;background:var(--bg);color:var(--text);outline:none;}
+  .lead-callback-row{display:flex;gap:6px;align-items:center;margin-top:6px;}
+  .lead-callback-date{padding:5px 8px;border:1px solid var(--blue);border-radius:var(--radius-sm);font-size:11px;background:var(--bg);color:var(--text);}
+
+  /* REVENUE SPLITS */
+  .split-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);}
+  .split-row:last-child{border-bottom:none;}
+  .split-label{font-size:13px;font-weight:700;}
+  .split-inputs{display:flex;align-items:center;gap:4px;}
+  .split-input{width:55px;padding:6px 7px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12px;font-weight:700;color:var(--text);background:var(--bg);text-align:right;outline:none;}
+  .split-input:focus{border-color:var(--green);box-shadow:var(--glow-green);}
+  .split-sep{font-size:11px;color:var(--text-muted);margin-right:4px;}
+
+  /* QUOTE PREVIEW */
+  .quote-preview{background:var(--bg);border:1px solid var(--blue);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:14px;box-shadow:var(--glow-blue);}
+  .quote-preview-header{background:linear-gradient(135deg,var(--green-dark),var(--blue-dark));padding:14px 16px;}
+  .quote-preview-biz{font-size:15px;font-weight:900;font-style:italic;color:#fff;}
+  .quote-preview-sub{font-size:10px;color:rgba(255,255,255,0.7);margin-top:2px;}
+  .quote-preview-body{padding:12px 14px;}
+  .qline{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;}
+  .qline:last-child{border-bottom:none;}
+  .qtotal-bar{background:var(--green-dark);border:1px solid var(--green);border-radius:var(--radius-sm);padding:10px 12px;display:flex;justify-content:space-between;align-items:center;margin-top:8px;box-shadow:var(--glow-green);}
+
+  /* MAPS LINK */
+  .map-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px;font-size:12px;font-weight:700;color:var(--text);text-decoration:none;}
+  .map-btn:active{opacity:0.8;}
+
+  /* BOOKING */
+  .booking-time-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:6px;}
+  .time-slot{padding:9px 4px;border:1px solid var(--border);border-radius:var(--radius-sm);text-align:center;font-size:11px;font-weight:700;color:var(--text-muted);cursor:pointer;}
+  .time-slot.selected{background:var(--green-dim);color:var(--green);border-color:var(--green);box-shadow:var(--glow-green);}
+  .time-slot.booked{opacity:0.3;cursor:not-allowed;text-decoration:line-through;}
+
+  /* TOAST */
+  .toast{position:fixed;bottom:calc(var(--nav-height)+14px);left:50%;transform:translateX(-50%) translateY(20px);background:var(--green-dark);color:#fff;border:1px solid var(--green);padding:10px 20px;border-radius:30px;font-size:12px;font-weight:700;opacity:0;transition:all 0.3s;z-index:500;white-space:nowrap;box-shadow:var(--glow-green);pointer-events:none;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  /* EXPENSES TOTAL */
+  .exp-total{display:flex;justify-content:space-between;align-items:center;padding:12px 0 0;border-top:1px solid var(--red);margin-top:6px;box-shadow:0 -1px 8px rgba(229,115,115,0.1);}
 
   /* EMPTY STATE */
-  .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); }
-  .empty-state svg { width: 48px; height: 48px; margin: 0 auto 12px; opacity: 0.35; }
-  .empty-state p { font-size: 14px; }
-
-  /* DETAIL VIEW */
-  .detail-overlay { display: none; position: fixed; inset: 0; z-index: 150; background: var(--bg); overflow-y: auto; }
-  .detail-overlay.open { display: block; }
-  .detail-topbar { background: var(--green); color: #fff; padding: 14px 16px; display: flex; align-items: center; gap: 12px; }
-  .detail-back { background: none; border: none; color: #fff; cursor: pointer; padding: 4px; }
-  .detail-title { font-size: 16px; font-weight: 700; }
-  .detail-content { padding: 14px; }
-
-  .tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 20px; font-weight: 600; }
-
-  @media (max-width: 380px) {
-    .stat-value { font-size: 20px; }
-  }
+  .empty-state{text-align:center;padding:40px 20px;color:var(--text-muted);}
+  .empty-state svg{width:44px;height:44px;margin:0 auto 12px;opacity:0.3;display:block;filter:drop-shadow(0 0 4px rgba(76,175,128,0.3));}
+  .empty-state p{font-size:13px;}
 </style>
 </head>
 <body>
 
-<!-- TOPBAR -->
-<div class="topbar">
-  <div class="topbar-brand">
-    <div class="topbar-logo">🪟</div>
-    <div>
-      <div class="topbar-name">Smudge Busters</div>
-      <div class="topbar-sub">Window &amp; Pressure Washing</div>
-    </div>
-  </div>
-  <div class="topbar-date" id="topbarDate"></div>
+<div class="app-wrap">
+<div id="loading-screen">
+  <div class="loading-logo">🪟</div>
+  <div class="loading-name-wrap"><span class="loading-smudge">SMUDGE</span> <span class="loading-busters">BUSTERS</span></div>
+  <div class="loading-sub">Window · Pressure · Pest</div>
+  <div class="loading-spinner"></div>
+  <div class="loading-status" id="loading-status">Connecting to database...</div>
 </div>
 
-<!-- MAIN CONTENT -->
+<div class="toast" id="toast"></div>
+
+<div class="topbar">
+  <div>
+    <div class="topbar-name"><span class="topbar-smudge">SMUDGE</span> <span class="topbar-busters">BUSTERS</span></div>
+    <div class="topbar-sub">🪟 Window · Pressure · Pest</div>
+  </div>
+  <div class="topbar-right">
+    <div class="sync-dot" id="sync-dot"></div>
+    <div class="topbar-date" id="topbarDate"></div>
+  </div>
+</div>
+
 <div class="content">
 
   <!-- DASHBOARD -->
   <div class="section active" id="sec-dashboard">
-    <div class="stat-grid">
-      <div class="stat-card accent-green">
-        <div class="stat-label">Monthly revenue</div>
-        <div class="stat-value" id="dash-revenue">$0</div>
-        <div class="stat-sub" id="dash-revenue-sub">This month</div>
+    <div class="home-tab-bar">
+      <button class="home-tab active-home" id="htab-dash" onclick="switchHomeTab('dash')">Home</button>
+      <button class="home-tab" id="htab-leads" onclick="switchHomeTab('leads')">Leads</button>
+      <button class="home-tab" id="htab-rev" onclick="switchHomeTab('rev')">Revenue</button>
+    </div>
+
+    <div id="home-dash-view">
+    <div class="gauge-grid">
+      <div class="gc gc-rev">
+        <div class="cash-bg" style="color:var(--green)">$$$$$$</div>
+        <div class="gi">
+          <div class="gl" style="color:var(--green);text-shadow:0 0 5px rgba(76,175,128,0.5)">Revenue</div>
+          <div class="gv" id="dash-revenue" style="color:var(--green);text-shadow:0 0 12px rgba(76,175,128,0.6)">$0</div>
+          <div>
+            <div class="gbar" style="background:linear-gradient(90deg,var(--green-border),var(--green));box-shadow:0 0 4px rgba(76,175,128,0.3)"><div class="gneedle" id="rev-needle" style="right:10%;background:var(--green);box-shadow:0 0 4px var(--green)"></div></div>
+            <div class="gs" style="color:var(--text-muted)" id="dash-rev-sub">This month</div>
+          </div>
+        </div>
       </div>
-      <div class="stat-card accent-blue">
-        <div class="stat-label">Jobs this week</div>
-        <div class="stat-value" id="dash-jobs-week">0</div>
-        <div class="stat-sub" id="dash-jobs-sub">Scheduled & done</div>
+      <div class="gc gc-job">
+        <div class="gi" style="padding:5px 5px 3px">
+          <div style="font-size:8px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:0.5px;text-shadow:0 0 5px rgba(74,159,212,0.5)">Jobs/week</div>
+          <svg width="100%" height="52" viewBox="0 0 110 56" style="display:block">
+            <path d="M 10 52 A 45 45 0 0 1 100 52" fill="none" stroke="#1e2d40" stroke-width="7" stroke-linecap="round"/>
+            <path d="M 10 52 A 45 45 0 0 1 100 52" fill="none" stroke="url(#spg)" stroke-width="7" stroke-linecap="round" stroke-dasharray="141" id="spedo-fill" stroke-dashoffset="100"/>
+            <defs><linearGradient id="spg" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#1a6fa8"/><stop offset="100%" stop-color="#4a9fd4"/></linearGradient></defs>
+            <filter id="gf"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+            <line x1="55" y1="52" id="spedo-needle" x2="10" y2="52" stroke="#4a9fd4" stroke-width="2" stroke-linecap="round" filter="url(#gf)"/>
+            <circle cx="55" cy="52" r="4" fill="#0d1520" stroke="#4a9fd4" stroke-width="1.5"/>
+            <text x="7" y="50" font-size="7" fill="#4a7090" font-family="sans-serif">0</text>
+            <text x="92" y="50" font-size="7" fill="#4a7090" font-family="sans-serif">10</text>
+          </svg>
+          <div style="font-size:18px;font-weight:900;color:var(--blue);margin-top:-6px;text-shadow:0 0 10px rgba(74,159,212,0.6)"><span id="dash-jobs-week">0</span> <span style="font-size:9px;font-weight:500;color:var(--text-muted)">jobs</span></div>
+        </div>
       </div>
-      <div class="stat-card accent-red">
-        <div class="stat-label">Unpaid invoices</div>
-        <div class="stat-value" id="dash-unpaid" style="color:var(--danger)">$0</div>
-        <div class="stat-sub" id="dash-unpaid-sub">Outstanding</div>
+      <div class="gc gc-unp">
+        <div class="cash-bg" style="color:var(--red)">⚠⚠⚠</div>
+        <div class="gi">
+          <div class="gl" style="color:var(--red);text-shadow:0 0 5px rgba(229,115,115,0.5)">Unpaid</div>
+          <div class="gv" id="dash-unpaid" style="color:var(--red);text-shadow:0 0 12px rgba(229,115,115,0.6)">$0</div>
+          <div>
+            <div class="gbar" style="background:linear-gradient(90deg,var(--green),var(--orange),var(--red));box-shadow:0 0 4px rgba(229,115,115,0.3)"><div class="gneedle" id="unp-needle" style="right:90%"></div></div>
+            <div class="gs" style="color:var(--text-muted)" id="dash-unpaid-sub">Outstanding</div>
+          </div>
+        </div>
       </div>
-      <div class="stat-card accent-orange">
-        <div class="stat-label">Customers</div>
-        <div class="stat-value" id="dash-customers">0</div>
-        <div class="stat-sub">Total active</div>
+      <div class="gc gc-cus">
+        <div class="gi">
+          <div class="gl" style="color:var(--purple);text-shadow:0 0 5px rgba(179,136,255,0.5)">Customers</div>
+          <div class="gv" id="dash-customers" style="color:var(--purple);text-shadow:0 0 12px rgba(179,136,255,0.6)">0</div>
+          <div id="cust-avatars" style="display:flex;margin-top:4px"></div>
+        </div>
       </div>
     </div>
 
     <div class="quick-grid">
-      <div class="quick-btn" onclick="openModal('customer')">
-        <div class="qicon" style="background:var(--green-light)">
-          <svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" width="20" height="20"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
-        </div>
-        New customer
-      </div>
-      <div class="quick-btn" onclick="openModal('job')">
-        <div class="qicon" style="background:var(--blue-light)">
-          <svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" width="20" height="20"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
-        </div>
-        New job
-      </div>
-      <div class="quick-btn" onclick="openModal('quote')">
-        <div class="qicon" style="background:var(--orange-light)">
-          <svg viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2" width="20" height="20"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-        </div>
-        New quote
-      </div>
-      <div class="quick-btn" onclick="openModal('payment')">
-        <div class="qicon" style="background:var(--green-light)">
-          <svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" width="20" height="20"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-        </div>
-        Log payment
-      </div>
+      <div class="quick-btn" onclick="openModal('customer')"><div class="qicon" style="background:rgba(76,175,128,0.15)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" width="18" height="18"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg></div><span style="color:var(--green)">New customer</span></div>
+      <div class="quick-btn blue" onclick="openModal('schedule-job')"><div class="qicon" style="background:rgba(74,159,212,0.15)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" width="18" height="18"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg></div><span style="color:var(--blue)">New job</span></div>
+      <div class="quick-btn" onclick="openModal('payment')"><div class="qicon" style="background:rgba(76,175,128,0.15)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" width="18" height="18"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div><span style="color:var(--green)">Log payment</span></div>
+      <div class="quick-btn orange" onclick="openModal('expense')"><div class="qicon" style="background:rgba(240,160,96,0.15)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2" width="18" height="18"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><span style="color:var(--orange)">Log expense</span></div>
     </div>
 
     <div class="card">
-      <div style="font-size:14px;font-weight:700;margin-bottom:10px">Recent activity</div>
-      <div id="dash-activity">
-        <div class="empty-state" style="padding:20px">
-          <p>No activity yet. Add a customer to get started!</p>
+      <div style="font-size:13px;font-weight:800;color:var(--green);margin-bottom:10px;text-shadow:0 0 6px rgba(76,175,128,0.4)">Recent activity</div>
+      <div id="dash-activity"><div class="empty-state" style="padding:16px"><p>No activity yet.</p></div></div>
+    </div>
+    </div>
+
+    <!-- LEADS VIEW -->
+    <div id="home-leads-view" style="display:none">
+      <div class="sec-header" style="margin-bottom:10px">
+        <div style="font-size:15px;font-weight:800;color:var(--text)">Leads</div>
+        <button class="btn-blue" onclick="openModal('send-referral')">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          Send referral form
+        </button>
+      </div>
+      <div id="leads-list"></div>
+    </div>
+
+    <!-- REVENUE VIEW -->
+    <div id="home-rev-view" style="display:none">
+      <div class="sec-header" style="margin-bottom:10px">
+        <div style="font-size:15px;font-weight:800;color:var(--text)">Revenue breakdown</div>
+      </div>
+      <div class="money-tab-bar" style="margin-bottom:10px">
+        <button class="money-tab active-pay" id="rtab-week" onclick="switchRevPeriod('week')">Week</button>
+        <button class="money-tab" id="rtab-month" onclick="switchRevPeriod('month')">Month</button>
+        <button class="money-tab" id="rtab-year" onclick="switchRevPeriod('year')">Year</button>
+      </div>
+      <div class="card">
+        <div style="text-align:center;margin-bottom:14px">
+          <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.6px" id="rev-period-label">This Week</div>
+          <div style="font-size:26px;font-weight:900;color:var(--green);text-shadow:0 0 12px rgba(76,175,128,0.6)" id="rev-total-display">$0.00</div>
+          <div style="font-size:10px;color:var(--text-muted)">Total revenue</div>
+        </div>
+        <div id="pie-chart-wrap" style="display:flex;justify-content:center;margin-bottom:14px"></div>
+        <div id="pie-legend" style="margin-bottom:6px"></div>
+      </div>
+
+      <div class="card">
+        <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:10px">Adjust your splits</div>
+
+        <div class="split-row">
+          <div class="split-label" style="color:var(--blue)">Ads</div>
+          <div class="split-inputs">
+            <input type="number" class="split-input" id="split-ads-pct" placeholder="%" min="0" max="100" oninput="onSplitInput('ads','pct')">
+            <span class="split-sep">%</span>
+            <input type="number" class="split-input" id="split-ads-amt" placeholder="$" min="0" oninput="onSplitInput('ads','amt')">
+            <span class="split-sep">$</span>
+          </div>
+        </div>
+        <div class="split-row">
+          <div class="split-label" style="color:var(--orange)">Partner Split</div>
+          <div class="split-inputs">
+            <input type="number" class="split-input" id="split-partner-pct" placeholder="%" min="0" max="100" oninput="onSplitInput('partner','pct')">
+            <span class="split-sep">%</span>
+            <input type="number" class="split-input" id="split-partner-amt" placeholder="$" min="0" oninput="onSplitInput('partner','amt')">
+            <span class="split-sep">$</span>
+          </div>
+        </div>
+        <div class="split-row">
+          <div class="split-label" style="color:var(--purple)">Employees</div>
+          <div class="split-inputs">
+            <input type="number" class="split-input" id="split-emp-pct" placeholder="%" min="0" max="100" oninput="onSplitInput('emp','pct')">
+            <span class="split-sep">%</span>
+            <input type="number" class="split-input" id="split-emp-amt" placeholder="$" min="0" oninput="onSplitInput('emp','amt')">
+            <span class="split-sep">$</span>
+          </div>
+        </div>
+        <div class="split-row" style="opacity:0.7">
+          <div class="split-label" style="color:var(--red)">Expenses</div>
+          <div class="split-inputs">
+            <span style="font-size:13px;font-weight:700;color:var(--red)" id="split-exp-pct-display">0%</span>
+            <span style="font-size:13px;font-weight:700;color:var(--red);margin-left:8px" id="split-exp-amt-display">$0.00</span>
+          </div>
+        </div>
+        <div id="split-warning" style="display:none;background:var(--red-dim);border:1px solid var(--red);border-radius:var(--radius-sm);padding:8px 10px;font-size:11px;color:var(--red);margin-top:8px;box-shadow:var(--glow-red)">⚠ Your splits + expenses add up to over 100%</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding-top:12px;margin-top:8px;border-top:1px solid var(--border)">
+          <span style="font-size:13px;font-weight:800;color:var(--text)">Your take-home</span>
+          <span style="font-size:20px;font-weight:900;color:var(--green);text-shadow:0 0 10px rgba(76,175,128,0.6)" id="split-net-display">$0.00</span>
         </div>
       </div>
     </div>
@@ -334,795 +481,1058 @@
 
   <!-- CUSTOMERS -->
   <div class="section" id="sec-customers">
-    <div class="sec-header">
-      <div class="sec-title">Customers</div>
-      <button class="btn-primary" onclick="openModal('customer')">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Add
-      </button>
-    </div>
+    <div class="sec-header"><div class="sec-title">Customers</div><button class="btn-primary" onclick="openModal('customer')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add</button></div>
     <div id="customer-list"></div>
-  </div>
-
-  <!-- JOBS -->
-  <div class="section" id="sec-jobs">
-    <div class="sec-header">
-      <div class="sec-title">Jobs</div>
-      <button class="btn-primary" onclick="openModal('job')">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Add
-      </button>
-    </div>
-    <div id="job-list"></div>
   </div>
 
   <!-- QUOTES -->
   <div class="section" id="sec-quotes">
-    <div class="sec-header">
-      <div class="sec-title">Quotes</div>
-      <button class="btn-primary" onclick="openModal('quote')">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        New
-      </button>
-    </div>
+    <div class="sec-header"><div class="sec-title">Quotes</div><button class="btn-primary" onclick="openQuoteBuilder()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>New quote</button></div>
     <div id="quote-list"></div>
   </div>
 
-  <!-- PAYMENTS -->
+  <!-- MONEY -->
   <div class="section" id="sec-payments">
     <div class="sec-header">
-      <div class="sec-title">Payments</div>
-      <button class="btn-primary" onclick="openModal('payment')">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Log
-      </button>
+      <div class="sec-title">Money</div>
+      <div style="display:flex;gap:6px">
+        <button class="btn-primary" onclick="openModal('payment')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Pay</button>
+        <button class="btn-orange" onclick="openModal('expense')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Exp</button>
+      </div>
+    </div>
+    <div class="money-tab-bar">
+      <button class="money-tab active-pay" id="tab-pay" onclick="switchMoneyTab('payments')">Payments</button>
+      <button class="money-tab" id="tab-exp" onclick="switchMoneyTab('expenses')">Expenses</button>
     </div>
     <div id="payment-list"></div>
-  </div>
-
-  <!-- EXPENSES -->
-  <div class="section" id="sec-expenses">
-    <div class="sec-header">
-      <div class="sec-title">Expenses</div>
-      <button class="btn-primary" onclick="openModal('expense')">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Add
-      </button>
-    </div>
-    <div id="expense-list"></div>
+    <div id="expense-list" style="display:none"></div>
   </div>
 
   <!-- SCHEDULE -->
   <div class="section" id="sec-schedule">
     <div class="sec-header">
-      <div class="sec-title" id="cal-month-title">June 2026</div>
-      <button class="btn-primary" onclick="openModal('job')">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Job
-      </button>
+      <div style="display:flex;align-items:center;gap:10px">
+        <button onclick="changeMonth(-1)" style="background:none;border:none;cursor:pointer;font-size:22px;color:var(--text-muted);padding:4px">&#8249;</button>
+        <div class="sec-title" id="cal-month-title"></div>
+        <button onclick="changeMonth(1)" style="background:none;border:none;cursor:pointer;font-size:22px;color:var(--text-muted);padding:4px">&#8250;</button>
+      </div>
+      <button class="btn-primary" onclick="openModal('schedule-job')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Job</button>
     </div>
-    <div class="card">
+    <div class="card" style="padding:12px 8px">
       <div class="cal-grid" id="cal-grid"></div>
     </div>
-    <div style="font-size:13px;font-weight:700;color:var(--text-muted);margin:14px 0 8px;text-transform:uppercase;letter-spacing:0.5px">Upcoming jobs</div>
+    <div style="font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:0.8px;margin:12px 0 8px;text-shadow:0 0 6px rgba(76,175,128,0.4)">Upcoming jobs</div>
     <div id="upcoming-jobs"></div>
   </div>
 
 </div>
 
-<!-- BOTTOM NAV -->
+<!-- NAV -->
 <nav class="nav">
-  <button class="nav-btn active" onclick="showSection('dashboard',this)" aria-label="Dashboard">
+  <button class="nav-btn active" onclick="showSection('dashboard',this)">
+    <div class="nb-line"></div>
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
     Home
   </button>
-  <button class="nav-btn" onclick="showSection('customers',this)" aria-label="Customers">
+  <button class="nav-btn" onclick="showSection('customers',this)">
+    <div class="nb-line"></div>
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
     Customers
   </button>
-  <button class="nav-btn" onclick="showSection('jobs',this)" aria-label="Jobs">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
-    Jobs
-  </button>
-  <button class="nav-btn" onclick="showSection('quotes',this)" aria-label="Quotes">
+  <button class="nav-btn" onclick="showSection('quotes',this)">
+    <div class="nb-line"></div>
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
     Quotes
   </button>
-  <button class="nav-btn" onclick="showSection('payments',this)" aria-label="Payments">
+  <button class="nav-btn" onclick="showSection('payments',this)">
+    <div class="nb-line"></div>
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-    Pay
+    Money
   </button>
-  <button class="nav-btn" onclick="showSection('expenses',this)" aria-label="Expenses">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-    Expenses
-  </button>
-  <button class="nav-btn" onclick="showSection('schedule',this)" aria-label="Schedule">
+  <button class="nav-btn" onclick="showSection('schedule',this)">
+    <div class="nb-line"></div>
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
     Schedule
   </button>
 </nav>
 
 <!-- MODALS -->
-
-<!-- Customer Modal -->
 <div class="modal-overlay" id="modal-customer">
   <div class="modal">
     <div class="modal-title">New customer</div>
-    <div class="form-group">
-      <label class="form-label">Full name</label>
-      <input class="form-input" id="cust-name" type="text" placeholder="Jane Smith" autocomplete="off">
-    </div>
+    <div class="form-group"><label class="form-label">Full name</label><input class="form-input" id="cust-name" type="text" placeholder="Jane Smith" autocomplete="off"></div>
     <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">Phone</label>
-        <input class="form-input" id="cust-phone" type="tel" placeholder="(618) 555-0100">
+      <div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="cust-phone" type="tel" placeholder="(618) 555-0100"></div>
+      <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="cust-email" type="email" placeholder="jane@email.com"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Address</label><input class="form-input" id="cust-address" type="text" placeholder="123 Main St, Venedy IL"></div>
+    <div class="form-group"><label class="form-label">Services</label>
+      <div class="service-checks" id="cust-service-checks">
+        <button type="button" class="check-item" onclick="toggleCheck(this)" data-value="Window cleaning"><div class="check-box"><span class="check-mark">✓</span></div>Window cleaning</button>
+        <button type="button" class="check-item" onclick="toggleCheck(this)" data-value="Pressure washing"><div class="check-box"><span class="check-mark">✓</span></div>Pressure washing</button>
+        <button type="button" class="check-item" onclick="toggleCheck(this)" data-value="Pest control"><div class="check-box"><span class="check-mark">✓</span></div>Pest control</button>
+        <button type="button" class="check-item" onclick="toggleCheck(this)" data-value="Quote"><div class="check-box"><span class="check-mark">✓</span></div>Quote only</button>
       </div>
-      <div class="form-group">
-        <label class="form-label">Email</label>
-        <input class="form-input" id="cust-email" type="email" placeholder="jane@email.com">
-      </div>
     </div>
-    <div class="form-group">
-      <label class="form-label">Address</label>
-      <input class="form-input" id="cust-address" type="text" placeholder="123 Main St, Venedy IL">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Service type</label>
-      <select class="form-input" id="cust-service">
-        <option>Window cleaning</option>
-        <option>Pressure washing</option>
-        <option>Both services</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Notes</label>
-      <input class="form-input" id="cust-notes" type="text" placeholder="Gate code, dog, etc.">
-    </div>
-    <div class="modal-actions">
-      <button class="btn-secondary" onclick="closeModal('customer')">Cancel</button>
-      <button class="btn-primary" onclick="saveCustomer()">Save customer</button>
-    </div>
+    <div class="form-group"><label class="form-label">Notes</label><input class="form-input" id="cust-notes" type="text" placeholder="Gate code, dog, parking..."></div>
+    <div class="modal-actions"><button class="btn-secondary" onclick="closeModal('customer')">Cancel</button><button class="btn-primary" onclick="saveCustomer()">Save customer</button></div>
   </div>
 </div>
 
-<!-- Job Modal -->
-<div class="modal-overlay" id="modal-job">
+<div class="modal-overlay" id="modal-schedule-job">
   <div class="modal">
     <div class="modal-title">New job</div>
-    <div class="form-group">
-      <label class="form-label">Customer</label>
-      <select class="form-input" id="job-customer"></select>
+    <div class="form-group"><label class="form-label">Customer</label><select class="form-input" id="job-customer"></select></div>
+    <div class="form-group"><label class="form-label">Services</label>
+      <div class="service-checks" id="job-service-checks">
+        <button type="button" class="check-item" onclick="toggleCheck(this)" data-value="Window cleaning"><div class="check-box"><span class="check-mark">✓</span></div>Window cleaning</button>
+        <button type="button" class="check-item" onclick="toggleCheck(this)" data-value="Pressure washing"><div class="check-box"><span class="check-mark">✓</span></div>Pressure washing</button>
+        <button type="button" class="check-item" onclick="toggleCheck(this)" data-value="Pest control"><div class="check-box"><span class="check-mark">✓</span></div>Pest control</button>
+        <button type="button" class="check-item" onclick="toggleCheck(this)" data-value="Quote"><div class="check-box"><span class="check-mark">✓</span></div>Quote</button>
+      </div>
+    </div>
+    <div class="form-group"><label class="form-label">Status</label><select class="form-input" id="job-status"><option>Scheduled</option><option>In progress</option><option>Completed</option><option>Invoiced</option></select></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Date</label><input class="form-input" id="job-date" type="date"></div>
+      <div class="form-group"><label class="form-label">Time</label><input class="form-input" id="job-time" type="time"></div>
     </div>
     <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">Service</label>
-        <select class="form-input" id="job-service">
-          <option>Window cleaning</option>
-          <option>Pressure washing</option>
-          <option>Both services</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Status</label>
-        <select class="form-input" id="job-status">
-          <option>Scheduled</option>
-          <option>In progress</option>
-          <option>Completed</option>
-          <option>Invoiced</option>
-        </select>
-      </div>
+      <div class="form-group"><label class="form-label">Price ($)</label><input class="form-input" id="job-price" type="number" placeholder="0.00" step="0.01"></div>
+      <div class="form-group"><label class="form-label">Photos</label><input class="form-input" id="job-photos" type="file" accept="image/*" multiple style="padding:8px;font-size:11px"></div>
     </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">Date</label>
-        <input class="form-input" id="job-date" type="date">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Price ($)</label>
-        <input class="form-input" id="job-price" type="number" placeholder="0.00" step="0.01">
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Notes</label>
-      <input class="form-input" id="job-notes" type="text" placeholder="Access info, special instructions...">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Photos (before/after)</label>
-      <input class="form-input" id="job-photos" type="file" accept="image/*" multiple style="padding:8px">
-    </div>
-    <div class="modal-actions">
-      <button class="btn-secondary" onclick="closeModal('job')">Cancel</button>
-      <button class="btn-primary" onclick="saveJob()">Save job</button>
-    </div>
+    <div class="form-group"><label class="form-label">Notes</label><textarea class="form-input" id="job-notes" rows="3" placeholder="Access info, gate code..."></textarea></div>
+    <div class="modal-actions"><button class="btn-secondary" onclick="closeModal('schedule-job')">Cancel</button><button class="btn-primary" onclick="saveJob()">Save job</button></div>
   </div>
 </div>
 
-<!-- Quote Modal -->
-<div class="modal-overlay" id="modal-quote">
-  <div class="modal">
-    <div class="modal-title">New quote</div>
-    <div class="form-group">
-      <label class="form-label">Customer</label>
-      <select class="form-input" id="quote-customer"></select>
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">Service</label>
-        <select class="form-input" id="quote-service">
-          <option>Window cleaning</option>
-          <option>Pressure washing</option>
-          <option>Both services</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Amount ($)</label>
-        <input class="form-input" id="quote-amount" type="number" placeholder="0.00" step="0.01">
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Status</label>
-      <select class="form-input" id="quote-status">
-        <option>Pending</option>
-        <option>Accepted</option>
-        <option>Declined</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Notes</label>
-      <input class="form-input" id="quote-notes" type="text" placeholder="Scope details, conditions...">
-    </div>
-    <div class="modal-actions">
-      <button class="btn-secondary" onclick="closeModal('quote')">Cancel</button>
-      <button class="btn-primary" onclick="saveQuote()">Save quote</button>
-    </div>
-  </div>
-</div>
-
-<!-- Payment Modal -->
 <div class="modal-overlay" id="modal-payment">
   <div class="modal">
     <div class="modal-title">Log payment</div>
-    <div class="form-group">
-      <label class="form-label">Customer</label>
-      <select class="form-input" id="pay-customer"></select>
+    <div class="form-group"><label class="form-label">Customer</label><select class="form-input" id="pay-customer"></select></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Amount ($)</label><input class="form-input" id="pay-amount" type="number" placeholder="0.00" step="0.01"></div>
+      <div class="form-group"><label class="form-label">Date</label><input class="form-input" id="pay-date" type="date"></div>
     </div>
     <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">Amount ($)</label>
-        <input class="form-input" id="pay-amount" type="number" placeholder="0.00" step="0.01">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Date</label>
-        <input class="form-input" id="pay-date" type="date">
-      </div>
+      <div class="form-group"><label class="form-label">Method</label><select class="form-input" id="pay-method"><option>Cash</option><option>Check</option><option>Venmo</option><option>Zelle</option><option>Card</option><option>Other</option></select></div>
+      <div class="form-group"><label class="form-label">Status</label><select class="form-input" id="pay-status"><option>Paid</option><option>Unpaid</option><option>Partial</option></select></div>
     </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">Method</label>
-        <select class="form-input" id="pay-method">
-          <option>Cash</option>
-          <option>Check</option>
-          <option>Venmo</option>
-          <option>Zelle</option>
-          <option>Card</option>
-          <option>Other</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Status</label>
-        <select class="form-input" id="pay-status">
-          <option>Paid</option>
-          <option>Unpaid</option>
-          <option>Partial</option>
-        </select>
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Notes</label>
-      <input class="form-input" id="pay-notes" type="text" placeholder="Invoice #, job reference...">
-    </div>
-    <div class="modal-actions">
-      <button class="btn-secondary" onclick="closeModal('payment')">Cancel</button>
-      <button class="btn-primary" onclick="savePayment()">Save payment</button>
-    </div>
+    <div class="form-group"><label class="form-label">Notes</label><input class="form-input" id="pay-notes" type="text" placeholder="Invoice #, reference..."></div>
+    <div class="modal-actions"><button class="btn-secondary" onclick="closeModal('payment')">Cancel</button><button class="btn-primary" onclick="savePayment()">Save payment</button></div>
   </div>
 </div>
 
-<!-- Expense Modal -->
 <div class="modal-overlay" id="modal-expense">
   <div class="modal">
     <div class="modal-title">Add expense</div>
-    <div class="form-group">
-      <label class="form-label">Category</label>
-      <select class="form-input" id="exp-category">
-        <option>Fuel</option>
-        <option>Cleaning supplies</option>
-        <option>Equipment</option>
-        <option>Equipment repair</option>
-        <option>Advertising</option>
-        <option>Insurance</option>
-        <option>Other</option>
-      </select>
-    </div>
+    <div class="form-group"><label class="form-label">Category</label><select class="form-input" id="exp-category"><option>Fuel</option><option>Cleaning supplies</option><option>Equipment</option><option>Equipment repair</option><option>Advertising</option><option>Insurance</option><option>Other</option></select></div>
     <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">Amount ($)</label>
-        <input class="form-input" id="exp-amount" type="number" placeholder="0.00" step="0.01">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Date</label>
-        <input class="form-input" id="exp-date" type="date">
-      </div>
+      <div class="form-group"><label class="form-label">Amount ($)</label><input class="form-input" id="exp-amount" type="number" placeholder="0.00" step="0.01"></div>
+      <div class="form-group"><label class="form-label">Date</label><input class="form-input" id="exp-date" type="date"></div>
     </div>
+    <div class="form-group"><label class="form-label">Description</label><input class="form-input" id="exp-desc" type="text" placeholder="What was it for?"></div>
     <div class="form-group">
-      <label class="form-label">Description</label>
-      <input class="form-input" id="exp-desc" type="text" placeholder="What was it for?">
+      <label class="form-label">Receipt photo</label>
+      <input class="form-input" id="exp-photo" type="file" accept="image/*" capture="environment" style="padding:8px;font-size:12px" onchange="previewReceipt(this)">
+      <div id="exp-photo-preview" style="margin-top:8px;display:none">
+        <img id="exp-photo-img" style="width:100%;max-height:160px;object-fit:cover;border-radius:var(--radius-sm);border:1px solid var(--border)">
+      </div>
     </div>
-    <div class="modal-actions">
-      <button class="btn-secondary" onclick="closeModal('expense')">Cancel</button>
-      <button class="btn-primary" onclick="saveExpense()">Save expense</button>
+    <div class="modal-actions"><button class="btn-secondary" onclick="closeModal('expense')">Cancel</button><button class="btn-primary" onclick="saveExpense()">Save expense</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-send-referral">
+  <div class="modal">
+    <div class="modal-title">Send referral form</div>
+    <div class="form-group"><label class="form-label">Customer to send to</label><select class="form-input" id="ref-customer"></select></div>
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.5">This sends a link where your customer can list up to 10 friends/family (name + phone) they'd refer you to. Submissions land directly in your Leads tab.</div>
+    <div class="modal-actions"><button class="btn-secondary" onclick="closeModal('send-referral')">Cancel</button><button class="btn-primary" onclick="sendReferralForm()">Send form</button></div>
+  </div>
+</div>
+
+<!-- DETAIL SHEETS -->
+<div class="detail-sheet" id="sheet-quote-builder">
+  <div class="detail-body">
+    <div class="detail-handle"></div>
+    <div class="detail-header"><div class="detail-title">New quote</div><button class="detail-close" onclick="closeSheet('quote-builder')">✕</button></div>
+    <div class="detail-content">
+      <div class="form-group"><label class="form-label">Customer</label><select class="form-input" id="qb-customer"></select></div>
+      <div class="form-group"><label class="form-label">Valid for</label><select class="form-input" id="qb-valid"><option value="14">14 days</option><option value="30" selected>30 days</option><option value="60">60 days</option></select></div>
+      <div class="form-group"><label class="form-label">Note to customer</label><textarea class="form-input" id="qb-notes" rows="2" placeholder="Any special notes..."></textarea></div>
+      <div class="form-group"><label class="form-label">Services & pricing</label>
+        <div class="card" style="padding:0;margin-bottom:0"><div id="qb-services"></div></div>
+      </div>
+      <div style="background:var(--green-dim);border:1px solid var(--green);border-radius:var(--radius-sm);padding:12px 14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;box-shadow:var(--glow-green)">
+        <span style="font-size:13px;font-weight:700;color:var(--green)">Total</span>
+        <span style="font-size:20px;font-weight:900;color:var(--green);text-shadow:0 0 10px rgba(76,175,128,0.6)" id="qb-total">$0.00</span>
+      </div>
+      <button class="btn-primary" style="width:100%;justify-content:center;font-size:14px;padding:13px" onclick="sendQuote()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        Send quote by email
+      </button>
     </div>
   </div>
 </div>
 
-<script>
-// ---- DATA STORE ----
-let data = {
-  customers: [],
-  jobs: [],
-  quotes: [],
-  payments: [],
-  expenses: [],
-  activity: []
+<div class="detail-sheet" id="sheet-customer">
+  <div class="detail-body">
+    <div class="detail-handle"></div>
+    <div class="detail-header"><div class="detail-title" id="sheet-cust-title">Customer</div><button class="detail-close" onclick="closeSheet('customer')">✕</button></div>
+    <div class="detail-content" id="sheet-cust-content"></div>
+    <div class="detail-actions"><button class="btn-primary" onclick="saveCustomerEdit()">Save changes</button><button class="btn-danger" onclick="deleteCustomer()">Delete</button></div>
+  </div>
+</div>
+
+<div class="detail-sheet" id="sheet-quote-detail">
+  <div class="detail-body">
+    <div class="detail-handle"></div>
+    <div class="detail-header"><div class="detail-title" id="sheet-quote-title">Quote</div><button class="detail-close" onclick="closeSheet('quote-detail')">✕</button></div>
+    <div class="detail-content" id="sheet-quote-content"></div>
+    <div class="detail-actions"><button class="btn-primary" onclick="resendQuote()">Resend</button><button class="btn-danger" onclick="deleteQuote()">Delete</button></div>
+  </div>
+</div>
+
+<div class="detail-sheet" id="sheet-job">
+  <div class="detail-body">
+    <div class="detail-handle"></div>
+    <div class="detail-header"><div class="detail-title" id="sheet-job-title">Job details</div><button class="detail-close" onclick="closeSheet('job')">✕</button></div>
+    <div class="detail-content" id="sheet-job-content"></div>
+    <div class="detail-actions"><button class="btn-primary" onclick="saveJobEdit()">Save changes</button><button class="btn-danger" onclick="deleteJob()">Delete</button></div>
+  </div>
+</div>
+
+<div class="detail-sheet" id="sheet-calday">
+  <div class="detail-body">
+    <div class="detail-handle"></div>
+    <div class="detail-header"><div class="detail-title" id="sheet-calday-title">Jobs</div><button class="detail-close" onclick="closeSheet('calday')">✕</button></div>
+    <div style="padding:0 16px 16px" id="sheet-calday-content"></div>
+  </div>
+</div>
+
+<div class="detail-sheet" id="sheet-jobnotes">
+  <div class="detail-body">
+    <div class="detail-handle"></div>
+    <div class="detail-header"><div class="detail-title" id="sheet-jobnotes-title">Job notes</div><button class="detail-close" onclick="closeSheet('jobnotes')">✕</button></div>
+    <div class="detail-content" id="sheet-jobnotes-content"></div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey:"AIzaSyCxXdYaK1fKls9rPdEKDC1xW3AmdLlZJCI",
+  authDomain:"smudge-busters.firebaseapp.com",
+  projectId:"smudge-busters",
+  storageBucket:"smudge-busters.firebasestorage.app",
+  messagingSenderId:"633105436511",
+  appId:"1:633105436511:web:6d460bbe49e988e438b0ea"
+};
+const EMAILJS_SVC="service_f4ccq3o", EMAILJS_TPL="template_5ajl1pn", EMAILJS_KEY="eOI3Xs13SoIg-jsvn";
+const BIZ_EMAIL="bustasmudge@gmail.com";
+
+const app=initializeApp(firebaseConfig);
+const db=getFirestore(app);
+let data={customers:[],jobs:[],payments:[],expenses:[],quotes:[],activity:[],leads:[]};
+let currentCustomerId=null,currentJobId=null,currentQuoteId=null,currentLeadId=null;
+let calViewYear,calViewMonth;
+let revPeriod='week';
+let splitMode={ads:'pct',partner:'pct',emp:'pct'};
+let splitVals={adsPct:0,partnerPct:0,empPct:0};
+
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+function setSyncDot(s){const d=document.getElementById('sync-dot');d.className='sync-dot'+(s==='syncing'?' syncing':s==='error'?' error':'');}
+async function fbAdd(col,obj){setSyncDot('syncing');try{const r=await addDoc(collection(db,col),obj);setSyncDot('ok');return r.id;}catch(e){setSyncDot('error');console.error(e);}}
+async function fbUpdate(col,id,obj){setSyncDot('syncing');try{await updateDoc(doc(db,col,id),obj);setSyncDot('ok');}catch(e){setSyncDot('error');}}
+async function fbDelete(col,id){setSyncDot('syncing');try{await deleteDoc(doc(db,col,id));setSyncDot('ok');}catch(e){setSyncDot('error');}}
+
+function startListeners(){
+  const cols={customers:'customers',jobs:'jobs',payments:'payments',expenses:'expenses',quotes:'quotes',activity:'activity',leads:'leads'};
+  for(const[col,key] of Object.entries(cols)){
+    onSnapshot(collection(db,col),snap=>{
+      data[key]=snap.docs.map(d=>({id:d.id,...d.data()}));
+      if(['customers','jobs','payments','activity'].includes(key))renderDashboard();
+      if(key==='customers')renderCustomers();
+      if(key==='jobs'){renderSchedule();}
+      if(key==='payments'){renderPayments();renderRevenue();}
+      if(key==='expenses'){renderExpenses();renderRevenue();}
+      if(key==='quotes')renderQuotes();
+      if(key==='leads')renderLeads();
+    });
+  }
+}
+
+async function init(){
+  document.getElementById('loading-status').textContent='Loading your data...';
+  try{
+    await Promise.all(Object.keys(data).map(c=>getDocs(collection(db,c)).then(s=>{data[c]=s.docs.map(d=>({id:d.id,...d.data()}));})));
+    startListeners();initCal();setDate();renderDashboard();
+    const ls=document.getElementById('loading-screen');
+    ls.classList.add('fade-out');setTimeout(()=>ls.style.display='none',400);
+  }catch(e){document.getElementById('loading-status').textContent='Connection error';setSyncDot('error');}
+}
+init();
+
+async function addActivity(text,sub){await fbAdd('activity',{text,sub,time:new Date().toISOString()});}
+
+window.showSection=function(id,btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='schedule')renderSchedule();
+  if(id==='quotes')renderQuotes();
 };
 
-function save() {
-  localStorage.setItem('smudge-busters-crm', JSON.stringify(data));
-}
+window.switchMoneyTab=function(tab){
+  const isPay=tab==='payments';
+  document.getElementById('payment-list').style.display=isPay?'':'none';
+  document.getElementById('expense-list').style.display=isPay?'none':'';
+  document.getElementById('tab-pay').className='money-tab'+(isPay?' active-pay':'');
+  document.getElementById('tab-exp').className='money-tab'+(!isPay?' active-exp':'');
+};
 
-function load() {
-  const raw = localStorage.getItem('smudge-busters-crm');
-  if (raw) {
-    try { data = JSON.parse(raw); } catch(e) {}
+window.toggleCheck=function(btn){btn.classList.toggle('checked');};
+function getCheckedServices(cid){return Array.from(document.querySelectorAll('#'+cid+' .check-item.checked')).map(b=>b.dataset.value);}
+function resetChecks(cid){document.querySelectorAll('#'+cid+' .check-item').forEach(b=>b.classList.remove('checked'));}
+
+window.openModal=function(type){
+  document.getElementById('modal-'+type).classList.add('open');
+  const today=new Date().toISOString().split('T')[0];
+  const df=document.getElementById('modal-'+type).querySelector('input[type="date"]');
+  if(df&&!df.value)df.value=today;
+  if(['schedule-job','payment'].includes(type))populateCustomerDropdown(type);
+  if(type==='send-referral'){
+    const sel=document.getElementById('ref-customer');
+    sel.innerHTML=data.customers.length===0?'<option>No customers yet</option>':data.customers.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');
   }
+};
+window.closeModal=function(type){
+  document.getElementById('modal-'+type).classList.remove('open');
+  const m=document.getElementById('modal-'+type);
+  m.querySelectorAll('input[type="text"],input[type="number"],input[type="email"],input[type="tel"],input[type="date"],input[type="time"],textarea').forEach(i=>i.value='');
+  m.querySelectorAll('select').forEach(s=>s.selectedIndex=0);
+  if(type==='customer')resetChecks('cust-service-checks');
+  if(type==='schedule-job')resetChecks('job-service-checks');
+};
+document.querySelectorAll('.modal-overlay').forEach(o=>{o.addEventListener('click',e=>{if(e.target===o)closeModal(o.id.replace('modal-',''));});});
+function populateCustomerDropdown(type){
+  const prefix=type==='payment'?'pay':type==='schedule-job'?'job':type;
+  const sel=document.getElementById(prefix+'-customer');if(!sel)return;
+  sel.innerHTML=data.customers.length===0?'<option>No customers yet</option>':data.customers.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');
 }
 
-function uid() {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
-}
+window.openSheet=function(type){document.getElementById('sheet-'+type).classList.add('open');};
+window.closeSheet=function(type){document.getElementById('sheet-'+type).classList.remove('open');};
+document.querySelectorAll('.detail-sheet').forEach(s=>{s.addEventListener('click',e=>{if(e.target===s)s.classList.remove('open');});});
 
-// ---- NAVIGATION ----
-function showSection(id, btn) {
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('sec-' + id).classList.add('active');
-  btn.classList.add('active');
-  renderSection(id);
-}
+function formatPhone(v){const d=v.replace(/\D/g,'').slice(0,10);if(d.length<4)return d;if(d.length<7)return'('+d.slice(0,3)+') '+d.slice(3);return'('+d.slice(0,3)+') '+d.slice(3,6)+'-'+d.slice(6);}
+function attachPhoneFormat(id){const el=document.getElementById(id);if(!el)return;el.addEventListener('input',function(){const p=this.selectionStart,pv=this.value.length;this.value=formatPhone(this.value);const diff=this.value.length-pv;try{this.setSelectionRange(p+diff,p+diff);}catch(e){}});}
 
-function renderSection(id) {
-  if (id === 'dashboard') renderDashboard();
-  else if (id === 'customers') renderCustomers();
-  else if (id === 'jobs') renderJobs();
-  else if (id === 'quotes') renderQuotes();
-  else if (id === 'payments') renderPayments();
-  else if (id === 'expenses') renderExpenses();
-  else if (id === 'schedule') renderSchedule();
-}
+window.saveCustomer=async function(){
+  const name=document.getElementById('cust-name').value.trim();
+  if(!name){alert('Please enter a name.');return;}
+  const services=getCheckedServices('cust-service-checks');
+  await fbAdd('customers',{name,phone:document.getElementById('cust-phone').value.trim(),email:document.getElementById('cust-email').value.trim(),address:document.getElementById('cust-address').value.trim(),services,notes:document.getElementById('cust-notes').value.trim(),created:new Date().toISOString()});
+  await addActivity('New customer added: '+name,services.join(', ')||'No services');
+  closeModal('customer');toast('Customer saved!');
+};
 
-// ---- MODALS ----
-function openModal(type) {
-  const overlay = document.getElementById('modal-' + type);
-  overlay.classList.add('open');
-  // set today's date on date fields
-  const today = new Date().toISOString().split('T')[0];
-  const df = overlay.querySelector('input[type="date"]');
-  if (df && !df.value) df.value = today;
-  // populate customer dropdowns
-  if (['job','quote','payment'].includes(type)) {
-    populateCustomerDropdown(type);
+window.saveJob=async function(){
+  const custId=document.getElementById('job-customer').value;
+  if(!custId||custId.length<5){alert('Please select a customer.');return;}
+  const cust=data.customers.find(c=>c.id===custId);
+  const services=getCheckedServices('job-service-checks');
+  const price=parseFloat(document.getElementById('job-price').value)||0;
+  await fbAdd('jobs',{customerId:custId,customerName:cust?cust.name:'Unknown',services,status:document.getElementById('job-status').value,date:document.getElementById('job-date').value,time:document.getElementById('job-time').value,price,notes:document.getElementById('job-notes').value.trim(),photoCount:document.getElementById('job-photos').files.length,created:new Date().toISOString()});
+  await addActivity('Job scheduled: '+(cust?cust.name:'Unknown'),(services.join(', ')||'No service')+' · $'+price.toFixed(2));
+  closeModal('schedule-job');toast('Job saved!');
+};
+
+window.savePayment=async function(){
+  const custId=document.getElementById('pay-customer').value;
+  if(!custId||custId.length<5){alert('Please select a customer.');return;}
+  const cust=data.customers.find(c=>c.id===custId);
+  const amount=parseFloat(document.getElementById('pay-amount').value)||0;
+  await fbAdd('payments',{customerId:custId,customerName:cust?cust.name:'Unknown',amount,date:document.getElementById('pay-date').value,method:document.getElementById('pay-method').value,status:document.getElementById('pay-status').value,notes:document.getElementById('pay-notes').value.trim(),created:new Date().toISOString()});
+  await addActivity('Payment logged: '+(cust?cust.name:'Unknown'),'$'+amount.toFixed(2)+' · '+document.getElementById('pay-method').value);
+  closeModal('payment');toast('Payment logged!');
+};
+
+window.previewReceipt=function(input){
+  const preview=document.getElementById('exp-photo-preview');
+  const img=document.getElementById('exp-photo-img');
+  if(input.files&&input.files[0]){
+    const reader=new FileReader();
+    reader.onload=e=>{img.src=e.target.result;preview.style.display='block';};
+    reader.readAsDataURL(input.files[0]);
   }
-}
+};
 
-function closeModal(type) {
-  document.getElementById('modal-' + type).classList.remove('open');
-  resetForm(type);
-}
-
-function resetForm(type) {
-  const m = document.getElementById('modal-' + type);
-  m.querySelectorAll('input[type="text"], input[type="number"], input[type="email"], input[type="tel"], input[type="date"]').forEach(i => i.value = '');
-  m.querySelectorAll('select').forEach(s => s.selectedIndex = 0);
-}
-
-function populateCustomerDropdown(type) {
-  const prefixes = { job: 'job', quote: 'quote', payment: 'pay' };
-  const prefix = prefixes[type];
-  const sel = document.getElementById(prefix + '-customer');
-  sel.innerHTML = data.customers.length === 0
-    ? '<option>No customers yet — add one first</option>'
-    : data.customers.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
-}
-
-// Close modal on overlay click
-document.querySelectorAll('.modal-overlay').forEach(overlay => {
-  overlay.addEventListener('click', e => {
-    if (e.target === overlay) {
-      const type = overlay.id.replace('modal-', '');
-      closeModal(type);
-    }
+function resizeImageToBase64(file,maxW){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onload=e=>{
+      const img=new Image();
+      img.onload=()=>{
+        let w=img.width,h=img.height;
+        if(w>maxW){h=h*(maxW/w);w=maxW;}
+        const canvas=document.createElement('canvas');
+        canvas.width=w;canvas.height=h;
+        canvas.getContext('2d').drawImage(img,0,0,w,h);
+        resolve(canvas.toDataURL('image/jpeg',0.6));
+      };
+      img.onerror=reject;
+      img.src=e.target.result;
+    };
+    reader.onerror=reject;
+    reader.readAsDataURL(file);
   });
-});
-
-// ---- SAVE FUNCTIONS ----
-function saveCustomer() {
-  const name = document.getElementById('cust-name').value.trim();
-  if (!name) { alert('Please enter a name.'); return; }
-  const c = {
-    id: uid(),
-    name,
-    phone: document.getElementById('cust-phone').value.trim(),
-    email: document.getElementById('cust-email').value.trim(),
-    address: document.getElementById('cust-address').value.trim(),
-    service: document.getElementById('cust-service').value,
-    notes: document.getElementById('cust-notes').value.trim(),
-    created: new Date().toISOString()
-  };
-  data.customers.push(c);
-  addActivity(`New customer added: ${c.name}`, c.service);
-  save();
-  closeModal('customer');
-  renderDashboard();
 }
 
-function saveJob() {
-  const custId = document.getElementById('job-customer').value;
-  const price = parseFloat(document.getElementById('job-price').value) || 0;
-  const date = document.getElementById('job-date').value;
-  if (!custId || custId.length < 5) { alert('Please select a customer.'); return; }
-  const cust = data.customers.find(c => c.id === custId);
-  const j = {
-    id: uid(),
-    customerId: custId,
-    customerName: cust ? cust.name : 'Unknown',
-    service: document.getElementById('job-service').value,
-    status: document.getElementById('job-status').value,
-    date,
-    price,
-    notes: document.getElementById('job-notes').value.trim(),
-    photoCount: document.getElementById('job-photos').files.length,
-    created: new Date().toISOString()
-  };
-  data.jobs.push(j);
-  addActivity(`Job scheduled: ${j.customerName}`, `${j.service} · $${j.price.toFixed(2)}`);
-  save();
-  closeModal('job');
-  renderDashboard();
-}
-
-function saveQuote() {
-  const custId = document.getElementById('quote-customer').value;
-  const amount = parseFloat(document.getElementById('quote-amount').value) || 0;
-  if (!custId || custId.length < 5) { alert('Please select a customer.'); return; }
-  const cust = data.customers.find(c => c.id === custId);
-  const q = {
-    id: uid(),
-    customerId: custId,
-    customerName: cust ? cust.name : 'Unknown',
-    service: document.getElementById('quote-service').value,
-    amount,
-    status: document.getElementById('quote-status').value,
-    notes: document.getElementById('quote-notes').value.trim(),
-    date: new Date().toISOString().split('T')[0],
-    created: new Date().toISOString()
-  };
-  data.quotes.push(q);
-  addActivity(`Quote sent: ${q.customerName}`, `${q.service} · $${q.amount.toFixed(2)}`);
-  save();
-  closeModal('quote');
-  renderDashboard();
-}
-
-function savePayment() {
-  const custId = document.getElementById('pay-customer').value;
-  const amount = parseFloat(document.getElementById('pay-amount').value) || 0;
-  if (!custId || custId.length < 5) { alert('Please select a customer.'); return; }
-  const cust = data.customers.find(c => c.id === custId);
-  const p = {
-    id: uid(),
-    customerId: custId,
-    customerName: cust ? cust.name : 'Unknown',
-    amount,
-    date: document.getElementById('pay-date').value,
-    method: document.getElementById('pay-method').value,
-    status: document.getElementById('pay-status').value,
-    notes: document.getElementById('pay-notes').value.trim(),
-    created: new Date().toISOString()
-  };
-  data.payments.push(p);
-  addActivity(`Payment logged: ${p.customerName}`, `$${p.amount.toFixed(2)} · ${p.method}`);
-  save();
-  closeModal('payment');
-  renderDashboard();
-}
-
-function saveExpense() {
-  const amount = parseFloat(document.getElementById('exp-amount').value) || 0;
-  const e = {
-    id: uid(),
-    category: document.getElementById('exp-category').value,
-    amount,
-    date: document.getElementById('exp-date').value,
-    desc: document.getElementById('exp-desc').value.trim(),
-    created: new Date().toISOString()
-  };
-  data.expenses.push(e);
-  addActivity(`Expense logged: ${e.category}`, `-$${e.amount.toFixed(2)}`);
-  save();
-  closeModal('expense');
-  renderDashboard();
-}
-
-// ---- ACTIVITY ----
-function addActivity(text, sub) {
-  data.activity.unshift({ text, sub, time: new Date().toISOString() });
-  if (data.activity.length > 20) data.activity = data.activity.slice(0, 20);
-}
-
-function timeAgo(iso) {
-  const diff = (Date.now() - new Date(iso)) / 1000;
-  if (diff < 60) return 'Just now';
-  if (diff < 3600) return Math.floor(diff/60) + 'm ago';
-  if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
-  return Math.floor(diff/86400) + 'd ago';
-}
-
-// ---- RENDER ----
-function initials(name) {
-  return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
-}
-
-function avatarColor(name) {
-  const colors = [
-    {bg:'var(--green-light)',c:'var(--green)'},
-    {bg:'var(--blue-light)',c:'var(--blue)'},
-    {bg:'var(--orange-light)',c:'var(--orange)'}
-  ];
-  let h = 0; for (let ch of name) h += ch.charCodeAt(0);
-  return colors[h % 3];
-}
-
-function statusBadge(status) {
-  const map = {
-    'Completed': 'badge-green', 'Paid': 'badge-green', 'Accepted': 'badge-green',
-    'Scheduled': 'badge-blue', 'In progress': 'badge-blue',
-    'Pending': 'badge-orange', 'Invoiced': 'badge-orange', 'Partial': 'badge-orange',
-    'Declined': 'badge-red', 'Unpaid': 'badge-red'
-  };
-  return map[status] || 'badge-orange';
-}
-
-function fmtDate(d) {
-  if (!d) return '';
-  const dt = new Date(d + 'T00:00:00');
-  return dt.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
-}
-
-function renderDashboard() {
-  // Stats
-  const now = new Date();
-  const monthJobs = data.jobs.filter(j => {
-    if (!j.date) return false;
-    const d = new Date(j.date + 'T00:00:00');
-    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-  });
-  const monthRevenue = monthJobs.reduce((s,j) => s + (parseFloat(j.price)||0), 0);
-  document.getElementById('dash-revenue').textContent = '$' + monthRevenue.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',');
-
-  const weekStart = new Date(now); weekStart.setDate(now.getDate() - now.getDay());
-  const weekEnd = new Date(weekStart); weekEnd.setDate(weekStart.getDate() + 6);
-  const weekJobs = data.jobs.filter(j => {
-    if (!j.date) return false;
-    const d = new Date(j.date + 'T00:00:00');
-    return d >= weekStart && d <= weekEnd;
-  });
-  document.getElementById('dash-jobs-week').textContent = weekJobs.length;
-  const done = weekJobs.filter(j => j.status === 'Completed').length;
-  document.getElementById('dash-jobs-sub').textContent = `${done} done · ${weekJobs.length - done} upcoming`;
-
-  const unpaid = data.payments.filter(p => p.status === 'Unpaid');
-  const unpaidTotal = unpaid.reduce((s,p) => s + (parseFloat(p.amount)||0), 0);
-  document.getElementById('dash-unpaid').textContent = '$' + unpaidTotal.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',');
-  document.getElementById('dash-unpaid-sub').textContent = unpaid.length + ' outstanding';
-
-  document.getElementById('dash-customers').textContent = data.customers.length;
-
-  // Activity
-  const actEl = document.getElementById('dash-activity');
-  if (data.activity.length === 0) {
-    actEl.innerHTML = '<div class="empty-state" style="padding:20px"><p>No activity yet. Add a customer to get started!</p></div>';
-  } else {
-    const dotColors = {'New customer':'var(--green)','Job':'var(--blue)','Quote':'var(--orange)','Payment':'var(--green)','Expense':'var(--danger)'};
-    actEl.innerHTML = data.activity.slice(0,6).map(a => {
-      let dc = 'var(--green)';
-      for (const [k,v] of Object.entries(dotColors)) { if (a.text.startsWith(k)) { dc = v; break; } }
-      return `<div class="activity-item">
-        <div class="activity-dot" style="background:${dc}"></div>
-        <div><div class="activity-text">${a.text}</div><div class="activity-sub">${a.sub} · ${timeAgo(a.time)}</div></div>
-      </div>`;
-    }).join('');
+window.saveExpense=async function(){
+  const amount=parseFloat(document.getElementById('exp-amount').value)||0;
+  const cat=document.getElementById('exp-category').value;
+  const photoInput=document.getElementById('exp-photo');
+  let receiptPhoto='';
+  if(photoInput.files&&photoInput.files[0]){
+    try{receiptPhoto=await resizeImageToBase64(photoInput.files[0],800);}catch(e){console.error('Photo resize failed',e);}
   }
-}
+  await fbAdd('expenses',{category:cat,amount,date:document.getElementById('exp-date').value,desc:document.getElementById('exp-desc').value.trim(),receiptPhoto,created:new Date().toISOString()});
+  await addActivity('Expense logged: '+cat,'-$'+amount.toFixed(2));
+  closeModal('expense');toast('Expense saved!');
+  document.getElementById('exp-photo-preview').style.display='none';
+  photoInput.value='';
+};
 
-function renderCustomers() {
-  const el = document.getElementById('customer-list');
-  if (data.customers.length === 0) {
-    el.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><p>No customers yet.<br>Tap <strong>Add</strong> to create your first one.</p></div>`;
-    return;
-  }
-  el.innerHTML = data.customers.map(c => {
-    const ac = avatarColor(c.name);
-    const lastJob = data.jobs.filter(j => j.customerId === c.id).sort((a,b) => new Date(b.date) - new Date(a.date))[0];
-    return `<div class="card card-sm">
-      <div class="cust-row">
-        <div class="avatar" style="background:${ac.bg};color:${ac.c}">${initials(c.name)}</div>
-        <div class="cust-info">
-          <div class="cust-name">${c.name}</div>
-          <div class="cust-detail">${c.phone || c.email || c.address || 'No contact info'}</div>
-          <div class="cust-detail">${c.service}${lastJob ? ' · Last job ' + fmtDate(lastJob.date) : ''}</div>
-        </div>
-        ${c.notes ? `<span class="badge badge-blue" style="flex-shrink:0">Note</span>` : ''}
+// QUOTE BUILDER
+const QUOTE_SERVICES=['Window Cleaning Interior','Window Cleaning Exterior','Window Cleaning Interior/Exterior','House Wash','Surface Cleaning','Pest Control Barrier Spray'];
+
+window.openQuoteBuilder=function(){
+  const sel=document.getElementById('qb-customer');
+  sel.innerHTML=data.customers.length===0?'<option>No customers yet</option>':data.customers.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');
+  document.getElementById('qb-services').innerHTML=QUOTE_SERVICES.map((s,i)=>`
+    <div class="qsvc-row">
+      <button type="button" class="check-item" style="padding:7px;border:none;background:none;flex-shrink:0" onclick="toggleQSvc(this,${i})" data-idx="${i}"><div class="check-box" style="width:20px;height:20px"><span class="check-mark">✓</span></div></button>
+      <span class="qsvc-name" id="qsn-${i}">${s}</span>
+      <input type="number" class="qsvc-price" id="qsp-${i}" placeholder="$0" min="0" step="0.01" oninput="updateQTotal()">
+    </div>`).join('');
+  document.getElementById('qb-total').textContent='$0.00';
+  openSheet('quote-builder');
+};
+
+window.toggleQSvc=function(btn,idx){btn.classList.toggle('checked');document.getElementById('qsn-'+idx).classList.toggle('sel',btn.classList.contains('checked'));updateQTotal();};
+window.updateQTotal=function(){let t=0;QUOTE_SERVICES.forEach((_,i)=>{const b=document.querySelector(`[data-idx="${i}"]`);if(b&&b.classList.contains('checked'))t+=parseFloat(document.getElementById('qsp-'+i).value)||0;});document.getElementById('qb-total').textContent='$'+t.toFixed(2);};
+
+window.sendQuote=async function(){
+  const custId=document.getElementById('qb-customer').value;
+  if(!custId||custId.length<5){alert('Please select a customer.');return;}
+  const cust=data.customers.find(c=>c.id===custId);
+  if(!cust||!cust.email){alert('This customer has no email. Please add one first.');return;}
+  const selectedServices=[];let total=0;
+  QUOTE_SERVICES.forEach((s,i)=>{const b=document.querySelector(`[data-idx="${i}"]`);if(b&&b.classList.contains('checked')){const price=parseFloat(document.getElementById('qsp-'+i).value)||0;selectedServices.push({name:s,price});total+=price;}});
+  if(selectedServices.length===0){alert('Please select at least one service.');return;}
+  const validDays=document.getElementById('qb-valid').value;
+  const notes=document.getElementById('qb-notes').value.trim();
+  const quoteNum='QB-'+String(Date.now()).slice(-4);
+  const validUntil=new Date(Date.now()+parseInt(validDays)*86400000).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  const serviceLines=selectedServices.map(s=>`${s.name}: $${s.price.toFixed(2)}`).join('\n');
+  const serviceHTML=selectedServices.map(s=>`<tr><td style="padding:8px 12px;border-bottom:1px solid #1e3528;color:#e8f5ee">${s.name}</td><td style="padding:8px 12px;border-bottom:1px solid #1e3528;text-align:right;font-weight:700;color:#4caf80">$${s.price.toFixed(2)}</td></tr>`).join('');
+  const htmlBody=`<div style="font-family:-apple-system,sans-serif;max-width:500px;margin:0 auto;background:#0a0f0a;border:1px solid #4caf80;border-radius:12px;overflow:hidden">
+    <div style="background:linear-gradient(135deg,#2a7d4f,#1a6fa8);padding:20px 24px">
+      <div style="font-size:22px;font-weight:900;font-style:italic;letter-spacing:-1px"><span style="color:#4a9fd4;text-shadow:0 0 8px #4a9fd4">SMUDGE</span> <span style="color:#f0a060;text-shadow:0 0 8px #f0a060">BUSTERS</span></div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.7);margin-top:4px;letter-spacing:1px;text-transform:uppercase">🪟 Window · Pressure · Pest · Venedy, IL</div>
+    </div>
+    <div style="padding:24px;background:#0d1a0f">
+      <p style="font-size:15px;color:#e8f5ee;margin-bottom:16px">Hi ${cust.name.split(' ')[0]},<br><br>Thank you for your interest in Smudge Busters! Here is your personalized quote <strong style="color:#4caf80">${quoteNum}</strong>.</p>
+      <table style="width:100%;border-collapse:collapse;border:1px solid #1e3528;border-radius:8px;overflow:hidden;margin-bottom:16px;background:#0a0f0a">
+        <thead><tr style="background:#1e3528"><th style="padding:10px 12px;text-align:left;font-size:11px;color:#4a7a5a;text-transform:uppercase;letter-spacing:0.5px">Service</th><th style="padding:10px 12px;text-align:right;font-size:11px;color:#4a7a5a;text-transform:uppercase;letter-spacing:0.5px">Price</th></tr></thead>
+        <tbody>${serviceHTML}</tbody>
+      </table>
+      <div style="background:#0d1f0f;border:1px solid #4caf80;border-radius:8px;padding:14px 16px;display:flex;justify-content:space-between;margin-bottom:20px">
+        <span style="color:#4caf80;font-weight:700">Total estimate</span>
+        <span style="color:#4caf80;font-size:20px;font-weight:900">$${total.toFixed(2)}</span>
       </div>
+      ${notes?`<p style="font-size:13px;color:#4a7a5a;margin-bottom:16px">${notes}</p>`:''}
+      <p style="font-size:12px;color:#4a7a5a;margin-bottom:20px">This quote is valid until ${validUntil}. Prices may vary based on property size and condition.</p>
+      <div style="background:#0d1520;border:1px solid #4a9fd4;border-radius:10px;padding:18px;text-align:center;margin-bottom:14px">
+        <div style="font-size:14px;font-weight:700;color:#e8f5ee;margin-bottom:8px">Ready to schedule?</div>
+        <div style="font-size:22px;font-weight:900;color:#4a9fd4">📞 Call Cole</div>
+        <div style="font-size:20px;font-weight:800;color:#4caf80;margin-top:4px">(618) 967-6977</div>
+        <div style="font-size:12px;color:#4a7a5a;margin-top:8px">Give us a call or text and we'll get you on the schedule!</div>
+      </div>
+      <div style="text-align:center;font-size:16px;font-weight:700;color:#e8f5ee;padding:8px 0">Thank you for choosing Smudge Busters! 🪟</div>
+    </div>
+    <div style="background:#0a0f0a;border-top:1px solid #1e3528;padding:12px 24px;text-align:center;font-size:11px;color:#4a7a5a">Smudge Busters · Venedy, IL · (618) 967-6977</div>
+  </div>`;
+  try{
+    if(!window.emailjs){
+      await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s);});
+      window.emailjs.init(EMAILJS_KEY);
+    }
+    toast('Sending quote...');
+    await window.emailjs.send(EMAILJS_SVC,EMAILJS_TPL,{to_email:cust.email,to_name:cust.name,from_name:'Smudge Busters',subject:`Your quote from Smudge Busters — ${quoteNum}`,message:serviceLines+'\n\nTotal: $'+total.toFixed(2)+'\n\nValid until: '+validUntil+(notes?'\n\nNote: '+notes:''),html_body:htmlBody,reply_to:BIZ_EMAIL});
+    await fbAdd('quotes',{customerId:custId,customerName:cust.name,customerEmail:cust.email,services:selectedServices,total,quoteNum,validDays,validUntil,notes,status:'Sent',created:new Date().toISOString()});
+    await addActivity('Quote sent: '+cust.name,'#'+quoteNum+' · $'+total.toFixed(2));
+    closeSheet('quote-builder');toast('Quote sent to '+cust.email+'!');
+  }catch(e){console.error(e);alert('Failed to send. Check your EmailJS template has: to_email, to_name, subject, message, html_body');}
+};
+
+// CUSTOMER DETAIL
+window.openCustomerDetail=function(id){
+  currentCustomerId=id;
+  const c=data.customers.find(x=>x.id===id);if(!c)return;
+  const services=c.services||(c.service?[c.service]:[]);
+  const phone=c.phone||'',email=c.email||'',addr=c.address||'';
+  const enc=encodeURIComponent(addr);
+  document.getElementById('sheet-cust-title').textContent=c.name;
+  document.getElementById('sheet-cust-content').innerHTML=`
+    <div class="detail-section">
+      <div class="detail-section-title">Contact</div>
+      ${phone?`<div class="contact-actions">
+        <a class="contact-btn call" href="tel:${phone.replace(/\D/g,'')}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.18 6.18l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>Call</a>
+        <a class="contact-btn sms" href="sms:${phone.replace(/\D/g,'')}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Text</a>
+        ${email?`<a class="contact-btn email" href="mailto:${email}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Email</a>`:''}
+      </div>`:''}
+    </div>
+    <div class="detail-section"><div class="detail-section-title">Edit info</div>
+      <div class="detail-field"><span class="detail-field-label">Name</span><input class="edit-input" id="edit-cust-name" value="${esc(c.name)}" style="max-width:190px"></div>
+      <div class="detail-field"><span class="detail-field-label">Phone</span><input class="edit-input" id="edit-cust-phone" type="tel" value="${esc(phone)}" style="max-width:190px"></div>
+      <div class="detail-field"><span class="detail-field-label">Email</span><input class="edit-input" id="edit-cust-email" type="email" value="${esc(email)}" style="max-width:190px"></div>
+      <div class="detail-field"><span class="detail-field-label">Address</span><input class="edit-input" id="edit-cust-address" value="${esc(addr)}" style="max-width:190px"></div>
+    </div>
+    <div class="detail-section"><div class="detail-section-title">Services</div>
+      <div class="service-checks" id="edit-cust-service-checks">
+        <button type="button" class="check-item ${services.includes('Window cleaning')?'checked':''}" onclick="toggleCheck(this)" data-value="Window cleaning"><div class="check-box"><span class="check-mark">✓</span></div>Window cleaning</button>
+        <button type="button" class="check-item ${services.includes('Pressure washing')?'checked':''}" onclick="toggleCheck(this)" data-value="Pressure washing"><div class="check-box"><span class="check-mark">✓</span></div>Pressure washing</button>
+        <button type="button" class="check-item ${services.includes('Pest control')?'checked':''}" onclick="toggleCheck(this)" data-value="Pest control"><div class="check-box"><span class="check-mark">✓</span></div>Pest control</button>
+        <button type="button" class="check-item ${services.includes('Quote')?'checked':''}" onclick="toggleCheck(this)" data-value="Quote"><div class="check-box"><span class="check-mark">✓</span></div>Quote only</button>
+      </div>
+    </div>
+    <div class="detail-section"><div class="detail-section-title">Notes</div>
+      <textarea class="edit-input" id="edit-cust-notes" rows="3" style="width:100%">${esc(c.notes||'')}</textarea>
+    </div>
+    ${addr?`<div class="detail-section"><div class="detail-section-title">Navigate</div>
+      <div style="display:flex;gap:8px">
+        <a href="https://maps.apple.com/?q=${enc}" class="map-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Apple Maps</a>
+        <a href="https://www.google.com/maps/search/?api=1&query=${enc}" class="map-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Google Maps</a>
+      </div>
+    </div>`:''}
+    <div class="detail-section"><div class="detail-section-title">Job history</div>
+      ${data.jobs.filter(j=>j.customerId===id).length===0?'<div style="font-size:13px;color:var(--text-muted)">No jobs yet</div>':data.jobs.filter(j=>j.customerId===id).sort((a,b)=>new Date(b.date)-new Date(a.date)).map(j=>`<div class="detail-field"><span class="detail-field-label">${fmtDate(j.date)}</span><span class="detail-field-value">${(j.services||[]).join(', ')} · $${(parseFloat(j.price)||0).toFixed(2)}</span></div>`).join('')}
+    </div>
+    <div class="detail-section"><div class="detail-section-title">Quotes sent</div>
+      ${data.quotes.filter(q=>q.customerId===id).length===0?'<div style="font-size:13px;color:var(--text-muted)">No quotes yet</div>':data.quotes.filter(q=>q.customerId===id).sort((a,b)=>new Date(b.created)-new Date(a.created)).map(q=>`<div class="detail-field"><span class="detail-field-label">#${q.quoteNum}</span><span class="detail-field-value">$${(parseFloat(q.total)||0).toFixed(2)} · <span class="badge badge-blue">${q.status}</span></span></div>`).join('')}
+    </div>`;
+  openSheet('customer');
+  setTimeout(()=>attachPhoneFormat('edit-cust-phone'),50);
+};
+
+window.saveCustomerEdit=async function(){
+  const c=data.customers.find(x=>x.id===currentCustomerId);if(!c)return;
+  await fbUpdate('customers',currentCustomerId,{name:document.getElementById('edit-cust-name').value.trim()||c.name,phone:document.getElementById('edit-cust-phone').value.trim(),email:document.getElementById('edit-cust-email').value.trim(),address:document.getElementById('edit-cust-address').value.trim(),notes:document.getElementById('edit-cust-notes').value.trim(),services:getCheckedServices('edit-cust-service-checks')});
+  closeSheet('customer');toast('Customer updated!');
+};
+window.deleteCustomer=async function(){if(!confirm('Delete this customer?'))return;await fbDelete('customers',currentCustomerId);closeSheet('customer');};
+
+// QUOTE DETAIL
+window.openQuoteDetail=function(id){
+  currentQuoteId=id;
+  const q=data.quotes.find(x=>x.id===id);if(!q)return;
+  document.getElementById('sheet-quote-title').textContent='Quote #'+q.quoteNum;
+  document.getElementById('sheet-quote-content').innerHTML=`
+    <div class="quote-preview">
+      <div class="quote-preview-header"><div class="quote-preview-biz"><span style="color:#4a9fd4">SMUDGE</span> <span style="color:#f0a060">BUSTERS</span></div><div class="quote-preview-sub">🪟 Window · Pressure · Pest</div></div>
+      <div class="quote-preview-body">
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px">To: ${esc(q.customerName)} · ${esc(q.customerEmail||'')}</div>
+        ${q.services.map(s=>`<div class="qline"><span style="color:var(--text-muted)">${esc(s.name)}</span><span style="font-weight:700;color:var(--green)">$${(parseFloat(s.price)||0).toFixed(2)}</span></div>`).join('')}
+        <div class="qtotal-bar"><span style="font-size:13px;font-weight:700;color:#fff">Total</span><span style="font-size:18px;font-weight:900;color:#fff">$${(parseFloat(q.total)||0).toFixed(2)}</span></div>
+      </div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-field"><span class="detail-field-label">Quote #</span><span class="detail-field-value">${q.quoteNum}</span></div>
+      <div class="detail-field"><span class="detail-field-label">Sent</span><span class="detail-field-value">${fmtDate(q.created?.split('T')[0])}</span></div>
+      <div class="detail-field"><span class="detail-field-label">Valid until</span><span class="detail-field-value">${q.validUntil}</span></div>
+      <div class="detail-field"><span class="detail-field-label">Status</span><span class="detail-field-value"><span class="badge badge-blue">${q.status}</span></span></div>
+      ${q.notes?`<div class="detail-field"><span class="detail-field-label">Notes</span><span class="detail-field-value" style="font-weight:400;color:var(--text-muted)">${esc(q.notes)}</span></div>`:''}
+    </div>`;
+  openSheet('quote-detail');
+};
+
+window.resendQuote=async function(){
+  const q=data.quotes.find(x=>x.id===currentQuoteId);if(!q)return;
+  toast('Resending...');
+  try{
+    if(!window.emailjs){await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s);});window.emailjs.init(EMAILJS_KEY);}
+    await window.emailjs.send(EMAILJS_SVC,EMAILJS_TPL,{to_email:q.customerEmail,to_name:q.customerName,from_name:'Smudge Busters',subject:`Your quote from Smudge Busters — #${q.quoteNum}`,message:q.services.map(s=>`${s.name}: $${(parseFloat(s.price)||0).toFixed(2)}`).join('\n')+'\n\nTotal: $'+q.total.toFixed(2),reply_to:BIZ_EMAIL});
+    toast('Quote resent!');
+  }catch(e){alert('Failed to resend.');}
+};
+window.deleteQuote=async function(){if(!confirm('Delete this quote?'))return;await fbDelete('quotes',currentQuoteId);closeSheet('quote-detail');toast('Deleted.');};
+
+// HOME SUB-TABS
+window.switchHomeTab=function(tab){
+  document.getElementById('home-dash-view').style.display=tab==='dash'?'':'none';
+  document.getElementById('home-leads-view').style.display=tab==='leads'?'':'none';
+  document.getElementById('home-rev-view').style.display=tab==='rev'?'':'none';
+  document.getElementById('htab-dash').className='home-tab'+(tab==='dash'?' active-home':'');
+  document.getElementById('htab-leads').className='home-tab'+(tab==='leads'?' active-leads':'');
+  document.getElementById('htab-rev').className='home-tab'+(tab==='rev'?' active-rev':'');
+  if(tab==='leads')renderLeads();
+  if(tab==='rev')renderRevenue();
+};
+
+// REFERRAL FORM SEND
+window.sendReferralForm=async function(){
+  const custId=document.getElementById('ref-customer').value;
+  if(!custId||custId.length<5){alert('Please select a customer.');return;}
+  const cust=data.customers.find(c=>c.id===custId);
+  if(!cust||!cust.email){alert('This customer has no email on file.');return;}
+  const refId='ref_'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+  const baseUrl=window.location.href.replace(/index\.html?$/,'').replace(/\?.*$/,'');
+  const refLink=baseUrl+'referral.html?ref='+refId+'&from='+encodeURIComponent(cust.name)+'&fromId='+custId;
+  const htmlBody=`<div style="font-family:-apple-system,sans-serif;max-width:500px;margin:0 auto;background:#0a0f0a;border:1px solid #4caf80;border-radius:12px;overflow:hidden">
+    <div style="background:linear-gradient(135deg,#2a7d4f,#1a6fa8);padding:20px 24px">
+      <div style="font-size:22px;font-weight:900;font-style:italic;letter-spacing:-1px"><span style="color:#4a9fd4;text-shadow:0 0 8px #4a9fd4">SMUDGE</span> <span style="color:#f0a060;text-shadow:0 0 8px #f0a060">BUSTERS</span></div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.7);margin-top:4px;letter-spacing:1px;text-transform:uppercase">🪟 Window · Pressure · Pest · Venedy, IL</div>
+    </div>
+    <div style="padding:24px;background:#0d1a0f">
+      <p style="font-size:15px;color:#e8f5ee;margin-bottom:16px">Hi ${cust.name.split(' ')[0]},<br><br>Know anyone who could use our window cleaning, pressure washing, or pest control services? Send us their info below and we'll reach out!</p>
+      <a href="${refLink}" style="display:block;background:#4caf80;color:#0a0f0a;text-align:center;padding:14px;border-radius:8px;font-size:15px;font-weight:800;text-decoration:none;margin-bottom:16px">Refer a friend →</a>
+      <div style="text-align:center;font-size:14px;font-weight:700;color:#e8f5ee">Thank you for choosing Smudge Busters! 🪟</div>
+    </div>
+    <div style="background:#0a0f0a;border-top:1px solid #1e3528;padding:12px 24px;text-align:center;font-size:11px;color:#4a7a5a">Smudge Busters · Venedy, IL · (618) 967-6977</div>
+  </div>`;
+  try{
+    if(!window.emailjs){
+      await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s);});
+      window.emailjs.init(EMAILJS_KEY);
+    }
+    toast('Sending referral form...');
+    await window.emailjs.send(EMAILJS_SVC,EMAILJS_TPL,{to_email:cust.email,to_name:cust.name,from_name:'Smudge Busters',subject:'Refer a friend to Smudge Busters!',message:'Tap the link to refer friends or family: '+refLink,html_body:htmlBody,reply_to:BIZ_EMAIL});
+    closeModal('send-referral');toast('Referral form sent to '+cust.email+'!');
+  }catch(e){console.error(e);alert('Failed to send. Check your EmailJS template setup.');}
+};
+
+// LEADS
+const LEAD_STATUSES=['No Answer','2nd Call','3rd Call','Not Interested','Job Sold','Call Back'];
+function leadStatusColor(s){const m={'No Answer':'orange','2nd Call':'blue','3rd Call':'blue','Not Interested':'red','Job Sold':'green','Call Back':'purple'};return m[s]||'orange';}
+
+function renderLeads(){
+  const el=document.getElementById('leads-list');if(!el)return;
+  if(data.leads.length===0){el.innerHTML=`<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><p>No leads yet.<br>Send a referral form to get started.</p></div>`;return;}
+  el.innerHTML=[...data.leads].sort((a,b)=>new Date(b.created)-new Date(a.created)).map(batch=>{
+    const names=batch.names||[];
+    return`<div class="lead-card">
+      <div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:8px;text-shadow:0 0 5px rgba(74,159,212,0.4)">Referred by ${esc(batch.fromName||'Unknown')} · ${timeAgo(batch.created)}</div>
+      ${names.map((n,i)=>{
+        const status=n.status||'No Answer';
+        const cls=leadStatusColor(status);
+        return`<div class="lead-row">
+          <div>
+            <div class="lead-name">${esc(n.name)}</div>
+            <div class="lead-phone">${esc(n.phone||'No number')}</div>
+            ${status==='Call Back'&&n.callbackDate?`<div class="lead-callback-row"><span style="font-size:10px;color:var(--purple)">📅 ${fmtDate(n.callbackDate)}</span></div>`:''}
+          </div>
+          <select class="lead-status-select" style="border-color:var(--${cls});color:var(--${cls})" onchange="updateLeadStatus('${batch.id}',${i},this.value)">
+            ${LEAD_STATUSES.map(s=>`<option ${status===s?'selected':''}>${s}</option>`).join('')}
+          </select>
+        </div>`;
+      }).join('')}
     </div>`;
   }).join('');
 }
 
-function renderJobs() {
-  const el = document.getElementById('job-list');
-  if (data.jobs.length === 0) {
-    el.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg><p>No jobs yet.<br>Tap <strong>Add</strong> to log your first job.</p></div>`;
-    return;
+window.updateLeadStatus=async function(batchId,idx,newStatus){
+  const batch=data.leads.find(b=>b.id===batchId);if(!batch)return;
+  const names=[...(batch.names||[])];
+  if(newStatus==='Call Back'){
+    const dateStr=prompt('Call back on what date? (YYYY-MM-DD)',new Date().toISOString().split('T')[0]);
+    if(!dateStr){renderLeads();return;}
+    names[idx]={...names[idx],status:newStatus,callbackDate:dateStr};
+    await fbUpdate('leads',batchId,{names});
+    await fbAdd('jobs',{customerId:'',customerName:names[idx].name+' (Callback Lead)',services:['Quote'],status:'Scheduled',date:dateStr,time:'',price:0,notes:'Lead callback · '+(names[idx].phone||''),photoCount:0,created:new Date().toISOString()});
+    await addActivity('Callback scheduled: '+names[idx].name,fmtDate(dateStr));
+    toast('Callback added to your Schedule!');
+  }else{
+    names[idx]={...names[idx],status:newStatus,callbackDate:null};
+    await fbUpdate('leads',batchId,{names});
+    toast('Lead status updated');
   }
-  const sorted = [...data.jobs].sort((a,b) => new Date(b.date) - new Date(a.date));
-  el.innerHTML = sorted.map(j => `
-    <div class="card">
-      <div class="job-header">
-        <div>
-          <div class="job-title">${j.customerName}</div>
-          <div class="job-sub">${j.service} · ${fmtDate(j.date)}</div>
-        </div>
-        <span class="badge ${statusBadge(j.status)}">${j.status}</span>
-      </div>
-      <div class="data-row"><span class="data-row-label">Price</span><span class="data-row-value">$${(parseFloat(j.price)||0).toFixed(2)}</span></div>
-      ${j.photoCount > 0 ? `<div class="data-row"><span class="data-row-label">Photos</span><span class="data-row-value" style="color:var(--blue)">${j.photoCount} attached</span></div>` : ''}
-      ${j.notes ? `<div class="data-row"><span class="data-row-label">Notes</span><span class="data-row-value" style="font-weight:400;color:var(--text-muted)">${j.notes}</span></div>` : ''}
-    </div>`).join('');
+};
+
+// REVENUE BREAKDOWN + PIE CHART
+window.switchRevPeriod=function(p){
+  revPeriod=p;
+  document.getElementById('rtab-week').className='money-tab'+(p==='week'?' active-pay':'');
+  document.getElementById('rtab-month').className='money-tab'+(p==='month'?' active-pay':'');
+  document.getElementById('rtab-year').className='money-tab'+(p==='year'?' active-pay':'');
+  renderRevenue();
+};
+
+function getRevPeriodRange(){
+  const now=new Date();
+  if(revPeriod==='week'){const s=new Date(now);s.setDate(now.getDate()-now.getDay());s.setHours(0,0,0,0);const e=new Date(s);e.setDate(s.getDate()+6);return{start:s,end:e,label:'This Week'};}
+  if(revPeriod==='year'){return{start:new Date(now.getFullYear(),0,1),end:new Date(now.getFullYear(),11,31),label:'This Year'};}
+  return{start:new Date(now.getFullYear(),now.getMonth(),1),end:new Date(now.getFullYear(),now.getMonth()+1,0),label:'This Month'};
 }
 
-function renderQuotes() {
-  const el = document.getElementById('quote-list');
-  if (data.quotes.length === 0) {
-    el.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><p>No quotes yet.<br>Tap <strong>New</strong> to create one.</p></div>`;
-    return;
-  }
-  el.innerHTML = [...data.quotes].sort((a,b) => new Date(b.created) - new Date(a.created)).map(q => `
-    <div class="card">
-      <div class="job-header">
-        <div>
-          <div class="job-title">${q.customerName}</div>
-          <div class="job-sub">Sent ${fmtDate(q.date)}</div>
-        </div>
-        <span class="badge ${statusBadge(q.status)}">${q.status}</span>
-      </div>
-      <div class="data-row"><span class="data-row-label">Service</span><span class="data-row-value">${q.service}</span></div>
-      <div class="data-row"><span class="data-row-label">Amount</span><span class="data-row-value">$${(parseFloat(q.amount)||0).toFixed(2)}</span></div>
-      ${q.notes ? `<div class="data-row"><span class="data-row-label">Notes</span><span class="data-row-value" style="font-weight:400;color:var(--text-muted)">${q.notes}</span></div>` : ''}
-    </div>`).join('');
+function getRevenueForPeriod(){
+  const{start,end}=getRevPeriodRange();
+  const jobsInPeriod=data.jobs.filter(j=>{if(!j.date)return false;const d=new Date(j.date+'T00:00:00');return d>=start&&d<=end;});
+  const revenue=jobsInPeriod.reduce((s,j)=>s+(parseFloat(j.price)||0),0);
+  const expensesInPeriod=data.expenses.filter(e=>{if(!e.date)return false;const d=new Date(e.date+'T00:00:00');return d>=start&&d<=end;});
+  const expenses=expensesInPeriod.reduce((s,e)=>s+(parseFloat(e.amount)||0),0);
+  return{revenue,expenses};
 }
 
-function renderPayments() {
-  const el = document.getElementById('payment-list');
-  if (data.payments.length === 0) {
-    el.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><p>No payments logged yet.</p></div>`;
-    return;
+window.onSplitInput=function(key,changedField){
+  const{revenue}=getRevenueForPeriod();
+  const pctEl=document.getElementById('split-'+key+'-pct');
+  const amtEl=document.getElementById('split-'+key+'-amt');
+  if(revenue<=0)return;
+  if(changedField==='pct'){
+    const pct=parseFloat(pctEl.value)||0;
+    amtEl.value=(revenue*pct/100).toFixed(2);
+  }else{
+    const amt=parseFloat(amtEl.value)||0;
+    pctEl.value=((amt/revenue)*100).toFixed(1);
   }
-  el.innerHTML = [...data.payments].sort((a,b) => new Date(b.created) - new Date(a.created)).map(p => `
-    <div class="card card-sm">
-      <div class="data-row"><span class="data-row-label">${p.customerName}</span><span class="data-row-value" style="color:${p.status==='Paid'?'var(--green)':'var(--danger)'}">$${(parseFloat(p.amount)||0).toFixed(2)}</span></div>
-      <div class="data-row"><span class="data-row-label">${fmtDate(p.date)} · ${p.method}</span><span class="data-row-value"><span class="badge ${statusBadge(p.status)}">${p.status}</span></span></div>
-      ${p.notes ? `<div class="data-row"><span class="data-row-label">Note</span><span class="data-row-value" style="font-weight:400;color:var(--text-muted)">${p.notes}</span></div>` : ''}
-    </div>`).join('');
+  recalcRevenue();
+};
+
+function recalcRevenue(){
+  const{revenue,expenses}=getRevenueForPeriod();
+  const adsAmt=parseFloat(document.getElementById('split-ads-amt').value)||0;
+  const partnerAmt=parseFloat(document.getElementById('split-partner-amt').value)||0;
+  const empAmt=parseFloat(document.getElementById('split-emp-amt').value)||0;
+  const expPct=revenue>0?(expenses/revenue*100):0;
+  document.getElementById('split-exp-pct-display').textContent=expPct.toFixed(1)+'%';
+  document.getElementById('split-exp-amt-display').textContent='$'+expenses.toFixed(2);
+  const totalAllocated=adsAmt+partnerAmt+empAmt+expenses;
+  const net=revenue-totalAllocated;
+  document.getElementById('split-net-display').textContent='$'+net.toFixed(2);
+  document.getElementById('split-net-display').style.color=net<0?'var(--red)':'var(--green)';
+  const warnEl=document.getElementById('split-warning');
+  warnEl.style.display=totalAllocated>revenue&&revenue>0?'block':'none';
+  drawPieChart(revenue,adsAmt,partnerAmt,empAmt,expenses,Math.max(net,0));
 }
 
-function renderExpenses() {
-  const el = document.getElementById('expense-list');
-  if (data.expenses.length === 0) {
-    el.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg><p>No expenses logged yet.</p></div>`;
+function drawPieChart(revenue,ads,partner,emp,expenses,net){
+  const wrap=document.getElementById('pie-chart-wrap');
+  const legendEl=document.getElementById('pie-legend');
+  if(!wrap)return;
+  if(revenue<=0){
+    wrap.innerHTML='<div style="font-size:12px;color:var(--text-muted);padding:30px 0">No revenue in this period yet</div>';
+    legendEl.innerHTML='';
     return;
   }
-  const now = new Date();
-  const monthExp = data.expenses.filter(e => {
-    if (!e.date) return true;
-    const d = new Date(e.date + 'T00:00:00');
-    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+  const slices=[
+    {label:'Ads',val:ads,color:'#4a9fd4'},
+    {label:'Partner Split',val:partner,color:'#f0a060'},
+    {label:'Employees',val:emp,color:'#b388ff'},
+    {label:'Expenses',val:expenses,color:'#e57373'},
+    {label:'Net (you)',val:net,color:'#4caf80'}
+  ].filter(s=>s.val>0);
+  const total=slices.reduce((s,x)=>s+x.val,0)||1;
+  let cumulative=0;
+  const cx=70,cy=70,r=60;
+  let paths='';
+  slices.forEach(s=>{
+    const startAngle=(cumulative/total)*2*Math.PI-Math.PI/2;
+    cumulative+=s.val;
+    const endAngle=(cumulative/total)*2*Math.PI-Math.PI/2;
+    const x1=cx+r*Math.cos(startAngle),y1=cy+r*Math.sin(startAngle);
+    const x2=cx+r*Math.cos(endAngle),y2=cy+r*Math.sin(endAngle);
+    const largeArc=(endAngle-startAngle)>Math.PI?1:0;
+    paths+=`<path d="M${cx},${cy} L${x1},${y1} A${r},${r} 0 ${largeArc} 1 ${x2},${y2} Z" fill="${s.color}" opacity="0.85" stroke="#0a0f0a" stroke-width="2"/>`;
   });
-  const total = monthExp.reduce((s,e) => s + (parseFloat(e.amount)||0), 0);
-  const sorted = [...data.expenses].sort((a,b) => new Date(b.created) - new Date(a.created));
-  el.innerHTML = `<div class="card">` +
-    sorted.map(e => `
-      <div class="data-row">
-        <span class="data-row-label">${e.category}${e.desc ? ' · ' + e.desc : ''}</span>
-        <span class="data-row-value" style="color:var(--danger)">-$${(parseFloat(e.amount)||0).toFixed(2)}</span>
-      </div>`).join('') +
-    `<div class="exp-total"><span style="font-size:14px;font-weight:700">This month</span><span style="font-size:16px;font-weight:700;color:var(--danger)">-$${total.toFixed(2)}</span></div>
+  wrap.innerHTML=`<svg width="160" height="160" viewBox="0 0 140 140" style="filter:drop-shadow(0 0 10px rgba(76,175,128,0.2))">${paths}<circle cx="${cx}" cy="${cy}" r="32" fill="#0d1a0f" stroke="#1e3528" stroke-width="1"/></svg>`;
+  legendEl.innerHTML=slices.map(s=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0;font-size:11px"><span style="display:flex;align-items:center;gap:6px;color:var(--text-muted)"><span style="width:8px;height:8px;border-radius:2px;background:${s.color};display:inline-block"></span>${s.label}</span><span style="font-weight:700;color:var(--text)">$${s.val.toFixed(2)} · ${((s.val/total)*100).toFixed(0)}%</span></div>`).join('');
+}
+
+function renderRevenue(){
+  const homeRevVisible=document.getElementById('home-rev-view');
+  if(!homeRevVisible||homeRevVisible.style.display==='none')return;
+  const{revenue}=getRevenueForPeriod();
+  const{label}=getRevPeriodRange();
+  document.getElementById('rev-period-label').textContent=label;
+  document.getElementById('rev-total-display').textContent='$'+revenue.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+  ['ads','partner','emp'].forEach(key=>{
+    const pctEl=document.getElementById('split-'+key+'-pct');
+    const amtEl=document.getElementById('split-'+key+'-amt');
+    const pct=parseFloat(pctEl.value)||0;
+    if(pct>0)amtEl.value=(revenue*pct/100).toFixed(2);
+  });
+  recalcRevenue();
+}
+
+
+// JOB DETAIL
+window.openJobDetail=function(id){
+  currentJobId=id;const j=data.jobs.find(x=>x.id===id);if(!j)return;
+  const services=j.services||(j.service?[j.service]:[]);
+  document.getElementById('sheet-job-title').textContent=j.customerName;
+  document.getElementById('sheet-job-content').innerHTML=`
+    <div class="detail-section"><div class="detail-section-title">Job info</div>
+      <div class="detail-field"><span class="detail-field-label">Customer</span><span class="detail-field-value">${esc(j.customerName)}</span></div>
+      <div class="detail-field"><span class="detail-field-label">Date</span><input class="edit-input" id="edit-job-date" type="date" value="${j.date||''}" style="max-width:155px"></div>
+      <div class="detail-field"><span class="detail-field-label">Time</span><input class="edit-input" id="edit-job-time" type="time" value="${j.time||''}" style="max-width:135px"></div>
+      <div class="detail-field"><span class="detail-field-label">Price</span><input class="edit-input" id="edit-job-price" type="number" value="${j.price||0}" step="0.01" style="max-width:110px"></div>
+      <div class="detail-field"><span class="detail-field-label">Status</span><select class="edit-input" id="edit-job-status" style="max-width:155px">${['Scheduled','In progress','Completed','Invoiced'].map(s=>`<option ${j.status===s?'selected':''}>${s}</option>`).join('')}</select></div>
+    </div>
+    <div class="detail-section"><div class="detail-section-title">Services</div>
+      <div class="service-checks" id="edit-job-service-checks">
+        <button type="button" class="check-item ${services.includes('Window cleaning')?'checked':''}" onclick="toggleCheck(this)" data-value="Window cleaning"><div class="check-box"><span class="check-mark">✓</span></div>Window cleaning</button>
+        <button type="button" class="check-item ${services.includes('Pressure washing')?'checked':''}" onclick="toggleCheck(this)" data-value="Pressure washing"><div class="check-box"><span class="check-mark">✓</span></div>Pressure washing</button>
+        <button type="button" class="check-item ${services.includes('Pest control')?'checked':''}" onclick="toggleCheck(this)" data-value="Pest control"><div class="check-box"><span class="check-mark">✓</span></div>Pest control</button>
+        <button type="button" class="check-item ${services.includes('Quote')?'checked':''}" onclick="toggleCheck(this)" data-value="Quote"><div class="check-box"><span class="check-mark">✓</span></div>Quote</button>
+      </div>
+    </div>
+    <div class="detail-section"><div class="detail-section-title">Notes</div>
+      <textarea class="edit-input" id="edit-job-notes" rows="4" style="width:100%">${esc(j.notes||'')}</textarea>
+    </div>`;
+  openSheet('job');
+};
+window.saveJobEdit=async function(){
+  await fbUpdate('jobs',currentJobId,{date:document.getElementById('edit-job-date').value,time:document.getElementById('edit-job-time').value,price:parseFloat(document.getElementById('edit-job-price').value)||0,status:document.getElementById('edit-job-status').value,notes:document.getElementById('edit-job-notes').value.trim(),services:getCheckedServices('edit-job-service-checks')});
+  closeSheet('job');toast('Job updated!');
+};
+window.deleteJob=async function(){if(!confirm('Delete this job?'))return;await fbDelete('jobs',currentJobId);closeSheet('job');};
+
+// CAL DAY + JOB NOTES
+window.openCalDay=function(year,month,day){
+  const dateStr=year+'-'+String(month+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');
+  const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const d=new Date(year,month,day);
+  document.getElementById('sheet-calday-title').textContent=days[d.getDay()]+', '+months[month]+' '+day;
+  const dayJobs=data.jobs.filter(j=>j.date===dateStr).sort((a,b)=>(a.time||'').localeCompare(b.time||''));
+  const el=document.getElementById('sheet-calday-content');
+  el.innerHTML=dayJobs.length===0?'<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:13px">No jobs scheduled.</div>':dayJobs.map(j=>{
+    const services=j.services||(j.service?[j.service]:[]);
+    return`<div class="cal-job-row" onclick="openJobNotes('${j.id}')"><div><div class="cal-job-name">${esc(j.customerName)}</div><div class="cal-job-sub">${services.join(', ')} · ${j.time?fmtTime(j.time):'No time set'}</div></div><div style="display:flex;align-items:center;gap:8px"><span class="badge ${statusBadge(j.status)}">${j.status}</span><span style="color:var(--text-muted);font-size:18px">›</span></div></div>`;
+  }).join('');
+  openSheet('calday');
+};
+
+window.openJobNotes=function(jobId){
+  const j=data.jobs.find(x=>x.id===jobId);if(!j)return;
+  const services=j.services||(j.service?[j.service]:[]);
+  const cust=data.customers.find(x=>x.id===j.customerId);
+  const addr=cust&&cust.address?cust.address:'';
+  const enc=encodeURIComponent(addr);
+  document.getElementById('sheet-jobnotes-title').textContent=j.customerName+' — Notes';
+  document.getElementById('sheet-jobnotes-content').innerHTML=`
+    <div class="detail-section"><div class="detail-section-title">Job details</div>
+      <div class="detail-field"><span class="detail-field-label">Date</span><span class="detail-field-value">${fmtDate(j.date)}</span></div>
+      <div class="detail-field"><span class="detail-field-label">Time</span><span class="detail-field-value" style="color:var(--blue);text-shadow:0 0 6px rgba(74,159,212,0.4)">${j.time?fmtTime(j.time):'Not set'}</span></div>
+      <div class="detail-field"><span class="detail-field-label">Services</span><span class="detail-field-value">${services.join(', ')||'—'}</span></div>
+      <div class="detail-field"><span class="detail-field-label">Price</span><span class="detail-field-value" style="color:var(--green);text-shadow:0 0 6px rgba(76,175,128,0.4)">$${(parseFloat(j.price)||0).toFixed(2)}</span></div>
+      <div class="detail-field"><span class="detail-field-label">Status</span><span class="detail-field-value"><span class="badge ${statusBadge(j.status)}">${j.status}</span></span></div>
+    </div>
+    ${addr?`<div class="detail-section"><div class="detail-section-title">Address</div>
+      <div style="font-size:13px;color:var(--text);margin-bottom:10px">${esc(addr)}</div>
+      <div style="display:flex;gap:8px">
+        <a href="https://maps.apple.com/?q=${enc}" class="map-btn">🍎 Apple Maps</a>
+        <a href="https://www.google.com/maps/search/?api=1&query=${enc}" class="map-btn">🗺 Google Maps</a>
+      </div>
+    </div>`:''}
+    <div class="detail-section"><div class="detail-section-title">Notes</div>
+      <div style="font-size:13px;color:var(--text);line-height:1.6;min-height:60px;padding:10px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm)">${j.notes?esc(j.notes):'<span style="color:var(--text-muted)">No notes for this job.</span>'}</div>
+    </div>
+    <div style="margin-top:8px"><button class="btn-primary" onclick="closeSheet('jobnotes');openJobDetail('${j.id}')" style="width:100%;justify-content:center">Edit this job</button></div>`;
+  openSheet('jobnotes');
+};
+
+// RENDER FUNCTIONS
+function timeAgo(iso){const d=(Date.now()-new Date(iso))/1000;if(d<60)return'Just now';if(d<3600)return Math.floor(d/60)+'m ago';if(d<86400)return Math.floor(d/3600)+'h ago';return Math.floor(d/86400)+'d ago';}
+function initials(n){return n.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);}
+function avatarCol(n){const c=[{bg:'rgba(76,175,128,0.2)',c:'#4caf80'},{bg:'rgba(74,159,212,0.2)',c:'#4a9fd4'},{bg:'rgba(240,160,96,0.2)',c:'#f0a060'}];let h=0;for(let ch of n)h+=ch.charCodeAt(0);return c[h%3];}
+function statusBadge(s){const m={Completed:'badge-green',Paid:'badge-green',Accepted:'badge-green',Scheduled:'badge-blue','In progress':'badge-blue',Pending:'badge-orange',Invoiced:'badge-orange',Partial:'badge-orange',Declined:'badge-red',Unpaid:'badge-red',Sent:'badge-blue'};return m[s]||'badge-orange';}
+function fmtDate(d){if(!d)return'—';const dt=new Date(d+'T00:00:00');return dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}
+function fmtTime(t){if(!t)return'';const[h,m]=t.split(':');const hr=parseInt(h);return(hr%12||12)+':'+m+(hr>=12?' PM':' AM');}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function svcTag(s){const cls=s==='Pest control'?'blue':s==='Quote'?'orange':'green';return`<span class="svc-tag ${cls}">${s}</span>`;}
+
+function updateSpeedometer(val,max){
+  const pct=Math.min(val/max,1);
+  const offset=141-(141*pct);
+  const needle=document.getElementById('spedo-needle');
+  const fill=document.getElementById('spedo-fill');
+  if(!needle||!fill)return;
+  fill.setAttribute('stroke-dashoffset',offset.toString());
+  const angle=-180+(180*pct);
+  const rad=angle*Math.PI/180;
+  const x2=55+45*Math.cos(rad);
+  const y2=52+45*Math.sin(rad);
+  needle.setAttribute('x2',x2.toString());
+  needle.setAttribute('y2',y2.toString());
+}
+
+function renderDashboard(){
+  const now=new Date();
+  const mj=data.jobs.filter(j=>{if(!j.date)return false;const d=new Date(j.date+'T00:00:00');return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();});
+  const rev=mj.reduce((s,j)=>s+(parseFloat(j.price)||0),0);
+  document.getElementById('dash-revenue').textContent='$'+rev.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+  const ws=new Date(now);ws.setDate(now.getDate()-now.getDay());const we=new Date(ws);we.setDate(ws.getDate()+6);
+  const wj=data.jobs.filter(j=>{if(!j.date)return false;const d=new Date(j.date+'T00:00:00');return d>=ws&&d<=we;});
+  const wjCount=wj.length;
+  document.getElementById('dash-jobs-week').textContent=wjCount;
+  updateSpeedometer(wjCount,10);
+  const up=data.payments.filter(p=>p.status==='Unpaid');
+  const upTotal=up.reduce((s,p)=>s+(parseFloat(p.amount)||0),0);
+  document.getElementById('dash-unpaid').textContent='$'+upTotal.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+  document.getElementById('dash-unpaid-sub').textContent=up.length+' outstanding';
+  const needle=document.getElementById('unp-needle');
+  if(needle){const pct=Math.min(upTotal/1000,1);needle.style.right=(100-pct*85)+'%';}
+  document.getElementById('dash-customers').textContent=data.customers.length;
+  const avatarEl=document.getElementById('cust-avatars');
+  if(avatarEl){
+    const shown=data.customers.slice(0,3);
+    const remaining=data.customers.length-shown.length;
+    avatarEl.innerHTML=shown.map(c=>{const ac=avatarCol(c.name);return`<div style="width:16px;height:16px;border-radius:50%;background:${ac.bg};color:${ac.c};font-size:6px;font-weight:800;display:flex;align-items:center;justify-content:center;border:1px solid var(--bg);margin-right:-3px">${initials(c.name)}</div>`;}).join('')+(remaining>0?`<div style="width:16px;height:16px;border-radius:50%;background:var(--surface);color:var(--text-muted);font-size:6px;font-weight:800;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);margin-right:-3px">+${remaining}</div>`:'');
+  }
+  const acts=[...data.activity].sort((a,b)=>new Date(b.time)-new Date(a.time)).slice(0,6);
+  const actEl=document.getElementById('dash-activity');
+  if(acts.length===0){actEl.innerHTML='<div class="empty-state" style="padding:16px"><p>No activity yet.</p></div>';return;}
+  const dc={'New customer':'#4caf80','Job':'#4a9fd4','Payment':'#4caf80','Expense':'#e57373','Quote':'#f0a060','Online':'#4a9fd4'};
+  actEl.innerHTML=acts.map(a=>{let c='#4caf80';for(const[k,v] of Object.entries(dc)){if(a.text.startsWith(k)){c=v;break;}}return`<div class="activity-item"><div class="activity-dot" style="background:${c};box-shadow:0 0 5px ${c}"></div><div><div class="activity-text">${esc(a.text)}</div><div class="activity-sub">${esc(a.sub)} · ${timeAgo(a.time)}</div></div></div>`;}).join('');
+}
+
+function renderCustomers(){
+  const el=document.getElementById('customer-list');
+  if(data.customers.length===0){el.innerHTML=`<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><p>No customers yet.<br>Tap <strong>Add</strong> to create your first one.</p></div>`;return;}
+  el.innerHTML=[...data.customers].sort((a,b)=>a.name.localeCompare(b.name)).map(c=>{
+    const ac=avatarCol(c.name);const services=c.services||(c.service?[c.service]:[]);
+    const lastJob=data.jobs.filter(j=>j.customerId===c.id).sort((a,b)=>new Date(b.date)-new Date(a.date))[0];
+    return`<div class="card card-tap" onclick="openCustomerDetail('${c.id}')">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="avatar" style="background:${ac.bg};color:${ac.c};box-shadow:0 0 8px ${ac.c}">${initials(c.name)}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:14px;font-weight:800;color:var(--text)">${esc(c.name)}</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(c.phone||c.email||c.address||'No contact info')}</div>
+          <div style="margin-top:4px">${services.map(svcTag).join('')}</div>
+        </div>
+        <div style="color:var(--text-muted);font-size:20px">›</div>
+      </div>
+      ${lastJob?`<div style="font-size:10px;color:var(--text-muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">Last job: ${fmtDate(lastJob.date)}</div>`:''}
+    </div>`;}).join('');
+}
+
+function renderQuotes(){
+  const el=document.getElementById('quote-list');
+  if(data.quotes.length===0){el.innerHTML=`<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><p>No quotes yet.<br>Tap <strong>New quote</strong> to send one.</p></div>`;return;}
+  el.innerHTML=[...data.quotes].sort((a,b)=>new Date(b.created)-new Date(a.created)).map(q=>`
+    <div class="card blue card-tap" onclick="openQuoteDetail('${q.id}')">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+        <div><div style="font-size:14px;font-weight:800;color:var(--text)">${esc(q.customerName)}</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px">#${q.quoteNum} · ${fmtDate(q.created?.split('T')[0])}</div></div>
+        <span class="badge badge-blue">${q.status}</span>
+      </div>
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">${q.services.map(s=>s.name).join(', ')}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:18px;font-weight:900;color:var(--green);text-shadow:0 0 8px rgba(76,175,128,0.5)">$${(parseFloat(q.total)||0).toFixed(2)}</span>
+        <span style="font-size:11px;color:var(--text-muted)">Valid until ${q.validUntil}</span>
+      </div>
+    </div>`).join('');
+}
+
+function renderPayments(){
+  const el=document.getElementById('payment-list');
+  if(data.payments.length===0){el.innerHTML=`<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><p>No payments logged yet.</p></div>`;return;}
+  el.innerHTML=[...data.payments].sort((a,b)=>new Date(b.created)-new Date(a.created)).map(p=>`
+    <div class="card ${p.status==='Paid'?'':'red'} card-sm">
+      <div class="data-row"><span class="data-row-label">${esc(p.customerName)}</span><span class="data-row-value" style="color:${p.status==='Paid'?'var(--green)':'var(--red)'};text-shadow:0 0 6px ${p.status==='Paid'?'rgba(76,175,128,0.4)':'rgba(229,115,115,0.4)'}">$${(parseFloat(p.amount)||0).toFixed(2)}</span></div>
+      <div class="data-row"><span class="data-row-label">${fmtDate(p.date)} · ${esc(p.method)}</span><span class="data-row-value"><span class="badge ${statusBadge(p.status)}">${p.status}</span></span></div>
+      ${p.notes?`<div class="data-row"><span class="data-row-label">Note</span><span class="data-row-value" style="font-weight:400;color:var(--text-muted)">${esc(p.notes)}</span></div>`:''}
+    </div>`).join('');
+}
+
+function renderExpenses(){
+  const el=document.getElementById('expense-list');
+  if(data.expenses.length===0){el.innerHTML=`<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg><p>No expenses logged yet.</p></div>`;return;}
+  const now=new Date();
+  const me=data.expenses.filter(e=>{if(!e.date)return true;const d=new Date(e.date+'T00:00:00');return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();});
+  const total=me.reduce((s,e)=>s+(parseFloat(e.amount)||0),0);
+  const withReceipts=data.expenses.filter(e=>e.receiptPhoto).length;
+  el.innerHTML=`<div class="card orange">`+[...data.expenses].sort((a,b)=>new Date(b.created)-new Date(a.created)).map(e=>`
+    <div class="data-row" ${e.receiptPhoto?`onclick="viewReceipt('${e.id}')" style="cursor:pointer"`:''}>
+      <span class="data-row-label" style="display:flex;align-items:center;gap:6px">
+        ${e.receiptPhoto?`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg>`:''}
+        ${esc(e.category)}${e.desc?' · '+esc(e.desc):''}
+      </span>
+      <span class="data-row-value" style="color:var(--red);text-shadow:0 0 5px rgba(229,115,115,0.3)">-$${(parseFloat(e.amount)||0).toFixed(2)}</span>
+    </div>`).join('')+
+    `<div class="exp-total"><span style="font-size:13px;font-weight:800;color:var(--text)">This month</span><span style="font-size:17px;font-weight:900;color:var(--red);text-shadow:0 0 8px rgba(229,115,115,0.5)">-$${total.toFixed(2)}</span></div>
+    ${withReceipts>0?`<div style="font-size:10px;color:var(--text-muted);text-align:center;margin-top:8px">📷 ${withReceipts} receipt${withReceipts!==1?'s':''} saved · tap an expense with 📎 to view</div>`:''}
     </div>`;
 }
 
-function renderSchedule() {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = now.getMonth();
-  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-  document.getElementById('cal-month-title').textContent = months[month] + ' ' + year;
+window.viewReceipt=function(expId){
+  const e=data.expenses.find(x=>x.id===expId);if(!e||!e.receiptPhoto)return;
+  document.getElementById('sheet-jobnotes-title').textContent=e.category+' Receipt';
+  document.getElementById('sheet-jobnotes-content').innerHTML=`
+    <div class="detail-section">
+      <div class="detail-field"><span class="detail-field-label">Amount</span><span class="detail-field-value" style="color:var(--red)">-$${(parseFloat(e.amount)||0).toFixed(2)}</span></div>
+      <div class="detail-field"><span class="detail-field-label">Date</span><span class="detail-field-value">${fmtDate(e.date)}</span></div>
+      ${e.desc?`<div class="detail-field"><span class="detail-field-label">Note</span><span class="detail-field-value" style="font-weight:400">${esc(e.desc)}</span></div>`:''}
+    </div>
+    <div class="detail-section">
+      <img src="${e.receiptPhoto}" style="width:100%;border-radius:var(--radius-md);border:1px solid var(--border)">
+    </div>`;
+  openSheet('jobnotes');
+};
 
-  const firstDay = new Date(year, month, 1).getDay();
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const today = now.getDate();
+function initCal(){const now=new Date();calViewYear=now.getFullYear();calViewMonth=now.getMonth();}
+window.changeMonth=function(dir){calViewMonth+=dir;if(calViewMonth>11){calViewMonth=0;calViewYear++;}if(calViewMonth<0){calViewMonth=11;calViewYear--;}renderSchedule();};
 
-  // job dates this month
-  const jobDates = new Set(data.jobs.filter(j => {
-    if (!j.date) return false;
-    const d = new Date(j.date + 'T00:00:00');
-    return d.getMonth() === month && d.getFullYear() === year;
-  }).map(j => parseInt(j.date.split('-')[2])));
-
-  const days = ['Su','Mo','Tu','We','Th','Fr','Sa'];
-  let html = days.map(d => `<div class="cal-day-label">${d}</div>`).join('');
-  for (let i = 0; i < firstDay; i++) html += `<div class="cal-day empty"></div>`;
-  for (let d = 1; d <= daysInMonth; d++) {
-    let cls = 'cal-day';
-    if (d === today) cls += ' today';
-    else if (jobDates.has(d)) cls += ' has-job';
-    html += `<div class="${cls}">${d}</div>`;
+function renderSchedule(){
+  if(calViewYear===undefined)initCal();
+  const now=new Date();const year=calViewYear,month=calViewMonth;
+  const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('cal-month-title').textContent=months[month]+' '+year;
+  const firstDay=new Date(year,month,1).getDay();
+  const dim=new Date(year,month+1,0).getDate();
+  const todayDay=(now.getFullYear()===year&&now.getMonth()===month)?now.getDate():0;
+  const jdm={};
+  data.jobs.filter(j=>{if(!j.date)return false;const d=new Date(j.date+'T00:00:00');return d.getMonth()===month&&d.getFullYear()===year;}).forEach(j=>{const d=parseInt(j.date.split('-')[2]);jdm[d]=(jdm[d]||0)+1;});
+  const days=['Su','Mo','Tu','We','Th','Fr','Sa'];
+  let html=days.map(d=>`<div class="cal-day-label">${d}</div>`).join('');
+  for(let i=0;i<firstDay;i++)html+=`<div class="cal-day empty"></div>`;
+  for(let d=1;d<=dim;d++){
+    let cls='cal-day';if(d===todayDay)cls+=' today';else if(jdm[d])cls+=' has-job';
+    html+=`<div class="${cls}" onclick="openCalDay(${year},${month},${d})">${d}${jdm[d]?'<div class="cal-dot"></div>':''}</div>`;
   }
-  document.getElementById('cal-grid').innerHTML = html;
-
-  // Upcoming jobs
-  const upcoming = data.jobs.filter(j => {
-    if (!j.date) return false;
-    return new Date(j.date + 'T00:00:00') >= new Date(now.toDateString());
-  }).sort((a,b) => new Date(a.date) - new Date(b.date)).slice(0, 5);
-
-  const upEl = document.getElementById('upcoming-jobs');
-  if (upcoming.length === 0) {
-    upEl.innerHTML = `<div class="card card-sm" style="color:var(--text-muted);font-size:13px;text-align:center;padding:20px">No upcoming jobs scheduled</div>`;
-  } else {
-    upEl.innerHTML = upcoming.map(j => `
-      <div class="card card-sm">
-        <div class="data-row">
-          <span class="data-row-label">${fmtDate(j.date)}</span>
-          <span class="badge ${statusBadge(j.status)}">${j.status}</span>
+  document.getElementById('cal-grid').innerHTML=html;
+  const todayStr=now.toISOString().split('T')[0];
+  const upcoming=data.jobs.filter(j=>j.date&&j.date>=todayStr).sort((a,b)=>a.date.localeCompare(b.date)||(a.time||'').localeCompare(b.time||'')).slice(0,8);
+  const upEl=document.getElementById('upcoming-jobs');
+  if(upcoming.length===0){upEl.innerHTML=`<div class="card" style="text-align:center;color:var(--text-muted);font-size:13px;padding:20px">No upcoming jobs</div>`;return;}
+  upEl.innerHTML=upcoming.map(j=>{
+    const services=j.services||(j.service?[j.service]:[]);
+    const dotCls=j.status==='Completed'?'':'j.status==="Invoiced"?"orange":"'+(j.time?'blue':'')+'';
+    return`<div class="jrow ${j.date===todayStr?'':'blue'} card-tap" onclick="openJobNotes('${j.id}')">
+      <div style="display:flex;align-items:flex-start">
+        <div class="jdot ${j.date===todayStr?'':'blue'}"></div>
+        <div>
+          <div class="jname">${esc(j.customerName)}</div>
+          <div class="jdet">${fmtDate(j.date)}${j.time?' · <span style="color:var(--blue);font-weight:700;text-shadow:0 0 5px rgba(74,159,212,0.4)">'+fmtTime(j.time)+'</span>':''}</div>
+          <div style="margin-top:3px">${services.map(svcTag).join('')}</div>
         </div>
-        <div class="data-row">
-          <span class="data-row-label">${j.customerName}</span>
-          <span class="data-row-value">$${(parseFloat(j.price)||0).toFixed(2)}</span>
-        </div>
-        <div style="font-size:12px;color:var(--text-muted);padding-top:4px">${j.service}</div>
-      </div>`).join('');
-  }
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px">
+        <span class="badge ${statusBadge(j.status)}">${j.status}</span>
+        <span style="color:var(--text-muted);font-size:18px">›</span>
+      </div>
+    </div>`;}).join('');
 }
 
-// ---- TOPBAR DATE ----
-function setDate() {
-  const now = new Date();
-  document.getElementById('topbarDate').innerHTML =
-    now.toLocaleDateString('en-US', {weekday:'short', month:'short', day:'numeric'});
-}
-
-// ---- INIT ----
-load();
+function setDate(){document.getElementById('topbarDate').innerHTML=new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});}
 setDate();
-renderDashboard();
+attachPhoneFormat('cust-phone');
 </script>
+</div>
 </body>
 </html>

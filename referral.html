@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Refer a Friend — Smudge Busters</title>
+<style>
+  :root {
+    --green:#4caf80;--green-dark:#2a7d4f;--green-dim:#0d1f0f;
+    --blue:#4a9fd4;--blue-dim:#0d1520;
+    --orange:#f0a060;
+    --bg:#0a0f0a;--surface:#0d1a0f;--border:#1e3528;
+    --text:#e8f5ee;--text-muted:#4a7a5a;
+    --glow-green:0 0 8px rgba(76,175,128,0.4);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+  .wrap{max-width:480px;margin:0 auto;padding:20px 16px 60px;}
+  .header{text-align:center;padding:24px 0;}
+  .biz-name{font-size:26px;font-weight:900;font-style:italic;letter-spacing:-1.5px;}
+  .biz-smudge{color:var(--blue);text-shadow:0 0 8px var(--blue),0 0 20px rgba(74,159,212,0.5);}
+  .biz-busters{color:var(--orange);text-shadow:0 0 8px var(--orange),0 0 20px rgba(240,160,96,0.5);}
+  .biz-sub{font-size:11px;color:var(--text-muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:6px;}
+  .intro{background:var(--surface);border:1px solid var(--green);border-radius:14px;padding:16px;margin-bottom:20px;box-shadow:var(--glow-green);font-size:14px;line-height:1.6;color:var(--text);}
+  .intro strong{color:var(--green);}
+  .row{display:flex;gap:8px;margin-bottom:10px;align-items:center;}
+  .row-num{width:22px;height:22px;border-radius:50%;background:var(--green-dim);border:1px solid var(--green);color:var(--green);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .row input{flex:1;padding:11px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;color:var(--text);background:var(--surface);outline:none;}
+  .row input:focus{border-color:var(--green);box-shadow:var(--glow-green);}
+  .submit-btn{width:100%;background:var(--green-dark);color:#fff;border:1px solid var(--green);border-radius:10px;padding:14px;font-size:15px;font-weight:800;cursor:pointer;margin-top:16px;box-shadow:var(--glow-green);}
+  .submit-btn:active{opacity:0.85;}
+  .submit-btn:disabled{opacity:0.5;}
+  .success{display:none;text-align:center;padding:40px 20px;}
+  .success.show{display:block;}
+  .success-icon{font-size:48px;margin-bottom:16px;}
+  .success-title{font-size:20px;font-weight:800;color:var(--green);margin-bottom:8px;}
+  .success-sub{font-size:13px;color:var(--text-muted);}
+  .form-wrap.hidden{display:none;}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="header">
+    <div class="biz-name"><span class="biz-smudge">SMUDGE</span> <span class="biz-busters">BUSTERS</span></div>
+    <div class="biz-sub">🪟 Window · Pressure · Pest</div>
+  </div>
+
+  <div class="intro" id="intro-text">
+    Know anyone who could use our services? List up to 10 friends or family below and we'll reach out to them directly. <strong>Thank you for spreading the word!</strong>
+  </div>
+
+  <div class="form-wrap" id="form-wrap">
+    <div id="rows"></div>
+    <button class="submit-btn" id="submit-btn" onclick="submitReferrals()">Submit referrals</button>
+  </div>
+
+  <div class="success" id="success">
+    <div class="success-icon">🎉</div>
+    <div class="success-title">Thanks for the referrals!</div>
+    <div class="success-sub">We'll be reaching out to them soon. We really appreciate it!</div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey:"AIzaSyCxXdYaK1fKls9rPdEKDC1xW3AmdLlZJCI",
+  authDomain:"smudge-busters.firebaseapp.com",
+  projectId:"smudge-busters",
+  storageBucket:"smudge-busters.firebasestorage.app",
+  messagingSenderId:"633105436511",
+  appId:"1:633105436511:web:6d460bbe49e988e438b0ea"
+};
+const app=initializeApp(firebaseConfig);
+const db=getFirestore(app);
+
+const params=new URLSearchParams(window.location.search);
+const fromName=params.get('from')||'A customer';
+const fromId=params.get('fromId')||'';
+
+document.getElementById('intro-text').innerHTML=`Hi! Know anyone who could use our services? List up to 10 friends or family below and we'll reach out to them directly. <strong>Thank you, ${fromName.split(' ')[0]}, for spreading the word!</strong>`;
+
+const rowsEl=document.getElementById('rows');
+let html='';
+for(let i=1;i<=10;i++){
+  html+=`<div class="row"><div class="row-num">${i}</div><input type="text" id="name-${i}" placeholder="Full name"><input type="tel" id="phone-${i}" placeholder="Phone number"></div>`;
+}
+rowsEl.innerHTML=html;
+
+function formatPhone(v){const d=v.replace(/\D/g,'').slice(0,10);if(d.length<4)return d;if(d.length<7)return'('+d.slice(0,3)+') '+d.slice(3);return'('+d.slice(0,3)+') '+d.slice(3,6)+'-'+d.slice(6);}
+for(let i=1;i<=10;i++){
+  const el=document.getElementById('phone-'+i);
+  el.addEventListener('input',function(){const p=this.selectionStart,pv=this.value.length;this.value=formatPhone(this.value);const diff=this.value.length-pv;try{this.setSelectionRange(p+diff,p+diff);}catch(e){}});
+}
+
+window.submitReferrals=async function(){
+  const names=[];
+  for(let i=1;i<=10;i++){
+    const name=document.getElementById('name-'+i).value.trim();
+    const phone=document.getElementById('phone-'+i).value.trim();
+    if(name){names.push({name,phone,status:'No Answer',callbackDate:null});}
+  }
+  if(names.length===0){alert('Please add at least one referral.');return;}
+  const btn=document.getElementById('submit-btn');
+  btn.disabled=true;btn.textContent='Submitting...';
+  try{
+    await addDoc(collection(db,'leads'),{fromName,fromId,names,created:new Date().toISOString()});
+    document.getElementById('form-wrap').classList.add('hidden');
+    document.getElementById('success').classList.add('show');
+  }catch(e){
+    console.error(e);
+    alert('Something went wrong submitting. Please try again.');
+    btn.disabled=false;btn.textContent='Submit referrals';
+  }
+};
+</script>
+</body>
+</html>
