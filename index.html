@@ -541,14 +541,30 @@
 
         <div class="form-group">
           <label class="form-label">Send to</label>
-          <div class="service-checks" style="grid-template-columns:1fr 1fr 1fr" id="camp-filter-checks">
-            <button type="button" class="check-item checked" onclick="toggleCampFilter(this,'all')" data-filter="all"><div class="check-box"><span class="check-mark">✓</span></div>All</button>
-            <button type="button" class="check-item" onclick="toggleCampFilter(this,'Window cleaning')" data-filter="Window cleaning"><div class="check-box"><span class="check-mark">✓</span></div>Window</button>
-            <button type="button" class="check-item" onclick="toggleCampFilter(this,'Pressure washing')" data-filter="Pressure washing"><div class="check-box"><span class="check-mark">✓</span></div>Pressure</button>
-            <button type="button" class="check-item" onclick="toggleCampFilter(this,'Pest control')" data-filter="Pest control"><div class="check-box"><span class="check-mark">✓</span></div>Pest</button>
-            <button type="button" class="check-item" onclick="toggleCampFilter(this,'Quote')" data-filter="Quote"><div class="check-box"><span class="check-mark">✓</span></div>Quote</button>
-            <button type="button" class="check-item" onclick="toggleCampFilter(this,'custom')" data-filter="custom"><div class="check-box"><span class="check-mark">✓</span></div>Pick individually</button>
+          <div class="service-checks" style="grid-template-columns:1fr 1fr" id="camp-mode-checks">
+            <button type="button" class="check-item checked" onclick="setCampMode(this,'all')" data-mode="all"><div class="check-box"><span class="check-mark">✓</span></div>All customers</button>
+            <button type="button" class="check-item" onclick="setCampMode(this,'service')" data-mode="service"><div class="check-box"><span class="check-mark">✓</span></div>By service type</button>
+            <button type="button" class="check-item" onclick="setCampMode(this,'month')" data-mode="month"><div class="check-box"><span class="check-mark">✓</span></div>By month serviced</button>
+            <button type="button" class="check-item" onclick="setCampMode(this,'custom')" data-mode="custom"><div class="check-box"><span class="check-mark">✓</span></div>Pick individually</button>
           </div>
+        </div>
+
+        <!-- SERVICE TYPE SUB-FILTER -->
+        <div class="form-group" id="camp-service-panel" style="display:none">
+          <label class="form-label">Service type</label>
+          <div class="service-checks" id="camp-filter-checks">
+            <button type="button" class="check-item checked" onclick="toggleCampServiceFilter(this,'Window cleaning')" data-filter="Window cleaning"><div class="check-box"><span class="check-mark">✓</span></div>Window</button>
+            <button type="button" class="check-item" onclick="toggleCampServiceFilter(this,'Pressure washing')" data-filter="Pressure washing"><div class="check-box"><span class="check-mark">✓</span></div>Pressure</button>
+            <button type="button" class="check-item" onclick="toggleCampServiceFilter(this,'Pest control')" data-filter="Pest control"><div class="check-box"><span class="check-mark">✓</span></div>Pest</button>
+            <button type="button" class="check-item" onclick="toggleCampServiceFilter(this,'Quote')" data-filter="Quote"><div class="check-box"><span class="check-mark">✓</span></div>Quote</button>
+          </div>
+        </div>
+
+        <!-- MONTH SUB-FILTER -->
+        <div class="form-group" id="camp-month-panel" style="display:none">
+          <label class="form-label">Month of last service</label>
+          <select class="form-input" id="camp-month-select" onchange="updateCampRecipients()"></select>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:6px">Includes customers with a completed job in that month.</div>
         </div>
 
         <div id="camp-recipient-list" style="margin-top:10px"></div>
@@ -626,7 +642,7 @@
       <div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="cust-phone" type="tel" placeholder="(618) 555-0100"></div>
       <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="cust-email" type="email" placeholder="jane@email.com"></div>
     </div>
-    <div class="form-group"><label class="form-label">Address</label><input class="form-input" id="cust-address" type="text" placeholder="123 Main St, Venedy IL"></div>
+    <div class="form-group"><label class="form-label">Address</label><input class="form-input" id="cust-address" type="text" placeholder="123 Main St, Sparta IL"></div>
     <div class="form-group"><label class="form-label">Services</label>
       <div class="service-checks" id="cust-service-checks">
         <button type="button" class="check-item" onclick="toggleCheck(this)" data-value="Window cleaning"><div class="check-box"><span class="check-mark">✓</span></div>Window cleaning</button>
@@ -1032,7 +1048,7 @@ window.sendQuote=async function(){
   const htmlBody=`<div style="font-family:-apple-system,sans-serif;max-width:500px;margin:0 auto;background:#0a0f0a;border:1px solid #4caf80;border-radius:12px;overflow:hidden">
     <div style="background:linear-gradient(135deg,#2a7d4f,#1a6fa8);padding:20px 24px">
       <div style="font-size:22px;font-weight:900;font-style:italic;letter-spacing:-1px"><span style="color:#4a9fd4;text-shadow:0 0 8px #4a9fd4">SMUDGE</span> <span style="color:#f0a060;text-shadow:0 0 8px #f0a060">BUSTERS</span></div>
-      <div style="font-size:11px;color:rgba(255,255,255,0.7);margin-top:4px;letter-spacing:1px;text-transform:uppercase">🪟 Window · Pressure · Pest · Venedy, IL</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.7);margin-top:4px;letter-spacing:1px;text-transform:uppercase">🪟 Window · Pressure · Pest · Sparta, IL</div>
     </div>
     <div style="padding:24px;background:#0d1a0f">
       <p style="font-size:15px;color:#e8f5ee;margin-bottom:16px">Hi ${cust.name.split(' ')[0]},<br><br>Thank you for your interest in Smudge Busters! Here is your personalized quote <strong style="color:#4caf80">${quoteNum}</strong>.</p>
@@ -1054,7 +1070,7 @@ window.sendQuote=async function(){
       </div>
       <div style="text-align:center;font-size:16px;font-weight:700;color:#e8f5ee;padding:8px 0">Thank you for choosing Smudge Busters! 🪟</div>
     </div>
-    <div style="background:#0a0f0a;border-top:1px solid #1e3528;padding:12px 24px;text-align:center;font-size:11px;color:#4a7a5a">Smudge Busters · Venedy, IL · (618) 967-6977</div>
+    <div style="background:#0a0f0a;border-top:1px solid #1e3528;padding:12px 24px;text-align:center;font-size:11px;color:#4a7a5a">Smudge Busters · Sparta, IL · (618) 967-6977</div>
   </div>`;
   try{
     if(!window.emailjs){
@@ -1219,39 +1235,65 @@ document.addEventListener('click',e=>{
 
 // REFERRAL FORM SEND
 // MASS EMAIL CAMPAIGNS
-let campSelectedFilters=['all'];
+let campMode='all';
+let campServiceFilters=['Window cleaning'];
 
-window.toggleCampFilter=function(btn,filter){
-  if(filter==='all'){
-    document.querySelectorAll('#camp-filter-checks .check-item').forEach(b=>b.classList.remove('checked'));
-    btn.classList.add('checked');
-    campSelectedFilters=['all'];
-  }else{
-    document.querySelector('#camp-filter-checks [data-filter="all"]').classList.remove('checked');
-    btn.classList.toggle('checked');
-    campSelectedFilters=Array.from(document.querySelectorAll('#camp-filter-checks .check-item.checked')).map(b=>b.dataset.filter);
-    if(campSelectedFilters.length===0){
-      document.querySelector('#camp-filter-checks [data-filter="all"]').classList.add('checked');
-      campSelectedFilters=['all'];
-    }
-  }
+window.setCampMode=function(btn,mode){
+  campMode=mode;
+  document.querySelectorAll('#camp-mode-checks .check-item').forEach(b=>b.classList.remove('checked'));
+  btn.classList.add('checked');
+  document.getElementById('camp-service-panel').style.display=mode==='service'?'block':'none';
+  document.getElementById('camp-month-panel').style.display=mode==='month'?'block':'none';
+  if(mode==='month')populateCampMonths();
   updateCampRecipients();
 };
 
+window.toggleCampServiceFilter=function(btn,filter){
+  btn.classList.toggle('checked');
+  campServiceFilters=Array.from(document.querySelectorAll('#camp-filter-checks .check-item.checked')).map(b=>b.dataset.filter);
+  updateCampRecipients();
+};
+
+function populateCampMonths(){
+  const sel=document.getElementById('camp-month-select');
+  const months=new Set();
+  data.jobs.forEach(j=>{
+    if(j.date){
+      const d=new Date(j.date+'T00:00:00');
+      months.add(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'));
+    }
+  });
+  const sorted=[...months].sort().reverse();
+  const monthNames=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  sel.innerHTML=sorted.length===0?'<option value="">No job history yet</option>':sorted.map(m=>{
+    const[y,mo]=m.split('-');
+    return`<option value="${m}">${monthNames[parseInt(mo)-1]} ${y}</option>`;
+  }).join('');
+}
+
 function getCampRecipients(){
-  if(campSelectedFilters.includes('all')){
+  if(campMode==='all'){
     return data.customers.filter(c=>c.email);
   }
-  if(campSelectedFilters.includes('custom')){
+  if(campMode==='custom'){
     return data.customers.filter(c=>{
       const cb=document.getElementById('camp-cust-'+c.id);
       return cb&&cb.checked;
     });
   }
+  if(campMode==='month'){
+    const monthVal=document.getElementById('camp-month-select').value;
+    if(!monthVal)return[];
+    const custIdsWithJobInMonth=new Set(
+      data.jobs.filter(j=>j.date&&j.date.startsWith(monthVal)).map(j=>j.customerId)
+    );
+    return data.customers.filter(c=>c.email&&custIdsWithJobInMonth.has(c.id));
+  }
+  // service mode
   return data.customers.filter(c=>{
     if(!c.email)return false;
     const services=c.services||(c.service?[c.service]:[]);
-    return campSelectedFilters.some(f=>services.includes(f));
+    return campServiceFilters.some(f=>services.includes(f));
   });
 }
 
@@ -1269,12 +1311,16 @@ function lastEmailedText(custId){
 window.updateCampRecipients=function(){
   const listEl=document.getElementById('camp-recipient-list');
   const countEl=document.getElementById('camp-recipient-count');
-  if(campSelectedFilters.includes('custom')){
+  if(campMode==='custom'){
+    // preserve currently checked IDs before rebuilding so a re-render never loses a selection
+    const previouslyChecked=new Set(
+      Array.from(document.querySelectorAll('#camp-recipient-list input[type="checkbox"]:checked')).map(cb=>cb.id.replace('camp-cust-',''))
+    );
     const withEmail=data.customers.filter(c=>c.email);
     listEl.innerHTML=withEmail.length===0?'<div style="font-size:12px;color:var(--text-muted)">No customers with an email on file</div>':withEmail.map(c=>`
       <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">
         <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text);cursor:pointer">
-          <input type="checkbox" id="camp-cust-${c.id}" onchange="updateCampRecipients()" style="width:16px;height:16px">
+          <input type="checkbox" id="camp-cust-${c.id}" onchange="updateCampRecipients()" style="width:16px;height:16px" ${previouslyChecked.has(c.id)?'checked':''}>
           ${esc(c.name)}
         </label>
         <span style="font-size:10px;color:var(--text-muted)">${lastEmailedText(c.id)}</span>
@@ -1300,11 +1346,11 @@ window.sendCampaign=async function(){
   const htmlBody=`<div style="font-family:-apple-system,sans-serif;max-width:500px;margin:0 auto;background:#0a0f0a;border:1px solid #4caf80;border-radius:12px;overflow:hidden">
     <div style="background:linear-gradient(135deg,#2a7d4f,#1a6fa8);padding:20px 24px">
       <div style="font-size:22px;font-weight:900;font-style:italic;letter-spacing:-1px"><span style="color:#4a9fd4;text-shadow:0 0 8px #4a9fd4">SMUDGE</span> <span style="color:#f0a060;text-shadow:0 0 8px #f0a060">BUSTERS</span></div>
-      <div style="font-size:11px;color:rgba(255,255,255,0.7);margin-top:4px;letter-spacing:1px;text-transform:uppercase">🪟 Window · Pressure · Pest · Venedy, IL</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.7);margin-top:4px;letter-spacing:1px;text-transform:uppercase">🪟 Window · Pressure · Pest · Sparta, IL</div>
     </div>
     <div style="padding:24px;background:#0d1a0f">
       <div style="font-size:14px;color:#e8f5ee;line-height:1.7;white-space:pre-wrap">${esc(message)}</div>
-      <div style="text-align:center;margin-top:24px;padding-top:16px;border-top:1px solid #1e3528;font-size:12px;color:#4a7a5a">Smudge Busters · Venedy, IL · (618) 967-6977</div>
+      <div style="text-align:center;margin-top:24px;padding-top:16px;border-top:1px solid #1e3528;font-size:12px;color:#4a7a5a">Smudge Busters · Sparta, IL · (618) 967-6977</div>
     </div>
   </div>`;
 
@@ -1355,14 +1401,14 @@ window.sendReferralForm=async function(){
   const htmlBody=`<div style="font-family:-apple-system,sans-serif;max-width:500px;margin:0 auto;background:#0a0f0a;border:1px solid #4caf80;border-radius:12px;overflow:hidden">
     <div style="background:linear-gradient(135deg,#2a7d4f,#1a6fa8);padding:20px 24px">
       <div style="font-size:22px;font-weight:900;font-style:italic;letter-spacing:-1px"><span style="color:#4a9fd4;text-shadow:0 0 8px #4a9fd4">SMUDGE</span> <span style="color:#f0a060;text-shadow:0 0 8px #f0a060">BUSTERS</span></div>
-      <div style="font-size:11px;color:rgba(255,255,255,0.7);margin-top:4px;letter-spacing:1px;text-transform:uppercase">🪟 Window · Pressure · Pest · Venedy, IL</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.7);margin-top:4px;letter-spacing:1px;text-transform:uppercase">🪟 Window · Pressure · Pest · Sparta, IL</div>
     </div>
     <div style="padding:24px;background:#0d1a0f">
       <p style="font-size:15px;color:#e8f5ee;margin-bottom:16px">Hi ${cust.name.split(' ')[0]},<br><br>Know anyone who could use our window cleaning, pressure washing, or pest control services? Send us their info below and we'll reach out!</p>
       <a href="${refLink}" style="display:block;background:#4caf80;color:#0a0f0a;text-align:center;padding:14px;border-radius:8px;font-size:15px;font-weight:800;text-decoration:none;margin-bottom:16px">Refer a friend →</a>
       <div style="text-align:center;font-size:14px;font-weight:700;color:#e8f5ee">Thank you for choosing Smudge Busters! 🪟</div>
     </div>
-    <div style="background:#0a0f0a;border-top:1px solid #1e3528;padding:12px 24px;text-align:center;font-size:11px;color:#4a7a5a">Smudge Busters · Venedy, IL · (618) 967-6977</div>
+    <div style="background:#0a0f0a;border-top:1px solid #1e3528;padding:12px 24px;text-align:center;font-size:11px;color:#4a7a5a">Smudge Busters · Sparta, IL · (618) 967-6977</div>
   </div>`;
   try{
     if(!window.emailjs){
