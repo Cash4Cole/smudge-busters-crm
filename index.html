@@ -335,13 +335,13 @@
   <div class="section active" id="sec-dashboard">
     <div class="home-tab-bar">
       <button class="home-tab active-home" id="htab-dash" onclick="switchHomeTab('dash')">Home</button>
-      <button class="home-tab" id="htab-leads" onclick="switchHomeTab('leads')">Leads</button>
+      <button class="home-tab" id="htab-money" onclick="switchHomeTab('money')">Money</button>
       <button class="home-tab" id="htab-rev" onclick="switchHomeTab('rev')">Revenue</button>
     </div>
 
     <div id="home-dash-view">
     <div class="gauge-grid">
-      <div class="gc gc-rev">
+      <div class="gc gc-rev" onclick="goToHomeSubTab('rev')" style="cursor:pointer">
         <div class="cash-bg" style="color:var(--green)">$$$$$$</div>
         <div class="gi">
           <div class="gl" style="color:var(--green);text-shadow:0 0 5px rgba(76,175,128,0.5)">Revenue</div>
@@ -352,7 +352,7 @@
           </div>
         </div>
       </div>
-      <div class="gc gc-job">
+      <div class="gc gc-job" onclick="showSection('schedule',document.querySelector('.nav-btn:nth-child(5)'))" style="cursor:pointer">
         <div class="gi" style="padding:5px 5px 3px">
           <div style="font-size:8px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:0.5px;text-shadow:0 0 5px rgba(74,159,212,0.5)">Jobs/week</div>
           <svg width="100%" height="52" viewBox="0 0 110 56" style="display:block">
@@ -368,7 +368,7 @@
           <div style="font-size:18px;font-weight:900;color:var(--blue);margin-top:-6px;text-shadow:0 0 10px rgba(74,159,212,0.6)"><span id="dash-jobs-week">0</span> <span style="font-size:9px;font-weight:500;color:var(--text-muted)">jobs</span></div>
         </div>
       </div>
-      <div class="gc gc-unp">
+      <div class="gc gc-unp" onclick="goToMoneyTab('payments')" style="cursor:pointer">
         <div class="cash-bg" style="color:var(--red)">⚠⚠⚠</div>
         <div class="gi">
           <div class="gl" style="color:var(--red);text-shadow:0 0 5px rgba(229,115,115,0.5)">Unpaid</div>
@@ -379,7 +379,7 @@
           </div>
         </div>
       </div>
-      <div class="gc gc-cus">
+      <div class="gc gc-cus" onclick="showSection('customers',document.querySelector('.nav-btn:nth-child(2)'))" style="cursor:pointer">
         <div class="gi">
           <div class="gl" style="color:var(--purple);text-shadow:0 0 5px rgba(179,136,255,0.5)">Customers</div>
           <div class="gv" id="dash-customers" style="color:var(--purple);text-shadow:0 0 12px rgba(179,136,255,0.6)">0</div>
@@ -401,16 +401,25 @@
     </div>
     </div>
 
-    <!-- LEADS VIEW -->
-    <div id="home-leads-view" style="display:none">
+    <!-- MONEY VIEW (under Home) -->
+    <div id="home-money-view" style="display:none">
       <div class="sec-header" style="margin-bottom:10px">
-        <div style="font-size:15px;font-weight:800;color:var(--text)">Leads</div>
-        <button class="btn-blue" onclick="openModal('send-referral')">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-          Send referral form
-        </button>
+        <div style="font-size:15px;font-weight:800;color:var(--text)">Money</div>
+        <div style="display:flex;gap:6px">
+          <button class="btn-primary" onclick="openModal('payment')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Pay</button>
+          <button class="btn-orange" onclick="openModal('expense')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Exp</button>
+        </div>
       </div>
-      <div id="leads-list"></div>
+      <button class="btn-secondary" style="width:100%;justify-content:center;margin-bottom:10px" onclick="exportMoneyCSV()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export CSV (for QuickBooks / accountant)
+      </button>
+      <div class="money-tab-bar">
+        <button class="money-tab active-pay" id="tab-pay" onclick="switchMoneyTab('payments')">Payments</button>
+        <button class="money-tab" id="tab-exp" onclick="switchMoneyTab('expenses')">Expenses</button>
+      </div>
+      <div id="payment-list"></div>
+      <div id="expense-list" style="display:none"></div>
     </div>
 
     <!-- REVENUE VIEW -->
@@ -476,12 +485,22 @@
           <span style="font-size:20px;font-weight:900;color:var(--green);text-shadow:0 0 10px rgba(76,175,128,0.6)" id="split-net-display">$0.00</span>
         </div>
       </div>
+
+      <div class="card">
+        <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:10px">Jobs by service type</div>
+        <div id="svc-pie-wrap" style="display:flex;justify-content:center;margin-bottom:14px"></div>
+        <div id="svc-pie-legend"></div>
+      </div>
     </div>
   </div>
 
   <!-- CUSTOMERS -->
   <div class="section" id="sec-customers">
     <div class="sec-header"><div class="sec-title">Customers</div><button class="btn-primary" onclick="openModal('customer')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add</button></div>
+    <button class="btn-secondary" style="width:100%;justify-content:center;margin-bottom:10px" onclick="exportCustomersCSV()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Export CSV
+    </button>
     <div id="customer-list"></div>
   </div>
 
@@ -491,21 +510,63 @@
     <div id="quote-list"></div>
   </div>
 
-  <!-- MONEY -->
+  <!-- PIPELINE (Leads + Campaigns) -->
   <div class="section" id="sec-payments">
     <div class="sec-header">
-      <div class="sec-title">Money</div>
-      <div style="display:flex;gap:6px">
-        <button class="btn-primary" onclick="openModal('payment')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Pay</button>
-        <button class="btn-orange" onclick="openModal('expense')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Exp</button>
-      </div>
+      <div class="sec-title">Pipeline</div>
     </div>
     <div class="money-tab-bar">
-      <button class="money-tab active-pay" id="tab-pay" onclick="switchMoneyTab('payments')">Payments</button>
-      <button class="money-tab" id="tab-exp" onclick="switchMoneyTab('expenses')">Expenses</button>
+      <button class="money-tab active-pay" id="tab-leads" onclick="switchPipelineTab('leads')">Leads</button>
+      <button class="money-tab" id="tab-camp" onclick="switchPipelineTab('campaigns')">Campaigns</button>
     </div>
-    <div id="payment-list"></div>
-    <div id="expense-list" style="display:none"></div>
+
+    <!-- LEADS VIEW -->
+    <div id="pipeline-leads-view">
+      <div class="sec-header" style="margin-bottom:10px">
+        <div style="font-size:13px;font-weight:700;color:var(--text-muted)">Referral leads</div>
+        <button class="btn-blue" onclick="openModal('send-referral')">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          Send referral form
+        </button>
+      </div>
+      <div id="leads-list"></div>
+    </div>
+
+    <!-- CAMPAIGNS VIEW -->
+    <div id="campaign-list" style="display:none">
+      <div class="card">
+        <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:10px">New campaign</div>
+        <div class="form-group"><label class="form-label">Subject line</label><input class="form-input" id="camp-subject" type="text" placeholder="e.g. Spring cleaning special — 15% off!"></div>
+        <div class="form-group"><label class="form-label">Message</label><textarea class="form-input" id="camp-message" rows="5" placeholder="Write your campaign message here..."></textarea></div>
+
+        <div class="form-group">
+          <label class="form-label">Send to</label>
+          <div class="service-checks" style="grid-template-columns:1fr 1fr 1fr" id="camp-filter-checks">
+            <button type="button" class="check-item checked" onclick="toggleCampFilter(this,'all')" data-filter="all"><div class="check-box"><span class="check-mark">✓</span></div>All</button>
+            <button type="button" class="check-item" onclick="toggleCampFilter(this,'Window cleaning')" data-filter="Window cleaning"><div class="check-box"><span class="check-mark">✓</span></div>Window</button>
+            <button type="button" class="check-item" onclick="toggleCampFilter(this,'Pressure washing')" data-filter="Pressure washing"><div class="check-box"><span class="check-mark">✓</span></div>Pressure</button>
+            <button type="button" class="check-item" onclick="toggleCampFilter(this,'Pest control')" data-filter="Pest control"><div class="check-box"><span class="check-mark">✓</span></div>Pest</button>
+            <button type="button" class="check-item" onclick="toggleCampFilter(this,'Quote')" data-filter="Quote"><div class="check-box"><span class="check-mark">✓</span></div>Quote</button>
+            <button type="button" class="check-item" onclick="toggleCampFilter(this,'custom')" data-filter="custom"><div class="check-box"><span class="check-mark">✓</span></div>Pick individually</button>
+          </div>
+        </div>
+
+        <div id="camp-recipient-list" style="margin-top:10px"></div>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-top:1px solid var(--border);margin-top:10px">
+          <span style="font-size:12px;color:var(--text-muted)">Recipients</span>
+          <span style="font-size:16px;font-weight:900;color:var(--blue);text-shadow:0 0 8px rgba(74,159,212,0.5)" id="camp-recipient-count">0</span>
+        </div>
+
+        <button class="btn-primary" style="width:100%;justify-content:center;font-size:14px;padding:13px;margin-top:8px" onclick="sendCampaign()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          Send campaign
+        </button>
+      </div>
+
+      <div style="font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:0.8px;margin:14px 0 8px;text-shadow:0 0 6px rgba(76,175,128,0.4)">Sent campaigns</div>
+      <div id="campaign-history"></div>
+    </div>
   </div>
 
   <!-- SCHEDULE -->
@@ -546,8 +607,8 @@
   </button>
   <button class="nav-btn" onclick="showSection('payments',this)">
     <div class="nb-line"></div>
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-    Money
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+    Pipeline
   </button>
   <button class="nav-btn" onclick="showSection('schedule',this)">
     <div class="nb-line"></div>
@@ -715,6 +776,15 @@
   </div>
 </div>
 
+<div class="detail-sheet" id="sheet-lead">
+  <div class="detail-body">
+    <div class="detail-handle"></div>
+    <div class="detail-header"><div class="detail-title" id="sheet-lead-title">Lead</div><button class="detail-close" onclick="closeSheet('lead')">✕</button></div>
+    <div class="detail-content" id="sheet-lead-content"></div>
+    <div class="detail-actions"><button class="btn-blue" onclick="scheduleLeadJob()">📅 Schedule job</button><button class="btn-danger" onclick="deleteLeadFromSheet()">Delete</button></div>
+  </div>
+</div>
+
 <div class="detail-sheet" id="sheet-jobnotes">
   <div class="detail-body">
     <div class="detail-handle"></div>
@@ -737,10 +807,11 @@ const firebaseConfig = {
 };
 const EMAILJS_SVC="service_f4ccq3o", EMAILJS_TPL="template_5ajl1pn", EMAILJS_KEY="eOI3Xs13SoIg-jsvn";
 const BIZ_EMAIL="bustasmudge@gmail.com";
+const BREVO_API_KEY="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";
 
 const app=initializeApp(firebaseConfig);
 const db=getFirestore(app);
-let data={customers:[],jobs:[],payments:[],expenses:[],quotes:[],activity:[],leads:[]};
+let data={customers:[],jobs:[],payments:[],expenses:[],quotes:[],activity:[],leads:[],campaigns:[]};
 let currentCustomerId=null,currentJobId=null,currentQuoteId=null,currentLeadId=null;
 let calViewYear,calViewMonth;
 let revPeriod='week';
@@ -754,7 +825,7 @@ async function fbUpdate(col,id,obj){setSyncDot('syncing');try{await updateDoc(do
 async function fbDelete(col,id){setSyncDot('syncing');try{await deleteDoc(doc(db,col,id));setSyncDot('ok');}catch(e){setSyncDot('error');}}
 
 function startListeners(){
-  const cols={customers:'customers',jobs:'jobs',payments:'payments',expenses:'expenses',quotes:'quotes',activity:'activity',leads:'leads'};
+  const cols={customers:'customers',jobs:'jobs',payments:'payments',expenses:'expenses',quotes:'quotes',activity:'activity',leads:'leads',campaigns:'campaigns'};
   for(const[col,key] of Object.entries(cols)){
     onSnapshot(collection(db,col),snap=>{
       data[key]=snap.docs.map(d=>({id:d.id,...d.data()}));
@@ -765,6 +836,7 @@ function startListeners(){
       if(key==='expenses'){renderExpenses();renderRevenue();}
       if(key==='quotes')renderQuotes();
       if(key==='leads')renderLeads();
+      if(key==='campaigns')renderCampaignHistory();
     });
   }
 }
@@ -773,7 +845,7 @@ async function init(){
   document.getElementById('loading-status').textContent='Loading your data...';
   try{
     await Promise.all(Object.keys(data).map(c=>getDocs(collection(db,c)).then(s=>{data[c]=s.docs.map(d=>({id:d.id,...d.data()}));})));
-    startListeners();initCal();setDate();renderDashboard();
+    startListeners();initCal();setDate();renderDashboard();loadSplitInputs();
     const ls=document.getElementById('loading-screen');
     ls.classList.add('fade-out');setTimeout(()=>ls.style.display='none',400);
   }catch(e){document.getElementById('loading-status').textContent='Connection error';setSyncDot('error');}
@@ -792,11 +864,22 @@ window.showSection=function(id,btn){
 };
 
 window.switchMoneyTab=function(tab){
-  const isPay=tab==='payments';
-  document.getElementById('payment-list').style.display=isPay?'':'none';
-  document.getElementById('expense-list').style.display=isPay?'none':'';
-  document.getElementById('tab-pay').className='money-tab'+(isPay?' active-pay':'');
-  document.getElementById('tab-exp').className='money-tab'+(!isPay?' active-exp':'');
+  const showPay=tab==='payments';
+  document.getElementById('payment-list').style.display=showPay?'':'none';
+  document.getElementById('expense-list').style.display=showPay?'none':'';
+  document.getElementById('tab-pay').className='money-tab'+(showPay?' active-pay':'');
+  document.getElementById('tab-exp').className='money-tab'+(!showPay?' active-exp':'');
+  if(!showPay)renderExpensePie();
+};
+
+window.switchPipelineTab=function(tab){
+  const showLeads=tab==='leads';
+  document.getElementById('pipeline-leads-view').style.display=showLeads?'':'none';
+  document.getElementById('campaign-list').style.display=showLeads?'none':'';
+  document.getElementById('tab-leads').className='money-tab'+(showLeads?' active-pay':'');
+  document.getElementById('tab-camp').className='money-tab'+(!showLeads?' active-pay':'');
+  if(showLeads)renderLeads();
+  else{updateCampRecipients();renderCampaignHistory();}
 };
 
 window.toggleCheck=function(btn){btn.classList.toggle('checked');};
@@ -1081,13 +1164,28 @@ window.deleteQuote=async function(){if(!confirm('Delete this quote?'))return;awa
 // HOME SUB-TABS
 window.switchHomeTab=function(tab){
   document.getElementById('home-dash-view').style.display=tab==='dash'?'':'none';
-  document.getElementById('home-leads-view').style.display=tab==='leads'?'':'none';
+  document.getElementById('home-money-view').style.display=tab==='money'?'':'none';
   document.getElementById('home-rev-view').style.display=tab==='rev'?'':'none';
   document.getElementById('htab-dash').className='home-tab'+(tab==='dash'?' active-home':'');
-  document.getElementById('htab-leads').className='home-tab'+(tab==='leads'?' active-leads':'');
+  document.getElementById('htab-money').className='home-tab'+(tab==='money'?' active-leads':'');
   document.getElementById('htab-rev').className='home-tab'+(tab==='rev'?' active-rev':'');
-  if(tab==='leads')renderLeads();
+  if(tab==='money')renderExpensePie();
   if(tab==='rev')renderRevenue();
+};
+
+// QUICK NAV FROM GAUGES
+window.goToHomeSubTab=function(tab){
+  showSection('dashboard',document.querySelector('.nav-btn:nth-child(1)'));
+  switchHomeTab(tab);
+};
+window.goToMoneyTab=function(tab){
+  showSection('dashboard',document.querySelector('.nav-btn:nth-child(1)'));
+  switchHomeTab('money');
+  switchMoneyTab(tab);
+};
+window.goToPipeline=function(tab){
+  showSection('payments',document.querySelector('.nav-btn:nth-child(4)'));
+  switchPipelineTab(tab||'leads');
 };
 
 // REFERRAL CUSTOMER SEARCH
@@ -1120,6 +1218,132 @@ document.addEventListener('click',e=>{
 });
 
 // REFERRAL FORM SEND
+// MASS EMAIL CAMPAIGNS
+let campSelectedFilters=['all'];
+
+window.toggleCampFilter=function(btn,filter){
+  if(filter==='all'){
+    document.querySelectorAll('#camp-filter-checks .check-item').forEach(b=>b.classList.remove('checked'));
+    btn.classList.add('checked');
+    campSelectedFilters=['all'];
+  }else{
+    document.querySelector('#camp-filter-checks [data-filter="all"]').classList.remove('checked');
+    btn.classList.toggle('checked');
+    campSelectedFilters=Array.from(document.querySelectorAll('#camp-filter-checks .check-item.checked')).map(b=>b.dataset.filter);
+    if(campSelectedFilters.length===0){
+      document.querySelector('#camp-filter-checks [data-filter="all"]').classList.add('checked');
+      campSelectedFilters=['all'];
+    }
+  }
+  updateCampRecipients();
+};
+
+function getCampRecipients(){
+  if(campSelectedFilters.includes('all')){
+    return data.customers.filter(c=>c.email);
+  }
+  if(campSelectedFilters.includes('custom')){
+    return data.customers.filter(c=>{
+      const cb=document.getElementById('camp-cust-'+c.id);
+      return cb&&cb.checked;
+    });
+  }
+  return data.customers.filter(c=>{
+    if(!c.email)return false;
+    const services=c.services||(c.service?[c.service]:[]);
+    return campSelectedFilters.some(f=>services.includes(f));
+  });
+}
+
+function lastEmailedText(custId){
+  const sent=data.campaigns||[];
+  let mostRecent=null;
+  sent.forEach(camp=>{
+    if((camp.recipientIds||[]).includes(custId)){
+      if(!mostRecent||new Date(camp.created)>new Date(mostRecent))mostRecent=camp.created;
+    }
+  });
+  return mostRecent?timeAgo(mostRecent):'Never emailed';
+}
+
+window.updateCampRecipients=function(){
+  const listEl=document.getElementById('camp-recipient-list');
+  const countEl=document.getElementById('camp-recipient-count');
+  if(campSelectedFilters.includes('custom')){
+    const withEmail=data.customers.filter(c=>c.email);
+    listEl.innerHTML=withEmail.length===0?'<div style="font-size:12px;color:var(--text-muted)">No customers with an email on file</div>':withEmail.map(c=>`
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">
+        <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text);cursor:pointer">
+          <input type="checkbox" id="camp-cust-${c.id}" onchange="updateCampRecipients()" style="width:16px;height:16px">
+          ${esc(c.name)}
+        </label>
+        <span style="font-size:10px;color:var(--text-muted)">${lastEmailedText(c.id)}</span>
+      </div>`).join('');
+    listEl.style.display='block';
+  }else{
+    const recipients=getCampRecipients();
+    listEl.innerHTML=recipients.length===0?'':`<div style="font-size:11px;color:var(--text-muted);max-height:140px;overflow-y:auto">${recipients.map(c=>`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border)"><span>${esc(c.name)}</span><span style="color:var(--text-dim)">${lastEmailedText(c.id)}</span></div>`).join('')}</div>`;
+    listEl.style.display=recipients.length>0?'block':'none';
+  }
+  countEl.textContent=getCampRecipients().length;
+};
+
+window.sendCampaign=async function(){
+  const subject=document.getElementById('camp-subject').value.trim();
+  const message=document.getElementById('camp-message').value.trim();
+  if(!subject||!message){alert('Please fill in a subject and message.');return;}
+  const recipients=getCampRecipients();
+  if(recipients.length===0){alert('No recipients match your selection.');return;}
+  if(!confirm(`Send this campaign to ${recipients.length} customer(s)?`))return;
+
+  toast('Sending campaign...');
+  const htmlBody=`<div style="font-family:-apple-system,sans-serif;max-width:500px;margin:0 auto;background:#0a0f0a;border:1px solid #4caf80;border-radius:12px;overflow:hidden">
+    <div style="background:linear-gradient(135deg,#2a7d4f,#1a6fa8);padding:20px 24px">
+      <div style="font-size:22px;font-weight:900;font-style:italic;letter-spacing:-1px"><span style="color:#4a9fd4;text-shadow:0 0 8px #4a9fd4">SMUDGE</span> <span style="color:#f0a060;text-shadow:0 0 8px #f0a060">BUSTERS</span></div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.7);margin-top:4px;letter-spacing:1px;text-transform:uppercase">🪟 Window · Pressure · Pest · Venedy, IL</div>
+    </div>
+    <div style="padding:24px;background:#0d1a0f">
+      <div style="font-size:14px;color:#e8f5ee;line-height:1.7;white-space:pre-wrap">${esc(message)}</div>
+      <div style="text-align:center;margin-top:24px;padding-top:16px;border-top:1px solid #1e3528;font-size:12px;color:#4a7a5a">Smudge Busters · Venedy, IL · (618) 967-6977</div>
+    </div>
+  </div>`;
+
+  let successCount=0,failCount=0;
+  for(const cust of recipients){
+    try{
+      const res=await fetch('https://api.brevo.com/v3/smtp/email',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','api-key':BREVO_API_KEY},
+        body:JSON.stringify({
+          sender:{name:'Smudge Busters',email:BIZ_EMAIL},
+          to:[{email:cust.email,name:cust.name}],
+          subject:subject,
+          htmlContent:htmlBody
+        })
+      });
+      if(res.ok)successCount++;else failCount++;
+    }catch(e){failCount++;}
+  }
+
+  await fbAdd('campaigns',{subject,message,recipientIds:recipients.map(c=>c.id),recipientCount:recipients.length,successCount,failCount,created:new Date().toISOString()});
+  await addActivity('Campaign sent: '+subject,successCount+' delivered'+(failCount>0?', '+failCount+' failed':''));
+  document.getElementById('camp-subject').value='';
+  document.getElementById('camp-message').value='';
+  toast(`Campaign sent! ${successCount} delivered${failCount>0?', '+failCount+' failed':''}`);
+  updateCampRecipients();
+};
+
+function renderCampaignHistory(){
+  const el=document.getElementById('campaign-history');if(!el)return;
+  const camps=data.campaigns||[];
+  if(camps.length===0){el.innerHTML='<div style="font-size:12px;color:var(--text-muted);text-align:center;padding:20px 0">No campaigns sent yet</div>';return;}
+  el.innerHTML=[...camps].sort((a,b)=>new Date(b.created)-new Date(a.created)).map(c=>`
+    <div class="card card-sm">
+      <div style="font-size:13px;font-weight:700;color:var(--text)">${esc(c.subject)}</div>
+      <div style="font-size:11px;color:var(--text-muted);margin-top:3px">${timeAgo(c.created)} · ${c.recipientCount} recipient${c.recipientCount!==1?'s':''}${c.failCount>0?' · <span style="color:var(--red)">'+c.failCount+' failed</span>':''}</div>
+    </div>`).join('');
+}
+
 window.sendReferralForm=async function(){
   const custId=document.getElementById('ref-customer').value;
   if(!custId||custId.length<5){alert('Please select a customer.');return;}
@@ -1177,11 +1401,13 @@ function renderLeads(){
       ${names.map((n,i)=>{
         const status=n.status||'No Answer';
         const cls=leadStatusColor(status);
+        const noteCount=(n.callNotes||[]).length;
         return`<div class="lead-row">
-          <div>
+          <div onclick="openLeadDetail('${batch.id}',${i})" style="cursor:pointer;flex:1">
             <div class="lead-name">${esc(n.name)}</div>
             <div class="lead-phone">${esc(n.phone||'No number')}</div>
             ${status==='Call Back'&&n.callbackDate?`<div class="lead-callback-row"><span style="font-size:10px;color:var(--purple)">📅 ${fmtDate(n.callbackDate)}</span></div>`:''}
+            ${noteCount>0?`<div style="font-size:10px;color:var(--text-muted);margin-top:3px">📝 ${noteCount} note${noteCount!==1?'s':''}</div>`:''}
           </div>
           <div style="display:flex;align-items:center;gap:6px">
             <select class="lead-status-select" style="border-color:var(--${cls});color:var(--${cls})" onchange="updateLeadStatus('${batch.id}',${i},this.value)">
@@ -1225,6 +1451,92 @@ window.deleteLeadsByStatus=async function(status){
     }
   }
   toast(`Cleared ${count} "${status}" lead(s)`);
+};
+
+// LEAD DETAIL SHEET
+let currentLeadBatchId=null,currentLeadIdx=null;
+
+window.openLeadDetail=function(batchId,idx){
+  currentLeadBatchId=batchId;currentLeadIdx=idx;
+  const batch=data.leads.find(b=>b.id===batchId);if(!batch)return;
+  const lead=(batch.names||[])[idx];if(!lead)return;
+  const status=lead.status||'No Answer';
+  const cls=leadStatusColor(status);
+  const notes=lead.callNotes||[];
+  document.getElementById('sheet-lead-title').textContent=lead.name;
+  document.getElementById('sheet-lead-content').innerHTML=`
+    <div class="detail-section">
+      <div class="detail-section-title">Contact</div>
+      ${lead.phone?`<div class="contact-actions">
+        <a class="contact-btn call" href="tel:${lead.phone.replace(/\D/g,'')}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.18 6.18l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>Call</a>
+        <a class="contact-btn sms" href="sms:${lead.phone.replace(/\D/g,'')}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Text</a>
+      </div>`:'<div style="font-size:13px;color:var(--text-muted)">No phone number on file</div>'}
+    </div>
+    <div class="detail-section">
+      <div class="detail-section-title">Referred by</div>
+      <div style="font-size:13px;color:var(--text)">${esc(batch.fromName||'Unknown')} · ${timeAgo(batch.created)}</div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-section-title">Call status</div>
+      <select class="edit-input" id="lead-detail-status" style="border-color:var(--${cls});color:var(--${cls})" onchange="updateLeadStatusFromSheet(this.value)">
+        ${LEAD_STATUSES.map(s=>`<option ${status===s?'selected':''}>${s}</option>`).join('')}
+      </select>
+      ${status==='Call Back'&&lead.callbackDate?`<div style="font-size:12px;color:var(--purple);margin-top:8px">📅 Scheduled callback: ${fmtDate(lead.callbackDate)}</div>`:''}
+    </div>
+    <div class="detail-section">
+      <div class="detail-section-title">Call notes</div>
+      ${notes.length===0?'<div style="font-size:13px;color:var(--text-muted);margin-bottom:10px">No notes yet</div>':notes.map(n=>`
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px;margin-bottom:8px">
+          <div style="font-size:13px;color:var(--text)">${esc(n.text)}</div>
+          <div style="font-size:10px;color:var(--text-muted);margin-top:4px">${timeAgo(n.time)}</div>
+        </div>`).join('')}
+      <div style="display:flex;gap:6px;margin-top:6px">
+        <input class="edit-input" id="lead-new-note" type="text" placeholder="Add a note about this call..." style="flex:1">
+        <button class="btn-primary" style="padding:8px 12px" onclick="addLeadNote()">Add</button>
+      </div>
+    </div>`;
+  openSheet('lead');
+};
+
+window.updateLeadStatusFromSheet=async function(newStatus){
+  await updateLeadStatus(currentLeadBatchId,currentLeadIdx,newStatus);
+  openLeadDetail(currentLeadBatchId,currentLeadIdx);
+};
+
+window.addLeadNote=async function(){
+  const input=document.getElementById('lead-new-note');
+  const text=input.value.trim();
+  if(!text)return;
+  const batch=data.leads.find(b=>b.id===currentLeadBatchId);if(!batch)return;
+  const names=[...(batch.names||[])];
+  const notes=[...(names[currentLeadIdx].callNotes||[])];
+  notes.push({text,time:new Date().toISOString()});
+  names[currentLeadIdx]={...names[currentLeadIdx],callNotes:notes};
+  await fbUpdate('leads',currentLeadBatchId,{names});
+  toast('Note added');
+  setTimeout(()=>openLeadDetail(currentLeadBatchId,currentLeadIdx),300);
+};
+
+window.scheduleLeadJob=function(){
+  const batch=data.leads.find(b=>b.id===currentLeadBatchId);if(!batch)return;
+  const lead=(batch.names||[])[currentLeadIdx];if(!lead)return;
+  closeSheet('lead');
+  openModal('schedule-job');
+  setTimeout(()=>{
+    const sel=document.getElementById('job-customer');
+    const opt=document.createElement('option');
+    opt.value='';
+    opt.textContent=lead.name+' (Lead — no customer profile yet)';
+    opt.selected=true;
+    sel.insertBefore(opt,sel.firstChild);
+    document.getElementById('job-notes').value='Lead: '+lead.name+(lead.phone?' · '+lead.phone:'');
+  },100);
+};
+
+window.deleteLeadFromSheet=async function(){
+  if(!confirm('Delete this lead?'))return;
+  await deleteLead(currentLeadBatchId,currentLeadIdx);
+  closeSheet('lead');
 };
 
 window.updateLeadStatus=async function(batchId,idx,newStatus){
@@ -1282,8 +1594,35 @@ window.onSplitInput=function(key,changedField){
     const amt=parseFloat(amtEl.value)||0;
     pctEl.value=((amt/revenue)*100).toFixed(1);
   }
+  saveSplitInputs();
   recalcRevenue();
 };
+
+// PERSIST SPLIT INPUTS
+function saveSplitInputs(){
+  const vals={
+    adsPct:document.getElementById('split-ads-pct').value,
+    adsAmt:document.getElementById('split-ads-amt').value,
+    partnerPct:document.getElementById('split-partner-pct').value,
+    partnerAmt:document.getElementById('split-partner-amt').value,
+    empPct:document.getElementById('split-emp-pct').value,
+    empAmt:document.getElementById('split-emp-amt').value
+  };
+  try{localStorage.setItem('sb-rev-splits',JSON.stringify(vals));}catch(e){}
+}
+function loadSplitInputs(){
+  try{
+    const raw=localStorage.getItem('sb-rev-splits');
+    if(!raw)return;
+    const vals=JSON.parse(raw);
+    if(vals.adsPct)document.getElementById('split-ads-pct').value=vals.adsPct;
+    if(vals.adsAmt)document.getElementById('split-ads-amt').value=vals.adsAmt;
+    if(vals.partnerPct)document.getElementById('split-partner-pct').value=vals.partnerPct;
+    if(vals.partnerAmt)document.getElementById('split-partner-amt').value=vals.partnerAmt;
+    if(vals.empPct)document.getElementById('split-emp-pct').value=vals.empPct;
+    if(vals.empAmt)document.getElementById('split-emp-amt').value=vals.empAmt;
+  }catch(e){}
+}
 
 function recalcRevenue(){
   const{revenue,expenses}=getRevenueForPeriod();
@@ -1335,6 +1674,47 @@ function drawPieChart(revenue,ads,partner,emp,expenses,net){
   legendEl.innerHTML=slices.map(s=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0;font-size:11px"><span style="display:flex;align-items:center;gap:6px;color:var(--text-muted)"><span style="width:8px;height:8px;border-radius:2px;background:${s.color};display:inline-block"></span>${s.label}</span><span style="font-weight:700;color:var(--text)">$${s.val.toFixed(2)} · ${((s.val/total)*100).toFixed(0)}%</span></div>`).join('');
 }
 
+// SERVICE TYPE PIE CHART
+const SVC_COLORS={'Window cleaning':'#4caf80','Pressure washing':'#4a9fd4','Pest control':'#f0a060','Quote':'#b388ff'};
+function drawServicePieChart(){
+  const wrap=document.getElementById('svc-pie-wrap');
+  const legendEl=document.getElementById('svc-pie-legend');
+  if(!wrap)return;
+  const{start,end}=getRevPeriodRange();
+  const jobsInPeriod=data.jobs.filter(j=>{if(!j.date)return false;const d=new Date(j.date+'T00:00:00');return d>=start&&d<=end;});
+  const counts={};
+  jobsInPeriod.forEach(j=>{
+    const services=j.services&&j.services.length?j.services:(j.service?[j.service]:['Other']);
+    services.forEach(s=>{counts[s]=(counts[s]||0)+1;});
+  });
+  const entries=Object.entries(counts);
+  if(entries.length===0){
+    wrap.innerHTML='<div style="font-size:12px;color:var(--text-muted);padding:30px 0">No jobs in this period yet</div>';
+    legendEl.innerHTML='';
+    return;
+  }
+  const total=entries.reduce((s,[,v])=>s+v,0);
+  let cumulative=0;
+  const cx=70,cy=70,r=60;
+  let paths='';
+  const fallbackColors=['#4caf80','#4a9fd4','#f0a060','#b388ff','#e57373'];
+  entries.forEach(([label,val],i)=>{
+    const color=SVC_COLORS[label]||fallbackColors[i%fallbackColors.length];
+    const startAngle=(cumulative/total)*2*Math.PI-Math.PI/2;
+    cumulative+=val;
+    const endAngle=(cumulative/total)*2*Math.PI-Math.PI/2;
+    const x1=cx+r*Math.cos(startAngle),y1=cy+r*Math.sin(startAngle);
+    const x2=cx+r*Math.cos(endAngle),y2=cy+r*Math.sin(endAngle);
+    const largeArc=(endAngle-startAngle)>Math.PI?1:0;
+    paths+=`<path d="M${cx},${cy} L${x1},${y1} A${r},${r} 0 ${largeArc} 1 ${x2},${y2} Z" fill="${color}" opacity="0.85" stroke="#0a0f0a" stroke-width="2"/>`;
+  });
+  wrap.innerHTML=`<svg width="160" height="160" viewBox="0 0 140 140" style="filter:drop-shadow(0 0 10px rgba(74,159,212,0.2))">${paths}<circle cx="${cx}" cy="${cy}" r="32" fill="#0d1a0f" stroke="#1e3528" stroke-width="1"/></svg>`;
+  legendEl.innerHTML=entries.map(([label,val],i)=>{
+    const color=SVC_COLORS[label]||fallbackColors[i%fallbackColors.length];
+    return`<div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0;font-size:11px"><span style="display:flex;align-items:center;gap:6px;color:var(--text-muted)"><span style="width:8px;height:8px;border-radius:2px;background:${color};display:inline-block"></span>${esc(label)}</span><span style="font-weight:700;color:var(--text)">${val} job${val!==1?'s':''} · ${((val/total)*100).toFixed(0)}%</span></div>`;
+  }).join('');
+}
+
 function renderRevenue(){
   const homeRevVisible=document.getElementById('home-rev-view');
   if(!homeRevVisible||homeRevVisible.style.display==='none')return;
@@ -1349,6 +1729,7 @@ function renderRevenue(){
     if(pct>0)amtEl.value=(revenue*pct/100).toFixed(2);
   });
   recalcRevenue();
+  drawServicePieChart();
 }
 
 
@@ -1539,7 +1920,15 @@ function renderExpenses(){
   const me=data.expenses.filter(e=>{if(!e.date)return true;const d=new Date(e.date+'T00:00:00');return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();});
   const total=me.reduce((s,e)=>s+(parseFloat(e.amount)||0),0);
   const withReceipts=data.expenses.filter(e=>e.receiptPhoto).length;
-  el.innerHTML=`<div class="card orange">`+[...data.expenses].sort((a,b)=>new Date(b.created)-new Date(a.created)).map(e=>`
+  el.innerHTML=`
+    <div class="card card-tap" onclick="openExpenseBreakdown()" style="cursor:pointer">
+      <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">
+        <span>Spending by category</span><span style="color:var(--orange);font-size:10px">Tap for details ›</span>
+      </div>
+      <div id="exp-pie-wrap" style="display:flex;justify-content:center;margin-bottom:10px"></div>
+      <div id="exp-pie-legend"></div>
+    </div>
+    <div class="card orange">`+[...data.expenses].sort((a,b)=>new Date(b.created)-new Date(a.created)).map(e=>`
     <div class="data-row" ${e.receiptPhoto?`onclick="viewReceipt('${e.id}')" style="cursor:pointer"`:''}>
       <span class="data-row-label" style="display:flex;align-items:center;gap:6px">
         ${e.receiptPhoto?`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg>`:''}
@@ -1550,7 +1939,125 @@ function renderExpenses(){
     `<div class="exp-total"><span style="font-size:13px;font-weight:800;color:var(--text)">This month</span><span style="font-size:17px;font-weight:900;color:var(--red);text-shadow:0 0 8px rgba(229,115,115,0.5)">-$${total.toFixed(2)}</span></div>
     ${withReceipts>0?`<div style="font-size:10px;color:var(--text-muted);text-align:center;margin-top:8px">📷 ${withReceipts} receipt${withReceipts!==1?'s':''} saved · tap an expense with 📎 to view</div>`:''}
     </div>`;
+  renderExpensePie();
 }
+
+const EXP_CAT_COLORS={'Fuel':'#e57373','Cleaning supplies':'#4caf80','Equipment':'#4a9fd4','Equipment repair':'#f0a060','Advertising':'#b388ff','Insurance':'#4a9fd4','Other':'#9ab5a5'};
+function getExpenseCategoryTotals(){
+  const totals={};
+  data.expenses.forEach(e=>{
+    const cat=e.category||'Other';
+    totals[cat]=(totals[cat]||0)+(parseFloat(e.amount)||0);
+  });
+  return totals;
+}
+
+window.renderExpensePie=function(){
+  const wrap=document.getElementById('exp-pie-wrap');
+  const legendEl=document.getElementById('exp-pie-legend');
+  if(!wrap)return;
+  const totals=getExpenseCategoryTotals();
+  const entries=Object.entries(totals).filter(([,v])=>v>0);
+  if(entries.length===0){
+    wrap.innerHTML='<div style="font-size:12px;color:var(--text-muted);padding:20px 0">No expenses logged yet</div>';
+    legendEl.innerHTML='';
+    return;
+  }
+  const total=entries.reduce((s,[,v])=>s+v,0);
+  let cumulative=0;
+  const cx=70,cy=70,r=55;
+  let paths='';
+  const fallback=['#e57373','#4caf80','#4a9fd4','#f0a060','#b388ff','#9ab5a5'];
+  entries.forEach(([label,val],i)=>{
+    const color=EXP_CAT_COLORS[label]||fallback[i%fallback.length];
+    const startAngle=(cumulative/total)*2*Math.PI-Math.PI/2;
+    cumulative+=val;
+    const endAngle=(cumulative/total)*2*Math.PI-Math.PI/2;
+    const x1=cx+r*Math.cos(startAngle),y1=cy+r*Math.sin(startAngle);
+    const x2=cx+r*Math.cos(endAngle),y2=cy+r*Math.sin(endAngle);
+    const largeArc=(endAngle-startAngle)>Math.PI?1:0;
+    paths+=`<path d="M${cx},${cy} L${x1},${y1} A${r},${r} 0 ${largeArc} 1 ${x2},${y2} Z" fill="${color}" opacity="0.85" stroke="#0a0f0a" stroke-width="2"/>`;
+  });
+  wrap.innerHTML=`<svg width="140" height="140" viewBox="0 0 140 140" style="filter:drop-shadow(0 0 8px rgba(229,115,115,0.2))">${paths}<circle cx="${cx}" cy="${cy}" r="28" fill="#0d1a0f" stroke="#1e3528" stroke-width="1"/></svg>`;
+  legendEl.innerHTML=entries.map(([label,val],i)=>{
+    const color=EXP_CAT_COLORS[label]||fallback[i%fallback.length];
+    return`<div style="display:flex;align-items:center;justify-content:space-between;padding:3px 0;font-size:10px"><span style="display:flex;align-items:center;gap:5px;color:var(--text-muted)"><span style="width:7px;height:7px;border-radius:2px;background:${color};display:inline-block"></span>${esc(label)}</span><span style="font-weight:700;color:var(--text)">$${val.toFixed(2)}</span></div>`;
+  }).join('');
+};
+
+window.openExpenseBreakdown=function(){
+  const totals=getExpenseCategoryTotals();
+  const entries=Object.entries(totals).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
+  const grandTotal=entries.reduce((s,[,v])=>s+v,0);
+  document.getElementById('sheet-jobnotes-title').textContent='Expense breakdown';
+  document.getElementById('sheet-jobnotes-content').innerHTML=`
+    <div class="detail-section">
+      <div style="text-align:center;margin-bottom:16px">
+        <div style="font-size:24px;font-weight:900;color:var(--red);text-shadow:0 0 10px rgba(229,115,115,0.5)">$${grandTotal.toFixed(2)}</div>
+        <div style="font-size:10px;color:var(--text-muted)">Total all-time expenses</div>
+      </div>
+    </div>
+    <div class="detail-section"><div class="detail-section-title">By category</div>
+      ${entries.map(([cat,val])=>{
+        const pct=grandTotal>0?(val/grandTotal*100):0;
+        const color=EXP_CAT_COLORS[cat]||'#9ab5a5';
+        const count=data.expenses.filter(e=>(e.category||'Other')===cat).length;
+        return`<div class="detail-field">
+          <span class="detail-field-label" style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:2px;background:${color};display:inline-block"></span>${esc(cat)} (${count})</span>
+          <span class="detail-field-value">$${val.toFixed(2)} · ${pct.toFixed(0)}%</span>
+        </div>`;
+      }).join('')}
+    </div>`;
+  openSheet('jobnotes');
+};
+
+// CSV EXPORTS
+function csvEscape(val){
+  const s=String(val==null?'':val);
+  if(s.includes(',')||s.includes('"')||s.includes('\n')){
+    return '"'+s.replace(/"/g,'""')+'"';
+  }
+  return s;
+}
+
+function downloadCSV(filename,rows){
+  const csvContent=rows.map(row=>row.map(csvEscape).join(',')).join('\n');
+  const blob=new Blob([csvContent],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const link=document.createElement('a');
+  link.href=url;
+  link.download=filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+window.exportMoneyCSV=function(){
+  if(data.payments.length===0&&data.expenses.length===0){alert('No payments or expenses to export yet.');return;}
+  const rows=[['Type','Date','Customer/Category','Amount','Status/Method','Notes']];
+  [...data.payments].sort((a,b)=>new Date(a.date||a.created)-new Date(b.date||b.created)).forEach(p=>{
+    rows.push(['Payment',p.date||'',p.customerName||'',(parseFloat(p.amount)||0).toFixed(2),p.status+' · '+p.method,p.notes||'']);
+  });
+  [...data.expenses].sort((a,b)=>new Date(a.date||a.created)-new Date(b.date||b.created)).forEach(e=>{
+    rows.push(['Expense',e.date||'',e.category||'',('-'+(parseFloat(e.amount)||0).toFixed(2)),'',e.desc||'']);
+  });
+  const today=new Date().toISOString().split('T')[0];
+  downloadCSV('smudge-busters-money-'+today+'.csv',rows);
+  toast('CSV downloaded!');
+};
+
+window.exportCustomersCSV=function(){
+  if(data.customers.length===0){alert('No customers to export yet.');return;}
+  const rows=[['Name','Phone','Email','Address','Services','Notes','Date Added']];
+  [...data.customers].sort((a,b)=>a.name.localeCompare(b.name)).forEach(c=>{
+    const services=c.services||(c.service?[c.service]:[]);
+    rows.push([c.name||'',c.phone||'',c.email||'',c.address||'',services.join('; '),c.notes||'',c.created?fmtDate(c.created.split('T')[0]):'']);
+  });
+  const today=new Date().toISOString().split('T')[0];
+  downloadCSV('smudge-busters-customers-'+today+'.csv',rows);
+  toast('CSV downloaded!');
+};
 
 window.viewReceipt=function(expId){
   const e=data.expenses.find(x=>x.id===expId);if(!e||!e.receiptPhoto)return;
