@@ -28,6 +28,22 @@
   /* LOADING */
   #loading-screen{position:absolute;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;transition:opacity 0.4s;}
   #loading-screen.fade-out{opacity:0;pointer-events:none;}
+  #login-screen{position:fixed;inset:0;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:1000;padding:24px;}
+  #login-screen.show{display:flex;}
+  .login-box{width:100%;max-width:340px;text-align:center;}
+  .login-logo{font-size:44px;margin-bottom:10px;}
+  .login-name{font-size:24px;font-weight:900;font-style:italic;margin-bottom:4px;}
+  .login-name .s{color:var(--blue);text-shadow:0 0 12px var(--blue);}
+  .login-name .b{color:var(--orange);text-shadow:0 0 12px var(--orange);}
+  .login-sub{font-size:11px;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:28px;}
+  .login-field{margin-bottom:12px;text-align:left;}
+  .login-field label{display:block;font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;}
+  .login-field input{width:100%;padding:13px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:15px;font-family:inherit;}
+  .login-field input:focus{outline:none;border-color:var(--green);box-shadow:0 0 8px rgba(76,175,128,0.3);}
+  .login-btn{width:100%;padding:14px;background:var(--green);border:none;border-radius:var(--radius-sm);color:#06120a;font-size:15px;font-weight:800;cursor:pointer;margin-top:8px;box-shadow:0 0 10px rgba(76,175,128,0.4);transition:transform .15s,opacity .2s;}
+  .login-btn:hover{transform:translateY(-1px);}
+  .login-btn:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+  .login-error{font-size:12px;color:var(--red);margin-top:14px;min-height:16px;line-height:1.4;}
   .loading-logo{font-size:48px;margin-bottom:12px;}
   .loading-name-wrap{margin-bottom:6px;}
   .loading-smudge{font-size:28px;font-weight:900;font-style:italic;color:var(--blue);text-shadow:0 0 12px var(--blue),0 0 30px rgba(74,159,212,0.5);}
@@ -316,6 +332,24 @@
   <div class="loading-status" id="loading-status">Connecting to database...</div>
 </div>
 
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">🪟</div>
+    <div class="login-name"><span class="s">SMUDGE</span> <span class="b">BUSTERS</span></div>
+    <div class="login-sub">CRM · Staff login</div>
+    <div class="login-field">
+      <label for="login-email">Email</label>
+      <input type="email" id="login-email" autocomplete="username" placeholder="you@bustasmudge.com">
+    </div>
+    <div class="login-field">
+      <label for="login-password">Password</label>
+      <input type="password" id="login-password" autocomplete="current-password" placeholder="••••••••">
+    </div>
+    <button class="login-btn" id="login-btn" onclick="doLogin()">Sign in</button>
+    <div class="login-error" id="login-error"></div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <div class="topbar">
@@ -324,7 +358,12 @@
     <div class="topbar-sub">🪟 Window · Pressure · Pest</div>
   </div>
   <div class="topbar-right">
-    <div class="sync-dot" id="sync-dot"></div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <div class="sync-dot" id="sync-dot"></div>
+      <button onclick="doLogout()" title="Sign out" style="background:var(--surface);border:1px solid var(--border);color:var(--text-muted);border-radius:6px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
+    </div>
     <div class="topbar-date" id="topbarDate"></div>
   </div>
 </div>
@@ -834,6 +873,7 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey:"AIzaSyCxXdYaK1fKls9rPdEKDC1xW3AmdLlZJCI",
@@ -849,6 +889,7 @@ const BREVO_API_KEY="xkeysib-267b482e462d11df5ef1a96e4e15967b8293a3612e36dc1d71d
 
 const app=initializeApp(firebaseConfig);
 const db=getFirestore(app);
+const auth=getAuth(app);
 let data={customers:[],jobs:[],payments:[],expenses:[],quotes:[],activity:[],leads:[],campaigns:[],givebacks:[]};
 let currentCustomerId=null,currentJobId=null,currentQuoteId=null,currentLeadId=null;
 let calViewYear,calViewMonth;
@@ -880,7 +921,10 @@ function startListeners(){
   }
 }
 
+let appStarted=false;
 async function init(){
+  if(appStarted)return;
+  appStarted=true;
   document.getElementById('loading-status').textContent='Loading your data...';
   try{
     await Promise.all(Object.keys(data).map(c=>getDocs(collection(db,c)).then(s=>{data[c]=s.docs.map(d=>({id:d.id,...d.data()}));})));
@@ -889,7 +933,52 @@ async function init(){
     ls.classList.add('fade-out');setTimeout(()=>ls.style.display='none',400);
   }catch(e){document.getElementById('loading-status').textContent='Connection error';setSyncDot('error');}
 }
-init();
+
+// AUTH GATE — nothing loads until a valid user is signed in
+setPersistence(auth,browserLocalPersistence).catch(()=>{});
+
+onAuthStateChanged(auth,user=>{
+  const loginScreen=document.getElementById('login-screen');
+  const loadingScreen=document.getElementById('loading-screen');
+  if(user){
+    loginScreen.classList.remove('show');
+    loadingScreen.style.display='';loadingScreen.classList.remove('fade-out');
+    init();
+  }else{
+    // Signed out: hide the app, show login
+    loadingScreen.style.display='none';
+    loginScreen.classList.add('show');
+  }
+});
+
+window.doLogin=async function(){
+  const email=document.getElementById('login-email').value.trim();
+  const pass=document.getElementById('login-password').value;
+  const errEl=document.getElementById('login-error');
+  const btn=document.getElementById('login-btn');
+  errEl.textContent='';
+  if(!email||!pass){errEl.textContent='Enter your email and password.';return;}
+  btn.disabled=true;btn.textContent='Signing in...';
+  try{
+    await signInWithEmailAndPassword(auth,email,pass);
+    document.getElementById('login-password').value='';
+    // onAuthStateChanged will take over and load the app
+  }catch(e){
+    const m={'auth/invalid-email':'That email doesn\'t look right.','auth/user-not-found':'No account found for that email.','auth/wrong-password':'Incorrect password.','auth/invalid-credential':'Email or password is incorrect.','auth/too-many-requests':'Too many attempts. Try again in a bit.'};
+    errEl.textContent=m[e.code]||'Could not sign in. Check your details and try again.';
+  }finally{
+    btn.disabled=false;btn.textContent='Sign in';
+  }
+};
+
+window.doLogout=async function(){
+  if(!confirm('Sign out of the CRM?'))return;
+  try{await signOut(auth);location.reload();}catch(e){toast('Could not sign out');}
+};
+
+// Allow Enter key to submit login
+document.getElementById('login-password').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+document.getElementById('login-email').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('login-password').focus();});
 
 async function addActivity(text,sub){await fbAdd('activity',{text,sub,time:new Date().toISOString()});}
 
