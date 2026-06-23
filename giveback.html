@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Smudge Busters · Give Back</title>
+<style>
+  :root{
+    --green:#4caf80;--blue:#4a9fd4;--orange:#f0a060;
+    --bg:#0a0f0a;--surface:#0d1a0f;--border:#1e3528;
+    --text:#e8f5ee;--text-muted:#4a7a5a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:20px;}
+  .wrap{width:100%;max-width:480px;}
+  .brand{text-align:center;margin:18px 0 22px;}
+  .brand .logo{font-size:40px;margin-bottom:8px;}
+  .brand .name{font-size:24px;font-weight:900;font-style:italic;}
+  .brand .name .s{color:var(--blue);text-shadow:0 0 12px var(--blue);}
+  .brand .name .b{color:var(--orange);text-shadow:0 0 12px var(--orange);}
+  .brand .tag{font-size:12px;color:var(--text-muted);margin-top:6px;letter-spacing:0.5px;}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;}
+  .intro{font-size:14px;line-height:1.6;color:var(--text);margin-bottom:6px;}
+  .intro b{color:var(--green);}
+  .sub{font-size:12px;color:var(--text-muted);line-height:1.5;margin-bottom:18px;}
+  .group{margin-bottom:16px;}
+  label{display:block;font-size:12px;font-weight:700;color:var(--green);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;}
+  input,textarea{width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:inherit;font-size:15px;transition:border-color .2s,box-shadow .2s;}
+  input:focus,textarea:focus{outline:none;border-color:var(--green);box-shadow:0 0 8px rgba(76,175,128,0.3);}
+  textarea{resize:vertical;min-height:140px;line-height:1.5;}
+  .count{font-size:11px;color:var(--text-muted);text-align:right;margin-top:4px;}
+  .opt{font-weight:400;color:var(--text-muted);text-transform:none;letter-spacing:0;}
+  button.submit{width:100%;padding:14px;background:var(--green);border:none;border-radius:8px;color:#06120a;font-size:15px;font-weight:800;cursor:pointer;margin-top:4px;box-shadow:0 0 10px rgba(76,175,128,0.4);transition:transform .15s,opacity .2s;}
+  button.submit:hover{transform:translateY(-1px);}
+  button.submit:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+  .msg{padding:12px;border-radius:8px;font-size:13px;margin-bottom:16px;display:none;line-height:1.5;}
+  .msg.show{display:block;}
+  .msg.ok{background:rgba(76,175,128,0.12);border:1px solid var(--green);color:var(--green);}
+  .msg.err{background:rgba(229,115,115,0.12);border:1px solid #e57373;color:#e57373;}
+  .done{text-align:center;padding:20px 0;}
+  .done .check{font-size:48px;margin-bottom:10px;}
+  .done h2{font-size:20px;color:var(--green);margin-bottom:8px;}
+  .done p{font-size:14px;color:var(--text-muted);line-height:1.6;}
+  .foot{text-align:center;font-size:11px;color:var(--text-muted);margin-top:18px;line-height:1.5;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">
+    <div class="logo">🪟✨</div>
+    <div class="name"><span class="s">Smudge</span> <span class="b">Busters</span></div>
+    <div class="tag">GIVING BACK TO SPARTA</div>
+  </div>
+
+  <div class="card" id="card">
+    <div class="intro">Every month we give <b>one free house cleaning</b> to someone in our community who could use a hand.</div>
+    <div class="sub">Know someone going through a tough stretch? Nominate them below and tell us their story. We read every single one.</div>
+
+    <div class="msg" id="msg"></div>
+
+    <form id="form">
+      <div class="group">
+        <label for="name">Your name</label>
+        <input type="text" id="name" placeholder="Jane Smith" required>
+      </div>
+      <div class="group">
+        <label for="phone">Your phone number</label>
+        <input type="tel" id="phone" placeholder="(618) 555-0123" required>
+      </div>
+      <div class="group">
+        <label for="nominee">Who are you nominating? <span class="opt">(optional)</span></label>
+        <input type="text" id="nominee" placeholder="Name of the person you're nominating">
+      </div>
+      <div class="group">
+        <label for="story">Their story</label>
+        <textarea id="story" maxlength="1000" placeholder="Tell us a little about this person and what they're going through right now..." required></textarea>
+        <div class="count"><span id="cc">0</span>/1000</div>
+      </div>
+      <button type="submit" class="submit" id="submit">Submit nomination</button>
+    </form>
+  </div>
+
+  <div class="foot">Smudge Busters Window Cleaning Co. · Sparta, IL<br>Window cleaning · Pressure washing · Pest control</div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey:"AIzaSyCxXdYaK1fKls9rPdEKDC1xW3AmdLlZJCI",
+  authDomain:"smudge-busters.firebaseapp.com",
+  projectId:"smudge-busters",
+  storageBucket:"smudge-busters.firebasestorage.app",
+  messagingSenderId:"633105436511",
+  appId:"1:633105436511:web:6d460bbe49e988e438b0ea"
+};
+const app=initializeApp(firebaseConfig);
+const db=getFirestore(app);
+
+const form=document.getElementById('form');
+const msg=document.getElementById('msg');
+const submit=document.getElementById('submit');
+const story=document.getElementById('story');
+const cc=document.getElementById('cc');
+
+story.addEventListener('input',()=>{cc.textContent=story.value.length;});
+
+function showMsg(text,type){msg.textContent=text;msg.className='msg show '+type;}
+
+form.addEventListener('submit',async(e)=>{
+  e.preventDefault();
+  const name=document.getElementById('name').value.trim();
+  const phone=document.getElementById('phone').value.trim();
+  const nomineeName=document.getElementById('nominee').value.trim();
+  const storyText=story.value.trim();
+  if(!name||!phone||!storyText){showMsg('Please fill out your name, phone, and their story.','err');return;}
+
+  submit.disabled=true;submit.textContent='Submitting...';
+  try{
+    await addDoc(collection(db,'givebacks'),{
+      name,phone,nomineeName,story:storyText,
+      status:'New',
+      created:new Date().toISOString()
+    });
+    document.getElementById('card').innerHTML=
+      '<div class="done"><div class="check">💚</div><h2>Thank you!</h2>'+
+      '<p>Your nomination has been received. We read every story and announce a winner each month. Keep an eye on our Facebook page!</p></div>';
+  }catch(err){
+    console.error(err);
+    showMsg('Something went wrong. Please try again in a moment.','err');
+    submit.disabled=false;submit.textContent='Submit nomination';
+  }
+});
+</script>
+</body>
+</html>

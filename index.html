@@ -518,6 +518,7 @@
     <div class="money-tab-bar">
       <button class="money-tab active-pay" id="tab-leads" onclick="switchPipelineTab('leads')">Leads</button>
       <button class="money-tab" id="tab-camp" onclick="switchPipelineTab('campaigns')">Campaigns</button>
+      <button class="money-tab" id="tab-giveback" onclick="switchPipelineTab('giveback')">Give Back</button>
     </div>
 
     <!-- LEADS VIEW -->
@@ -582,6 +583,18 @@
 
       <div style="font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:0.8px;margin:14px 0 8px;text-shadow:0 0 6px rgba(76,175,128,0.4)">Sent campaigns</div>
       <div id="campaign-history"></div>
+    </div>
+
+    <!-- GIVE BACK VIEW -->
+    <div id="giveback-view" style="display:none">
+      <div class="sec-header" style="margin-bottom:10px">
+        <div style="font-size:13px;font-weight:700;color:var(--text-muted)">Nominations</div>
+        <button class="btn-secondary" style="font-size:11px;padding:7px 11px" onclick="copyGivebackLink()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          Copy form link
+        </button>
+      </div>
+      <div id="giveback-list"></div>
     </div>
   </div>
 
@@ -809,6 +822,15 @@
   </div>
 </div>
 
+<div class="detail-sheet" id="sheet-giveback">
+  <div class="detail-body">
+    <div class="detail-handle"></div>
+    <div class="detail-header"><div class="detail-title" id="sheet-giveback-title">Nomination</div><button class="detail-close" onclick="closeSheet('giveback')">✕</button></div>
+    <div class="detail-content" id="sheet-giveback-content"></div>
+    <div class="detail-actions"><button class="btn-danger" onclick="deleteGivebackFromSheet()">Delete</button></div>
+  </div>
+</div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -827,7 +849,7 @@ const BREVO_API_KEY="xkeysib-267b482e462d11df5ef1a96e4e15967b8293a3612e36dc1d71d
 
 const app=initializeApp(firebaseConfig);
 const db=getFirestore(app);
-let data={customers:[],jobs:[],payments:[],expenses:[],quotes:[],activity:[],leads:[],campaigns:[]};
+let data={customers:[],jobs:[],payments:[],expenses:[],quotes:[],activity:[],leads:[],campaigns:[],givebacks:[]};
 let currentCustomerId=null,currentJobId=null,currentQuoteId=null,currentLeadId=null;
 let calViewYear,calViewMonth;
 let revPeriod='week';
@@ -841,7 +863,7 @@ async function fbUpdate(col,id,obj){setSyncDot('syncing');try{await updateDoc(do
 async function fbDelete(col,id){setSyncDot('syncing');try{await deleteDoc(doc(db,col,id));setSyncDot('ok');}catch(e){setSyncDot('error');}}
 
 function startListeners(){
-  const cols={customers:'customers',jobs:'jobs',payments:'payments',expenses:'expenses',quotes:'quotes',activity:'activity',leads:'leads',campaigns:'campaigns'};
+  const cols={customers:'customers',jobs:'jobs',payments:'payments',expenses:'expenses',quotes:'quotes',activity:'activity',leads:'leads',campaigns:'campaigns',givebacks:'givebacks'};
   for(const[col,key] of Object.entries(cols)){
     onSnapshot(collection(db,col),snap=>{
       data[key]=snap.docs.map(d=>({id:d.id,...d.data()}));
@@ -853,6 +875,7 @@ function startListeners(){
       if(key==='quotes')renderQuotes();
       if(key==='leads')renderLeads();
       if(key==='campaigns')renderCampaignHistory();
+      if(key==='givebacks')renderGivebacks();
     });
   }
 }
@@ -889,13 +912,16 @@ window.switchMoneyTab=function(tab){
 };
 
 window.switchPipelineTab=function(tab){
-  const showLeads=tab==='leads';
-  document.getElementById('pipeline-leads-view').style.display=showLeads?'':'none';
-  document.getElementById('campaign-list').style.display=showLeads?'none':'';
-  document.getElementById('tab-leads').className='money-tab'+(showLeads?' active-pay':'');
-  document.getElementById('tab-camp').className='money-tab'+(!showLeads?' active-pay':'');
-  if(showLeads)renderLeads();
-  else{updateCampRecipients();renderCampaignHistory();}
+  const isLeads=tab==='leads', isCamp=tab==='campaigns', isGive=tab==='giveback';
+  document.getElementById('pipeline-leads-view').style.display=isLeads?'':'none';
+  document.getElementById('campaign-list').style.display=isCamp?'':'none';
+  document.getElementById('giveback-view').style.display=isGive?'':'none';
+  document.getElementById('tab-leads').className='money-tab'+(isLeads?' active-pay':'');
+  document.getElementById('tab-camp').className='money-tab'+(isCamp?' active-pay':'');
+  document.getElementById('tab-giveback').className='money-tab'+(isGive?' active-pay':'');
+  if(isLeads)renderLeads();
+  else if(isCamp){updateCampRecipients();renderCampaignHistory();}
+  else if(isGive)renderGivebacks();
 };
 
 window.toggleCheck=function(btn){btn.classList.toggle('checked');};
@@ -1601,6 +1627,138 @@ window.updateLeadStatus=async function(batchId,idx,newStatus){
     await fbUpdate('leads',batchId,{names});
     toast('Lead status updated');
   }
+};
+
+// ===== GIVE BACK =====
+const GIVEBACK_STATUSES=['New','Reviewing','Shortlisted','Winner','Passed'];
+function givebackStatusColor(s){const m={'New':'blue','Reviewing':'orange','Shortlisted':'purple','Winner':'green','Passed':'red'};return m[s]||'blue';}
+
+function renderGivebacks(){
+  const el=document.getElementById('giveback-list');if(!el)return;
+  if(data.givebacks.length===0){
+    el.innerHTML=`<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg><p>No nominations yet.<br>Share your Give Back form link to collect entries.</p></div>`;
+    return;
+  }
+  const winner=data.givebacks.find(g=>(g.status||'New')==='Winner');
+  const winnerBar=winner?`<div class="card" style="padding:10px 12px;margin-bottom:10px;border-color:var(--green);box-shadow:var(--glow-green)">
+    <div style="font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:4px;text-shadow:0 0 6px rgba(76,175,128,0.4)">⭐ This month's winner</div>
+    <div style="font-size:14px;font-weight:800;color:var(--text)">${esc(winner.nomineeName||winner.name||'—')}</div>
+    <div style="font-size:11px;color:var(--text-muted)">Nominated by ${esc(winner.name||'Unknown')}</div>
+  </div>`:'';
+
+  const cards=[...data.givebacks].sort((a,b)=>new Date(b.created||b.timestamp||0)-new Date(a.created||a.timestamp||0)).map(g=>{
+    const status=g.status||'New';
+    const cls=givebackStatusColor(status);
+    const created=g.created||g.timestamp||null;
+    const story=g.story||'';
+    const preview=story.length>120?story.slice(0,120)+'…':story;
+    const nominee=g.nomineeName||'';
+    return`<div class="lead-card" style="border-color:var(--${cls});box-shadow:var(--glow-${cls})">
+      <div class="lead-row" style="border-bottom:none;padding-bottom:4px">
+        <div onclick="openGivebackDetail('${g.id}')" style="cursor:pointer;flex:1">
+          <div class="lead-name">${esc(g.name||'Anonymous')}${nominee?` <span style="color:var(--text-muted);font-weight:600">→ ${esc(nominee)}</span>`:''}</div>
+          <div class="lead-phone">${esc(g.phone||'No number')}${created?' · '+timeAgo(created):''}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <select class="lead-status-select" style="border-color:var(--${cls});color:var(--${cls})" onchange="updateGivebackStatus('${g.id}',this.value)">
+            ${GIVEBACK_STATUSES.map(s=>`<option ${status===s?'selected':''}>${s}</option>`).join('')}
+          </select>
+          <button onclick="deleteGiveback('${g.id}')" style="background:var(--red-dim);border:1px solid var(--red);color:var(--red);border-radius:6px;width:26px;height:26px;font-size:14px;cursor:pointer;flex-shrink:0;box-shadow:var(--glow-red)">✕</button>
+        </div>
+      </div>
+      <div onclick="openGivebackDetail('${g.id}')" style="cursor:pointer;font-size:12px;color:var(--text-muted);line-height:1.5;margin-top:6px;padding-top:8px;border-top:1px solid var(--border)">${esc(preview)||'<span style="font-style:italic">No story provided</span>'}</div>
+    </div>`;
+  }).join('');
+
+  el.innerHTML=winnerBar+cards;
+}
+
+let currentGivebackId=null;
+
+window.openGivebackDetail=function(id){
+  currentGivebackId=id;
+  const g=data.givebacks.find(x=>x.id===id);if(!g)return;
+  const status=g.status||'New';
+  const cls=givebackStatusColor(status);
+  const created=g.created||g.timestamp||null;
+  const phone=g.phone||'';
+  document.getElementById('sheet-giveback-title').textContent=g.name||'Nomination';
+  document.getElementById('sheet-giveback-content').innerHTML=`
+    <div class="detail-section">
+      <div class="detail-section-title">Submitted by</div>
+      <div style="font-size:14px;font-weight:700;color:var(--text)">${esc(g.name||'Anonymous')}</div>
+      ${created?`<div style="font-size:11px;color:var(--text-muted);margin-top:2px">${timeAgo(created)}</div>`:''}
+    </div>
+    ${g.nomineeName?`<div class="detail-section">
+      <div class="detail-section-title">Nominee</div>
+      <div style="font-size:14px;color:var(--text)">${esc(g.nomineeName)}</div>
+    </div>`:''}
+    <div class="detail-section">
+      <div class="detail-section-title">Contact</div>
+      ${phone?`<div class="contact-actions">
+        <a class="contact-btn call" href="tel:${phone.replace(/\D/g,'')}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.18 6.18l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>Call</a>
+        <a class="contact-btn sms" href="sms:${phone.replace(/\D/g,'')}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Text</a>
+      </div>`:'<div style="font-size:13px;color:var(--text-muted)">No phone number on file</div>'}
+    </div>
+    <div class="detail-section">
+      <div class="detail-section-title">Their story</div>
+      <div style="font-size:14px;color:var(--text);line-height:1.65;white-space:pre-wrap;word-break:break-word">${esc(g.story||'No story provided')}</div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-section-title">Status</div>
+      <select class="edit-input" id="giveback-detail-status" style="border-color:var(--${cls});color:var(--${cls})" onchange="updateGivebackStatusFromSheet(this.value)">
+        ${GIVEBACK_STATUSES.map(s=>`<option ${status===s?'selected':''}>${s}</option>`).join('')}
+      </select>
+      <button class="btn-primary" style="width:100%;justify-content:center;margin-top:10px" onclick="markGivebackWinner()">⭐ Mark as this month's winner</button>
+    </div>`;
+  openSheet('giveback');
+};
+
+window.updateGivebackStatus=async function(id,newStatus){
+  if(newStatus==='Winner'){await markGivebackWinnerById(id);return;}
+  await fbUpdate('givebacks',id,{status:newStatus});
+  toast('Status updated');
+};
+
+window.updateGivebackStatusFromSheet=async function(newStatus){
+  await updateGivebackStatus(currentGivebackId,newStatus);
+  setTimeout(()=>openGivebackDetail(currentGivebackId),200);
+};
+
+async function markGivebackWinnerById(id){
+  // Only one winner at a time — demote any existing winner to Shortlisted
+  for(const g of data.givebacks){
+    if(g.id!==id&&(g.status||'New')==='Winner'){await fbUpdate('givebacks',g.id,{status:'Shortlisted'});}
+  }
+  await fbUpdate('givebacks',id,{status:'Winner'});
+  const g=data.givebacks.find(x=>x.id===id);
+  await addActivity('Give Back winner selected',g?(g.nomineeName||g.name||''):'');
+  toast('🎉 Winner selected!');
+}
+
+window.markGivebackWinner=async function(){
+  if(!currentGivebackId)return;
+  await markGivebackWinnerById(currentGivebackId);
+  setTimeout(()=>openGivebackDetail(currentGivebackId),200);
+};
+
+window.deleteGiveback=async function(id){
+  if(!confirm('Delete this nomination?'))return;
+  await fbDelete('givebacks',id);
+  toast('Nomination deleted');
+};
+
+window.deleteGivebackFromSheet=async function(){
+  if(!currentGivebackId)return;
+  if(!confirm('Delete this nomination?'))return;
+  await fbDelete('givebacks',currentGivebackId);
+  closeSheet('giveback');
+  toast('Nomination deleted');
+};
+
+window.copyGivebackLink=function(){
+  const url=window.location.origin+window.location.pathname.replace(/[^/]*$/,'')+'giveback.html';
+  navigator.clipboard.writeText(url).then(()=>toast('Form link copied!')).catch(()=>prompt('Copy your Give Back form link:',url));
 };
 
 // REVENUE BREAKDOWN + PIE CHART
