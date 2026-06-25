@@ -247,6 +247,14 @@
   .quick-btn.blue{border-color:var(--blue);box-shadow:var(--glow-blue);}
   .quick-btn.orange{border-color:var(--orange);box-shadow:var(--glow-orange);}
   .quick-btn:active{opacity:0.8;}
+  .tool-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+  .tool-tile{background:var(--surface);border:1px solid var(--blue);border-radius:var(--radius-lg);padding:18px 12px;text-align:center;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;box-shadow:var(--glow-blue);min-height:96px;}
+  .tool-tile:active{opacity:0.85;}
+  .tool-tile svg{width:26px;height:26px;stroke-width:1.8;}
+  .tool-tile .tt-label{font-size:13px;font-weight:800;color:var(--text);}
+  .tool-tile .tt-sub{font-size:10px;color:var(--text-muted);font-weight:600;}
+  .tool-tile.placeholder{border-style:dashed;border-color:var(--border);box-shadow:none;cursor:default;color:var(--text-muted);}
+  .tool-tile.placeholder:active{opacity:1;}
   .qicon{width:30px;height:30px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;}
 
   /* ACTIVITY */
@@ -255,6 +263,23 @@
   .activity-dot{width:8px;height:8px;border-radius:50%;margin-top:4px;flex-shrink:0;}
   .activity-text{font-size:12px;color:var(--text);font-weight:600;}
   .activity-sub{font-size:11px;color:var(--text-muted);margin-top:1px;}
+  .pending-item{background:var(--orange-dim);border:1px solid var(--orange);border-radius:var(--radius-sm);padding:11px;margin-bottom:8px;box-shadow:var(--glow-orange);}
+  .pending-badge{width:18px;height:18px;border-radius:50%;background:var(--orange);color:#06120a;font-size:12px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+  .pending-btn{flex:1;border-radius:6px;padding:7px 0;font-size:11px;font-weight:700;cursor:pointer;border:1px solid;}
+  .pending-btn.confirm{background:var(--green);border-color:var(--green);color:#06120a;}
+  .pending-btn.edit{background:var(--blue-dim);border-color:var(--blue);color:var(--blue);}
+  .pending-btn.dismiss{background:var(--surface);border-color:var(--border);color:var(--text-muted);}
+  .pending-btn:active{opacity:0.8;}
+  .toggle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);}
+  .toggle-row:last-child{border-bottom:none;}
+  .toggle-label{font-size:13px;font-weight:600;color:var(--text);}
+  .toggle-sub{font-size:11px;color:var(--text-muted);margin-top:1px;}
+  .tswitch{position:relative;width:44px;height:24px;flex-shrink:0;cursor:pointer;}
+  .tswitch input{opacity:0;width:0;height:0;position:absolute;}
+  .tslider{position:absolute;inset:0;background:var(--border);border-radius:24px;transition:0.2s;}
+  .tslider:before{content:'';position:absolute;height:18px;width:18px;left:3px;top:3px;background:var(--text-muted);border-radius:50%;transition:0.2s;}
+  .tswitch input:checked+.tslider{background:var(--green-dim);border:1px solid var(--green);box-shadow:var(--glow-green);}
+  .tswitch input:checked+.tslider:before{transform:translateX(20px);background:var(--green);}
 
   /* MONEY TABS */
   .money-tab-bar{display:flex;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:3px;margin-bottom:12px;}
@@ -432,6 +457,18 @@
       <div class="quick-btn blue" onclick="openModal('schedule-job')"><div class="qicon" style="background:rgba(74,159,212,0.15)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" width="18" height="18"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg></div><span style="color:var(--blue)">New job</span></div>
       <div class="quick-btn" onclick="openModal('payment')"><div class="qicon" style="background:rgba(76,175,128,0.15)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" width="18" height="18"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div><span style="color:var(--green)">Log payment</span></div>
       <div class="quick-btn orange" onclick="openModal('expense')"><div class="qicon" style="background:rgba(240,160,96,0.15)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2" width="18" height="18"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><span style="color:var(--orange)">Log expense</span></div>
+    </div>
+
+    <div class="tool-grid" id="home-tools-tile">
+      <div class="tool-tile" onclick="showSection('tools',null)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        <span class="tt-label">More Tools</span>
+        <span class="tt-sub">Mileage & more</span>
+      </div>
+      <div class="tool-tile placeholder">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <span class="tt-sub">Coming soon</span>
+      </div>
     </div>
 
     <div class="card">
@@ -654,6 +691,69 @@
     <div id="upcoming-jobs"></div>
   </div>
 
+  <!-- TOOLS SECTION -->
+  <div class="section" id="sec-tools">
+    <!-- Tools home (tile grid) -->
+    <div id="tools-home">
+      <div class="sec-header">
+        <div class="sec-title">More Tools</div>
+      </div>
+      <div class="tool-grid">
+        <div class="tool-tile" onclick="openMileageTool()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span class="tt-label">Mileage</span>
+          <span class="tt-sub">Auto trip tracking</span>
+        </div>
+        <div class="tool-tile" onclick="openMileageSettings()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--green)"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span class="tt-label">Settings</span>
+          <span class="tt-sub">Maps key & home base</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mileage tracker view -->
+    <div id="tools-mileage" style="display:none">
+      <div class="sec-header">
+        <div style="display:flex;align-items:center;gap:8px">
+          <button onclick="backToTools()" style="background:none;border:none;cursor:pointer;font-size:20px;color:var(--text-muted);padding:0 4px">&#8249;</button>
+          <div class="sec-title">Mileage</div>
+        </div>
+        <button class="btn-primary" onclick="openModal('add-trip')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add trip</button>
+      </div>
+
+      <div class="card" style="display:flex;gap:8px;text-align:center">
+        <div style="flex:1">
+          <div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.6px">This month</div>
+          <div style="font-size:20px;font-weight:900;color:var(--blue);text-shadow:0 0 8px rgba(74,159,212,0.4)" id="mi-month-miles">0</div>
+          <div style="font-size:9px;color:var(--text-muted)">miles</div>
+        </div>
+        <div style="flex:1;border-left:1px solid var(--border)">
+          <div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.6px">Deduction</div>
+          <div style="font-size:20px;font-weight:900;color:var(--green);text-shadow:0 0 8px rgba(76,175,128,0.4)" id="mi-month-ded">$0</div>
+          <div style="font-size:9px;color:var(--text-muted)" id="mi-rate-label">@ 72.5¢/mi</div>
+        </div>
+        <div style="flex:1;border-left:1px solid var(--border)">
+          <div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.6px">Year total</div>
+          <div style="font-size:20px;font-weight:900;color:var(--text);text-shadow:0 0 8px rgba(255,255,255,0.1)" id="mi-year-miles">0</div>
+          <div style="font-size:9px;color:var(--text-muted)">miles</div>
+        </div>
+      </div>
+
+      <div class="money-tab-bar" style="margin-bottom:10px">
+        <button class="money-tab active-pay" id="mi-tab-mine" onclick="setMileageScope('mine')">My trips</button>
+        <button class="money-tab" id="mi-tab-all" onclick="setMileageScope('all')">All trips</button>
+      </div>
+
+      <button class="btn-secondary" style="width:100%;justify-content:center;margin-bottom:10px" onclick="exportMileageCSV()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export mileage log (CSV)
+      </button>
+
+      <div id="mileage-list"></div>
+    </div>
+  </div>
+
 </div>
 
 <!-- NAV -->
@@ -721,6 +821,17 @@
       </div>
     </div>
     <div class="form-group"><label class="form-label">Status</label><select class="form-input" id="job-status"><option>Scheduled</option><option>In progress</option><option>Completed</option><option>Invoiced</option></select></div>
+    <div class="form-group"><label class="form-label">Repeat</label>
+      <select class="form-input" id="job-recurring">
+        <option value="none">One time</option>
+        <option value="monthly">Monthly</option>
+        <option value="bimonthly">Every 2 months</option>
+        <option value="quarterly">Quarterly (every 3 mo)</option>
+        <option value="biannual">Bi-annual (every 6 mo)</option>
+        <option value="yearly">Yearly</option>
+      </select>
+      <div style="font-size:11px;color:var(--text-muted);margin-top:4px" id="recurring-hint">Repeats land on the same weekday of the month (e.g. 1st Wednesday).</div>
+    </div>
     <div class="form-row">
       <div class="form-group"><label class="form-label">Date</label><input class="form-input" id="job-date" type="date"></div>
       <div class="form-group"><label class="form-label">Time</label><input class="form-input" id="job-time" type="time"></div>
@@ -782,6 +893,98 @@
     </div>
     <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.5">This sends a link where your customer can list up to 10 friends/family (name + phone) they'd refer you to. Submissions land directly in your Leads tab.</div>
     <div class="modal-actions"><button class="btn-secondary" onclick="closeModal('send-referral')">Cancel</button><button class="btn-primary" onclick="sendReferralForm()">Send form</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-add-trip">
+  <div class="modal">
+    <div class="modal-title" id="add-trip-title">Add trip</div>
+    <input type="hidden" id="trip-edit-id">
+    <div class="form-group" style="position:relative">
+      <label class="form-label">Customer (optional)</label>
+      <input class="form-input" id="trip-customer-search" type="text" placeholder="Type a name, or leave blank" autocomplete="off" oninput="filterTripCustomers(this.value)" onfocus="filterTripCustomers(this.value)">
+      <input type="hidden" id="trip-customer">
+      <div id="trip-customer-results" style="display:none;position:absolute;top:100%;left:0;right:0;z-index:50;background:var(--bg);border:1px solid var(--green);border-radius:var(--radius-sm);box-shadow:var(--glow-green);max-height:180px;overflow-y:auto;margin-top:4px"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Miles</label><input class="form-input" id="trip-miles" type="number" placeholder="0.0" step="0.1" oninput="updateTripDeduction()"></div>
+      <div class="form-group"><label class="form-label">Date</label><input class="form-input" id="trip-date" type="date"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Purpose</label><input class="form-input" id="trip-purpose" type="text" placeholder="e.g. Job — window cleaning"></div>
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px">Deduction: <span id="trip-ded-preview" style="color:var(--green);font-weight:700">$0.00</span></div>
+    <div class="modal-actions"><button class="btn-secondary" onclick="closeModal('add-trip')">Cancel</button><button class="btn-primary" onclick="saveTrip()">Save trip</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-job-reason">
+  <div class="modal">
+    <div class="modal-title" id="job-reason-title">Job not complete</div>
+    <input type="hidden" id="job-reason-id">
+    <div style="font-size:13px;color:var(--text-muted);margin-bottom:14px" id="job-reason-customer">What happened?</div>
+    <div class="form-group">
+      <label class="form-label">Reason / notes</label>
+      <textarea class="form-input" id="job-reason-notes" rows="3" placeholder="e.g. Rained out, customer wasn't home, ran behind..."></textarea>
+    </div>
+    <div class="form-group" id="job-reschedule-wrap" style="display:none">
+      <label class="form-label">New date</label>
+      <input class="form-input" id="job-reschedule-date" type="date">
+    </div>
+    <div class="modal-actions" style="flex-wrap:wrap;gap:8px">
+      <button class="btn-secondary" onclick="closeModal('job-reason')">Back</button>
+      <button class="btn-blue" id="job-reason-resched-btn" onclick="jobReasonReschedule()">Reschedule</button>
+      <button class="btn-danger" onclick="jobReasonCancel()">Cancel job</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-mileage-settings">
+  <div class="modal">
+    <div class="modal-title">Mileage settings</div>
+    <div style="font-size:11px;color:var(--blue);background:var(--blue-dim);border:1px solid var(--blue);border-radius:var(--radius-sm);padding:8px 10px;margin-bottom:14px;line-height:1.4">Signed in as <span id="set-user-label" style="font-weight:700">this login</span>. Your home base is saved just for you — each user keeps their own.</div>
+    <div class="form-group">
+      <label class="form-label">Your home base address <span style="color:var(--blue)">(per-user)</span></label>
+      <input class="form-input" id="set-home-address" type="text" placeholder="123 Main St, Sparta IL 62286">
+      <div style="font-size:11px;color:var(--text-muted);margin-top:4px">Trips are measured round-trip from here to the customer and back.</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Google Maps API key <span style="color:var(--green)">(shared)</span></label>
+      <input class="form-input" id="set-maps-key" type="text" placeholder="AIza..." style="font-family:monospace;font-size:12px">
+      <div style="font-size:11px;color:var(--text-muted);margin-top:4px">Business-wide. Restricted to your site only.</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">IRS rate ($/mile) <span style="color:var(--green)">(shared)</span></label>
+      <input class="form-input" id="set-mileage-rate" type="number" step="0.001" placeholder="0.725">
+      <div style="font-size:11px;color:var(--text-muted);margin-top:4px">2026 business rate is $0.725. Update each year.</div>
+    </div>
+    <div style="border-top:1px solid var(--border);margin:6px 0 14px;padding-top:14px">
+      <label class="form-label" style="margin-bottom:4px">Features <span style="color:var(--green)">(shared)</span></label>
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px">Turn off anything you don't use to declutter the app.</div>
+      <div class="toggle-row">
+        <div><div class="toggle-label">Referral leads</div><div class="toggle-sub">Pipeline → Leads tab</div></div>
+        <label class="tswitch"><input type="checkbox" id="feat-leads"><span class="tslider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div><div class="toggle-label">Campaigns</div><div class="toggle-sub">Email/SMS blasts</div></div>
+        <label class="tswitch"><input type="checkbox" id="feat-campaigns"><span class="tslider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div><div class="toggle-label">Give Back</div><div class="toggle-sub">Monthly giveaway pipeline</div></div>
+        <label class="tswitch"><input type="checkbox" id="feat-giveback"><span class="tslider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div><div class="toggle-label">More Tools</div><div class="toggle-sub">Mileage tracker tile on home</div></div>
+        <label class="tswitch"><input type="checkbox" id="feat-tools"><span class="tslider"></span></label>
+      </div>
+    </div>
+    <div style="border-top:1px solid var(--border);margin:6px 0 14px;padding-top:14px">
+      <label class="form-label" style="margin-bottom:8px">Tax export</label>
+      <button class="btn-secondary" style="width:100%;justify-content:center" onclick="exportTaxBundle()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export everything for taxes
+      </button>
+      <div style="font-size:11px;color:var(--text-muted);margin-top:6px;line-height:1.4">Downloads your mileage, expenses, and revenue as separate CSVs — ready to drop into a tax spreadsheet as tabs.</div>
+    </div>
+    <div class="modal-actions"><button class="btn-secondary" onclick="closeModal('mileage-settings')">Cancel</button><button class="btn-primary" onclick="saveMileageSettings()">Save</button></div>
   </div>
 </div>
 
@@ -872,7 +1075,7 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, onSnapshot, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const firebaseConfig = {
@@ -885,12 +1088,19 @@ const firebaseConfig = {
 };
 const EMAILJS_SVC="service_f4ccq3o", EMAILJS_TPL="template_5ajl1pn", EMAILJS_KEY="eOI3Xs13SoIg-jsvn";
 const BIZ_EMAIL="bustasmudge@gmail.com";
+const REVIEW_LINK="https://www.facebook.com/profile.php?id=61559142696043&sk=reviews";
 const BREVO_API_KEY="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";
 
 const app=initializeApp(firebaseConfig);
 const db=getFirestore(app);
 const auth=getAuth(app);
-let data={customers:[],jobs:[],payments:[],expenses:[],quotes:[],activity:[],leads:[],campaigns:[],givebacks:[]};
+let data={customers:[],jobs:[],payments:[],expenses:[],quotes:[],activity:[],leads:[],campaigns:[],givebacks:[],mileage:[],pending:[]};
+let appSettings={mapsApiKey:'',homeAddress:'',mileageRate:0.725}; // effective merged settings
+let sharedSettings={mapsApiKey:'',mileageRate:0.725}; // business-wide (key + default rate)
+let userSettings={homeAddress:'',mileageRate:null}; // per-login (home base, optional rate override)
+let features={giveback:true,campaigns:true,leads:true,tools:true}; // feature toggles (business-wide)
+let currentUid=null;
+let currentEmail=null;
 let currentCustomerId=null,currentJobId=null,currentQuoteId=null,currentLeadId=null;
 let calViewYear,calViewMonth;
 let revPeriod='week';
@@ -904,7 +1114,7 @@ async function fbUpdate(col,id,obj){setSyncDot('syncing');try{await updateDoc(do
 async function fbDelete(col,id){setSyncDot('syncing');try{await deleteDoc(doc(db,col,id));setSyncDot('ok');}catch(e){setSyncDot('error');}}
 
 function startListeners(){
-  const cols={customers:'customers',jobs:'jobs',payments:'payments',expenses:'expenses',quotes:'quotes',activity:'activity',leads:'leads',campaigns:'campaigns',givebacks:'givebacks'};
+  const cols={customers:'customers',jobs:'jobs',payments:'payments',expenses:'expenses',quotes:'quotes',activity:'activity',leads:'leads',campaigns:'campaigns',givebacks:'givebacks',mileage:'mileage',pending:'pending'};
   for(const[col,key] of Object.entries(cols)){
     onSnapshot(collection(db,col),snap=>{
       data[key]=snap.docs.map(d=>({id:d.id,...d.data()}));
@@ -917,6 +1127,8 @@ function startListeners(){
       if(key==='leads')renderLeads();
       if(key==='campaigns')renderCampaignHistory();
       if(key==='givebacks')renderGivebacks();
+      if(key==='pending'||key==='activity')renderDashboard();
+      if(key==='mileage')renderMileage();
     });
   }
 }
@@ -928,7 +1140,9 @@ async function init(){
   document.getElementById('loading-status').textContent='Loading your data...';
   try{
     await Promise.all(Object.keys(data).map(c=>getDocs(collection(db,c)).then(s=>{data[c]=s.docs.map(d=>({id:d.id,...d.data()}));})));
+    await loadSettings();
     startListeners();initCal();setDate();renderDashboard();loadSplitInputs();
+    topUpRecurringSeries().catch(e=>console.error('recur topup',e));
     const ls=document.getElementById('loading-screen');
     ls.classList.add('fade-out');setTimeout(()=>ls.style.display='none',400);
   }catch(e){document.getElementById('loading-status').textContent='Connection error';setSyncDot('error');}
@@ -941,6 +1155,8 @@ onAuthStateChanged(auth,user=>{
   const loginScreen=document.getElementById('login-screen');
   const loadingScreen=document.getElementById('loading-screen');
   if(user){
+    currentUid=user.uid;
+    currentEmail=user.email||'';
     loginScreen.classList.remove('show');
     loadingScreen.style.display='';loadingScreen.classList.remove('fade-out');
     init();
@@ -986,9 +1202,11 @@ window.showSection=function(id,btn){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('sec-'+id).classList.add('active');
-  btn.classList.add('active');
+  if(btn)btn.classList.add('active');
+  if(id==='dashboard'&&typeof switchHomeTab==='function')switchHomeTab('dash');
   if(id==='schedule')renderSchedule();
   if(id==='quotes')renderQuotes();
+  if(id==='tools'){backToTools();}
 };
 
 window.switchMoneyTab=function(tab){
@@ -1028,6 +1246,18 @@ window.openModal=function(type){
     document.getElementById('ref-customer').value='';
     document.getElementById('ref-customer-results').style.display='none';
   }
+  if(type==='add-trip'){
+    // Only reset when not editing (editTrip sets fields then opens)
+    if(!document.getElementById('trip-edit-id').value){
+      document.getElementById('add-trip-title').textContent='Add trip';
+      document.getElementById('trip-customer-search').value='';
+      document.getElementById('trip-customer').value='';
+      document.getElementById('trip-miles').value='';
+      document.getElementById('trip-purpose').value='';
+      document.getElementById('trip-customer-results').style.display='none';
+      document.getElementById('trip-ded-preview').textContent='$0.00';
+    }
+  }
 };
 window.closeModal=function(type){
   document.getElementById('modal-'+type).classList.remove('open');
@@ -1036,6 +1266,7 @@ window.closeModal=function(type){
   m.querySelectorAll('select').forEach(s=>s.selectedIndex=0);
   if(type==='customer')resetChecks('cust-service-checks');
   if(type==='schedule-job')resetChecks('job-service-checks');
+  if(type==='add-trip'){document.getElementById('trip-edit-id').value='';document.getElementById('trip-customer').value='';document.getElementById('trip-ded-preview').textContent='$0.00';}
 };
 document.querySelectorAll('.modal-overlay').forEach(o=>{o.addEventListener('click',e=>{if(e.target===o)closeModal(o.id.replace('modal-',''));});});
 function populateCustomerDropdown(type){
@@ -1066,10 +1297,109 @@ window.saveJob=async function(){
   const cust=data.customers.find(c=>c.id===custId);
   const services=getCheckedServices('job-service-checks');
   const price=parseFloat(document.getElementById('job-price').value)||0;
-  await fbAdd('jobs',{customerId:custId,customerName:cust?cust.name:'Unknown',services,status:document.getElementById('job-status').value,date:document.getElementById('job-date').value,time:document.getElementById('job-time').value,price,notes:document.getElementById('job-notes').value.trim(),photoCount:document.getElementById('job-photos').files.length,created:new Date().toISOString()});
-  await addActivity('Job scheduled: '+(cust?cust.name:'Unknown'),(services.join(', ')||'No service')+' · $'+price.toFixed(2));
-  closeModal('schedule-job');toast('Job saved!');
+  const dateStr=document.getElementById('job-date').value;
+  const time=document.getElementById('job-time').value;
+  const status=document.getElementById('job-status').value;
+  const notes=document.getElementById('job-notes').value.trim();
+  const recurring=document.getElementById('job-recurring').value;
+  if(!dateStr){alert('Please pick a date.');return;}
+
+  const base={customerId:custId,customerName:cust?cust.name:'Unknown',services,status,date:dateStr,time,price,notes,photoCount:document.getElementById('job-photos').files.length};
+
+  if(recurring&&recurring!=='none'){
+    // Create a recurring series with a rolling window of future dates
+    const seriesId='series_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
+    const dates=generateRecurringDates(dateStr,recurring,RECUR_WINDOW_MONTHS);
+    for(const d of dates){
+      await fbAdd('jobs',{...base,date:d,recurring,seriesId,created:new Date().toISOString()});
+    }
+    await addActivity('Recurring job: '+(cust?cust.name:'Unknown'),capitalize(recurring)+' · starts '+fmtDate(dateStr));
+    toast(dates.length+' recurring jobs added');
+  }else{
+    await fbAdd('jobs',{...base,recurring:'none',created:new Date().toISOString()});
+    await addActivity('Job scheduled: '+(cust?cust.name:'Unknown'),(services.join(', ')||'No service')+' · $'+price.toFixed(2));
+    toast('Job saved!');
+  }
+  closeModal('schedule-job');
 };
+
+window.scheduleJobForCustomer=function(custId){
+  closeSheet('customer');
+  openModal('schedule-job');
+  // pre-select the customer in the dropdown
+  setTimeout(()=>{const sel=document.getElementById('job-customer');if(sel)sel.value=custId;},50);
+};
+
+// ===== RECURRENCE ENGINE =====
+const RECUR_WINDOW_MONTHS=24; // rolling window of future jobs to keep on the calendar
+const RECUR_STEP={monthly:1,bimonthly:2,quarterly:3,biannual:6,yearly:12};
+
+function capitalize(s){return (s||'').charAt(0).toUpperCase()+(s||'').slice(1);}
+
+// Given a date, find which weekday it is and which occurrence in its month (1st, 2nd, 3rd...)
+function weekdayOccurrence(dateStr){
+  const d=new Date(dateStr+'T12:00:00');
+  const dow=d.getDay(); // 0-6
+  const dayNum=d.getDate();
+  const occurrence=Math.floor((dayNum-1)/7)+1; // 1=first, 2=second, etc.
+  return {dow,occurrence};
+}
+
+// Return the date string for the Nth <weekday> of a given year/month.
+// If that occurrence doesn't exist (e.g. 5th Friday), fall back to the last one in the month.
+function nthWeekdayOfMonth(year,month,dow,occurrence){
+  const first=new Date(year,month,1,12,0,0);
+  const firstDow=first.getDay();
+  let day=1+((dow-firstDow+7)%7)+(occurrence-1)*7;
+  const daysInMonth=new Date(year,month+1,0).getDate();
+  if(day>daysInMonth){day-=7;} // fall back to last occurrence of that weekday
+  const m=String(month+1).padStart(2,'0');const dd=String(day).padStart(2,'0');
+  return `${year}-${m}-${dd}`;
+}
+
+// Build the list of recurring dates from a start date, by interval, across a window of months
+function generateRecurringDates(startStr,interval,windowMonths){
+  const step=RECUR_STEP[interval];if(!step)return [startStr];
+  const {dow,occurrence}=weekdayOccurrence(startStr);
+  const start=new Date(startStr+'T12:00:00');
+  const dates=[startStr];
+  let monthsOut=step;
+  while(monthsOut<=windowMonths){
+    const target=new Date(start.getFullYear(),start.getMonth()+monthsOut,1,12,0,0);
+    dates.push(nthWeekdayOfMonth(target.getFullYear(),target.getMonth(),dow,occurrence));
+    monthsOut+=step;
+  }
+  return dates;
+}
+
+// Top up recurring series so there are always ~windowMonths of future jobs ("forever until deleted")
+async function topUpRecurringSeries(){
+  const today=new Date();today.setHours(0,0,0,0);
+  const horizon=new Date(today.getFullYear(),today.getMonth()+RECUR_WINDOW_MONTHS,today.getDate());
+  // Group jobs by seriesId
+  const series={};
+  data.jobs.forEach(j=>{if(j.seriesId){(series[j.seriesId]=series[j.seriesId]||[]).push(j);}});
+  for(const sid in series){
+    const jobs=series[sid].sort((a,b)=>new Date(a.date)-new Date(b.date));
+    const last=jobs[jobs.length-1];
+    const interval=last.recurring;const step=RECUR_STEP[interval];if(!step)continue;
+    const lastDate=new Date(last.date+'T12:00:00');
+    if(lastDate>=horizon)continue; // already enough future jobs
+    const {dow,occurrence}=weekdayOccurrence(last.date);
+    // add new occurrences from last+step up to horizon
+    let monthsOut=step;
+    const existing=new Set(jobs.map(j=>j.date));
+    while(true){
+      const target=new Date(lastDate.getFullYear(),lastDate.getMonth()+monthsOut,1,12,0,0);
+      if(target>horizon)break;
+      const ds=nthWeekdayOfMonth(target.getFullYear(),target.getMonth(),dow,occurrence);
+      if(!existing.has(ds)){
+        await fbAdd('jobs',{customerId:last.customerId,customerName:last.customerName,services:last.services||[],status:'Scheduled',date:ds,time:last.time||'',price:last.price||0,notes:last.notes||'',photoCount:0,recurring:interval,seriesId:sid,created:new Date().toISOString()});
+      }
+      monthsOut+=step;
+    }
+  }
+}
 
 window.savePayment=async function(){
   const custId=document.getElementById('pay-customer').value;
@@ -1217,6 +1547,12 @@ window.openCustomerDetail=function(id){
         ${email?`<a class="contact-btn email" href="mailto:${email}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Email</a>`:''}
       </div>`:''}
     </div>
+    <div class="detail-section"><div class="detail-section-title">Request a review</div>
+      <div style="display:flex;gap:8px">
+        <button class="btn-secondary" style="flex:1;justify-content:center${phone?'':';opacity:0.4'}" ${phone?'':'disabled'} onclick="reviewTextCustomer('${id}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Text link</button>
+        <button class="btn-secondary" style="flex:1;justify-content:center${email?'':';opacity:0.4'}" ${email?'':'disabled'} onclick="reviewEmailCustomer('${id}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Email link</button>
+      </div>
+    </div>
     <div class="detail-section"><div class="detail-section-title">Edit info</div>
       <div class="detail-field"><span class="detail-field-label">Name</span><input class="edit-input" id="edit-cust-name" value="${esc(c.name)}" style="max-width:190px"></div>
       <div class="detail-field"><span class="detail-field-label">Phone</span><input class="edit-input" id="edit-cust-phone" type="tel" value="${esc(phone)}" style="max-width:190px"></div>
@@ -1241,7 +1577,8 @@ window.openCustomerDetail=function(id){
       </div>
     </div>`:''}
     <div class="detail-section"><div class="detail-section-title">Job history</div>
-      ${data.jobs.filter(j=>j.customerId===id).length===0?'<div style="font-size:13px;color:var(--text-muted)">No jobs yet</div>':data.jobs.filter(j=>j.customerId===id).sort((a,b)=>new Date(b.date)-new Date(a.date)).map(j=>`<div class="detail-field"><span class="detail-field-label">${fmtDate(j.date)}</span><span class="detail-field-value">${(j.services||[]).join(', ')} · $${(parseFloat(j.price)||0).toFixed(2)}</span></div>`).join('')}
+      <button class="btn-primary" style="width:100%;justify-content:center;margin-bottom:10px" onclick="scheduleJobForCustomer('${id}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="12" y1="14" x2="12" y2="18"/><line x1="10" y1="16" x2="14" y2="16"/></svg>Schedule a job</button>
+      ${data.jobs.filter(j=>j.customerId===id).length===0?'<div style="font-size:13px;color:var(--text-muted)">No jobs yet</div>':data.jobs.filter(j=>j.customerId===id).sort((a,b)=>new Date(b.date)-new Date(a.date)).map(j=>`<div class="detail-field"><span class="detail-field-label">${fmtDate(j.date)}</span><span class="detail-field-value">${(j.services||[]).join(', ')} · $${(parseFloat(j.price)||0).toFixed(2)}${j.recurring&&j.recurring!=='none'?' · <span class="badge badge-blue">↻</span>':''}</span></div>`).join('')}
     </div>
     <div class="detail-section"><div class="detail-section-title">Quotes sent</div>
       ${data.quotes.filter(q=>q.customerId===id).length===0?'<div style="font-size:13px;color:var(--text-muted)">No quotes yet</div>':data.quotes.filter(q=>q.customerId===id).sort((a,b)=>new Date(b.created)-new Date(a.created)).map(q=>`<div class="detail-field"><span class="detail-field-label">#${q.quoteNum}</span><span class="detail-field-value">$${(parseFloat(q.total)||0).toFixed(2)} · <span class="badge badge-blue">${q.status}</span></span></div>`).join('')}
@@ -1718,6 +2055,509 @@ window.updateLeadStatus=async function(batchId,idx,newStatus){
   }
 };
 
+// ===== MILEAGE / TOOLS =====
+function applyEffectiveSettings(){
+  // Merge: key comes from shared; home address from user; rate = user override or shared default
+  appSettings.mapsApiKey=sharedSettings.mapsApiKey||'';
+  appSettings.homeAddress=userSettings.homeAddress||'';
+  appSettings.mileageRate=(userSettings.mileageRate!=null?userSettings.mileageRate:(sharedSettings.mileageRate||0.725));
+}
+async function loadSettings(){
+  try{
+    const snap=await getDoc(doc(db,'settings','config'));
+    if(snap.exists()){const d=snap.data();sharedSettings.mapsApiKey=d.mapsApiKey||'';sharedSettings.mileageRate=d.mileageRate||0.725;
+      if(d.features)features={...features,...d.features};
+      // Migrate: if an old shared homeAddress exists and this user has none yet, we leave it as a fallback default
+      if(d.homeAddress&&!userSettings.homeAddress)userSettings.homeAddress=userSettings.homeAddress||'';
+    }
+  }catch(e){console.error('shared settings load',e);}
+  try{
+    if(currentUid){
+      const usnap=await getDoc(doc(db,'settings','user_'+currentUid));
+      if(usnap.exists()){const u=usnap.data();userSettings.homeAddress=u.homeAddress||'';userSettings.mileageRate=(u.mileageRate!=null?u.mileageRate:null);}
+    }
+  }catch(e){console.error('user settings load',e);}
+  applyEffectiveSettings();
+  applyFeatureFlags();
+}
+
+// Show/hide optional features based on toggles
+function applyFeatureFlags(){
+  // Pipeline sub-tabs
+  const tabCamp=document.getElementById('tab-camp');if(tabCamp)tabCamp.style.display=features.campaigns?'':'none';
+  const tabGive=document.getElementById('tab-giveback');if(tabGive)tabGive.style.display=features.giveback?'':'none';
+  const tabLeads=document.getElementById('tab-leads');if(tabLeads)tabLeads.style.display=features.leads?'':'none';
+  // More Tools home tile
+  const toolTiles=document.querySelectorAll('.tool-grid');
+  const moreToolsTile=document.getElementById('home-tools-tile');if(moreToolsTile)moreToolsTile.style.display=features.tools?'':'none';
+  // If currently-active pipeline tab is hidden, fall back to an available one
+  const order=[['leads','tab-leads','pipeline-leads-view'],['campaigns','tab-camp','campaign-list'],['giveback','tab-giveback','giveback-view']];
+  const activeStill=order.find(([f,t])=>features[f]&&document.getElementById(t)&&document.getElementById(t).classList.contains('active-pay'));
+  if(!activeStill){const first=order.find(([f])=>features[f]);if(first)switchPipelineTab(first[0]);}
+}
+
+window.openMileageTool=function(){
+  document.getElementById('tools-home').style.display='none';
+  document.getElementById('tools-mileage').style.display='';
+  renderMileage();
+};
+window.backToTools=function(){
+  document.getElementById('tools-home').style.display='';
+  document.getElementById('tools-mileage').style.display='none';
+};
+window.openMileageSettings=function(){
+  document.getElementById('set-home-address').value=userSettings.homeAddress||'';
+  document.getElementById('set-maps-key').value=sharedSettings.mapsApiKey||'';
+  document.getElementById('set-mileage-rate').value=(sharedSettings.mileageRate||0.725);
+  document.getElementById('feat-leads').checked=!!features.leads;
+  document.getElementById('feat-campaigns').checked=!!features.campaigns;
+  document.getElementById('feat-giveback').checked=!!features.giveback;
+  document.getElementById('feat-tools').checked=!!features.tools;
+  const who=document.getElementById('set-user-label');if(who)who.textContent=currentEmail||'this login';
+  openModal('mileage-settings');
+};
+window.saveMileageSettings=async function(){
+  const home=document.getElementById('set-home-address').value.trim();
+  const key=document.getElementById('set-maps-key').value.trim();
+  const rate=parseFloat(document.getElementById('set-mileage-rate').value)||0.725;
+  features={
+    leads:document.getElementById('feat-leads').checked,
+    campaigns:document.getElementById('feat-campaigns').checked,
+    giveback:document.getElementById('feat-giveback').checked,
+    tools:document.getElementById('feat-tools').checked
+  };
+  setSyncDot('syncing');
+  try{
+    // Per-user: home address
+    if(currentUid){await setDoc(doc(db,'settings','user_'+currentUid),{homeAddress:home,email:currentEmail||''},{merge:true});}
+    userSettings.homeAddress=home;
+    // Shared: API key + business default rate + feature flags
+    await setDoc(doc(db,'settings','config'),{mapsApiKey:key,mileageRate:rate,features:features},{merge:true});
+    sharedSettings.mapsApiKey=key;sharedSettings.mileageRate=rate;
+    applyEffectiveSettings();
+    applyFeatureFlags();
+    setSyncDot('ok');toast('Settings saved');
+  }catch(e){setSyncDot('error');toast('Could not save');console.error(e);}
+  closeModal('mileage-settings');
+  renderMileage();
+};
+
+function mileageRate(){return appSettings.mileageRate||0.725;}
+
+let mileageScope='mine';
+window.setMileageScope=function(s){
+  mileageScope=s;
+  document.getElementById('mi-tab-mine').className='money-tab'+(s==='mine'?' active-pay':'');
+  document.getElementById('mi-tab-all').className='money-tab'+(s==='all'?' active-pay':'');
+  renderMileage();
+};
+
+function renderMileage(){
+  const el=document.getElementById('mileage-list');if(!el)return;
+  const rate=mileageRate();
+  // Filter by scope: 'mine' = trips created by this login, 'all' = everyone
+  const scoped=data.mileage.filter(t=>mileageScope==='all'?true:(t.uid===currentUid));
+  // stat tiles (based on scope)
+  const now=new Date();const ym=now.toISOString().slice(0,7);const yr=now.getFullYear().toString();
+  let monthMiles=0,yearMiles=0;
+  scoped.forEach(t=>{
+    const d=(t.date||'').slice(0,10);const mi=parseFloat(t.miles)||0;
+    if(d.startsWith(ym))monthMiles+=mi;
+    if(d.startsWith(yr))yearMiles+=mi;
+  });
+  const mm=document.getElementById('mi-month-miles');if(mm)mm.textContent=monthMiles.toFixed(1);
+  const md=document.getElementById('mi-month-ded');if(md)md.textContent='$'+(monthMiles*rate).toFixed(2);
+  const ym2=document.getElementById('mi-year-miles');if(ym2)ym2.textContent=yearMiles.toFixed(1);
+  const rl=document.getElementById('mi-rate-label');if(rl)rl.textContent='@ '+(rate*100).toFixed(1)+'¢/mi';
+
+  if(scoped.length===0){
+    const msg=mileageScope==='mine'?'No trips logged under your account yet.<br>Complete a job or add one manually.':'No trips logged yet.';
+    el.innerHTML=`<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><p>${msg}</p></div>`;
+    return;
+  }
+  const trips=[...scoped].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  el.innerHTML=trips.map(t=>{
+    const mi=parseFloat(t.miles)||0;
+    const ded=(mi*rate).toFixed(2);
+    const owner=(mileageScope==='all'&&t.userEmail)?`<span style="color:var(--blue)"> · ${esc(t.userEmail.split('@')[0])}</span>`:'';
+    return`<div class="lead-card" style="border-color:var(--blue);box-shadow:var(--glow-blue)">
+      <div class="lead-row" style="border-bottom:none">
+        <div style="flex:1">
+          <div class="lead-name">${esc(t.customerName||t.purpose||'Trip')}${owner}</div>
+          <div class="lead-phone">${fmtDate(t.date)} · ${mi.toFixed(1)} mi · <span style="color:var(--green)">$${ded}</span></div>
+          ${t.purpose&&t.customerName?`<div style="font-size:11px;color:var(--text-muted);margin-top:2px">${esc(t.purpose)}</div>`:''}
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <button onclick="editTrip('${t.id}')" style="background:var(--blue-dim);border:1px solid var(--blue);color:var(--blue);border-radius:6px;width:26px;height:26px;font-size:12px;cursor:pointer">✎</button>
+          <button onclick="deleteTrip('${t.id}')" style="background:var(--red-dim);border:1px solid var(--red);color:var(--red);border-radius:6px;width:26px;height:26px;font-size:14px;cursor:pointer">✕</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// Manual add / edit trip
+window.updateTripDeduction=function(){
+  const mi=parseFloat(document.getElementById('trip-miles').value)||0;
+  document.getElementById('trip-ded-preview').textContent='$'+(mi*mileageRate()).toFixed(2);
+};
+window.filterTripCustomers=function(q){
+  const box=document.getElementById('trip-customer-results');
+  q=(q||'').toLowerCase().trim();
+  const matches=data.customers.filter(c=>c.name&&c.name.toLowerCase().includes(q)).slice(0,6);
+  if(matches.length===0){box.style.display='none';return;}
+  box.innerHTML=matches.map(c=>`<div style="padding:10px 12px;cursor:pointer;border-bottom:1px solid var(--border);font-size:13px" onclick="pickTripCustomer('${c.id}')">${esc(c.name)}${c.address?`<div style="font-size:11px;color:var(--text-muted)">${esc(c.address)}</div>`:''}</div>`).join('');
+  box.style.display='';
+};
+window.pickTripCustomer=function(id){
+  const c=data.customers.find(x=>x.id===id);if(!c)return;
+  document.getElementById('trip-customer').value=id;
+  document.getElementById('trip-customer-search').value=c.name;
+  document.getElementById('trip-customer-results').style.display='none';
+  if(!document.getElementById('trip-purpose').value)document.getElementById('trip-purpose').value='Job — '+c.name;
+};
+window.editTrip=function(id){
+  const t=data.mileage.find(x=>x.id===id);if(!t)return;
+  document.getElementById('add-trip-title').textContent='Edit trip';
+  document.getElementById('trip-edit-id').value=id;
+  document.getElementById('trip-customer').value=t.customerId||'';
+  document.getElementById('trip-customer-search').value=t.customerName||'';
+  document.getElementById('trip-miles').value=t.miles||'';
+  document.getElementById('trip-date').value=(t.date||'').slice(0,10);
+  document.getElementById('trip-purpose').value=t.purpose||'';
+  updateTripDeduction();
+  openModal('add-trip');
+};
+window.saveTrip=async function(){
+  const miles=parseFloat(document.getElementById('trip-miles').value)||0;
+  if(miles<=0){alert('Enter the miles for this trip.');return;}
+  const custId=document.getElementById('trip-customer').value;
+  const cust=data.customers.find(c=>c.id===custId);
+  const obj={
+    customerId:custId||'',
+    customerName:cust?cust.name:'',
+    miles:miles,
+    date:document.getElementById('trip-date').value||new Date().toISOString().slice(0,10),
+    purpose:document.getElementById('trip-purpose').value.trim()
+  };
+  const editId=document.getElementById('trip-edit-id').value;
+  if(editId){await fbUpdate('mileage',editId,obj);toast('Trip updated');}
+  else{obj.created=new Date().toISOString();obj.uid=currentUid||'';obj.userEmail=currentEmail||'';await fbAdd('mileage',obj);toast('Trip logged');}
+  closeModal('add-trip');
+};
+window.deleteTrip=async function(id){
+  if(!confirm('Delete this trip?'))return;
+  await fbDelete('mileage',id);toast('Trip deleted');
+};
+
+window.exportMileageCSV=function(){
+  const scoped=data.mileage.filter(t=>mileageScope==='all'?true:(t.uid===currentUid));
+  if(scoped.length===0){toast('No trips to export');return;}
+  const rate=mileageRate();
+  const showOwner=mileageScope==='all';
+  const header=['Date','Customer/Destination','Purpose','Miles','Deduction ($)'];
+  if(showOwner)header.push('Logged by');
+  const rows=[header];
+  [...scoped].sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(t=>{
+    const mi=parseFloat(t.miles)||0;
+    const row=[(t.date||'').slice(0,10),t.customerName||'',t.purpose||'',mi.toFixed(1),(mi*rate).toFixed(2)];
+    if(showOwner)row.push(t.userEmail||'');
+    rows.push(row);
+  });
+  const csv=rows.map(r=>r.map(f=>`"${String(f).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob=new Blob([csv],{type:'text/csv'});const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download='mileage-'+(mileageScope==='mine'?'mine':'all')+'-'+new Date().toISOString().slice(0,10)+'.csv';a.click();
+  URL.revokeObjectURL(url);
+};
+
+// Export everything for taxes — mileage (your trips) + expenses + revenue, as separate CSVs
+window.exportTaxBundle=async function(){
+  const today=new Date().toISOString().split('T')[0];
+  const yr=new Date().getFullYear();
+  const rate=mileageRate();
+  const who=(currentEmail||'me').split('@')[0];
+  let downloaded=0;
+
+  // 1) Mileage — current user's trips only (for personal taxes)
+  const myTrips=data.mileage.filter(t=>t.uid===currentUid);
+  if(myTrips.length){
+    const rows=[['Date','Customer/Destination','Purpose','Miles','Deduction ($)']];
+    [...myTrips].sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(t=>{
+      const mi=parseFloat(t.miles)||0;
+      rows.push([(t.date||'').slice(0,10),t.customerName||'',t.purpose||'',mi.toFixed(1),(mi*rate).toFixed(2)]);
+    });
+    const totalMi=myTrips.reduce((s,t)=>s+(parseFloat(t.miles)||0),0);
+    rows.push([]);rows.push(['','','TOTAL',totalMi.toFixed(1),(totalMi*rate).toFixed(2)]);
+    downloadCSV('tax-'+yr+'-mileage-'+who+'-'+today+'.csv',rows);downloaded++;
+    await new Promise(r=>setTimeout(r,400));
+  }
+
+  // 2) Expenses
+  if(data.expenses.length){
+    const rows=[['Date','Category','Description','Amount ($)']];
+    [...data.expenses].sort((a,b)=>new Date(a.date||a.created)-new Date(b.date||b.created)).forEach(e=>{
+      rows.push([(e.date||'').slice(0,10),e.category||'',e.desc||'',(parseFloat(e.amount)||0).toFixed(2)]);
+    });
+    const totalExp=data.expenses.reduce((s,e)=>s+(parseFloat(e.amount)||0),0);
+    rows.push([]);rows.push(['','','TOTAL',totalExp.toFixed(2)]);
+    downloadCSV('tax-'+yr+'-expenses-'+today+'.csv',rows);downloaded++;
+    await new Promise(r=>setTimeout(r,400));
+  }
+
+  // 3) Revenue (payments)
+  if(data.payments.length){
+    const rows=[['Date','Customer','Amount ($)','Method','Status','Notes']];
+    [...data.payments].sort((a,b)=>new Date(a.date||a.created)-new Date(b.date||b.created)).forEach(p=>{
+      rows.push([(p.date||'').slice(0,10),p.customerName||'',(parseFloat(p.amount)||0).toFixed(2),p.method||'',p.status||'',p.notes||'']);
+    });
+    const totalRev=data.payments.reduce((s,p)=>s+(parseFloat(p.amount)||0),0);
+    rows.push([]);rows.push(['','TOTAL',totalRev.toFixed(2)]);
+    downloadCSV('tax-'+yr+'-revenue-'+today+'.csv',rows);downloaded++;
+    await new Promise(r=>setTimeout(r,400));
+  }
+
+  if(downloaded===0){toast('Nothing to export yet');}
+  else{toast(downloaded+' tax file'+(downloaded>1?'s':'')+' downloaded');}
+};
+
+// ===== ROUTES API: round-trip distance =====
+async function geocodeAddress(addr){
+  const key=appSettings.mapsApiKey;
+  const url=`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(addr)}&key=${key}`;
+  const r=await fetch(url);const j=await r.json();
+  if(j.status!=='OK'||!j.results.length)throw new Error('Could not find address: '+addr);
+  const loc=j.results[0].geometry.location;return{lat:loc.lat,lng:loc.lng};
+}
+async function drivingMiles(origin,dest){
+  // Routes API computeRoutes
+  const key=appSettings.mapsApiKey;
+  const body={
+    origin:{location:{latLng:{latitude:origin.lat,longitude:origin.lng}}},
+    destination:{location:{latLng:{latitude:dest.lat,longitude:dest.lng}}},
+    travelMode:'DRIVE'
+  };
+  const r=await fetch('https://routes.googleapis.com/directions/v2:computeRoutes',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','X-Goog-Api-Key':key,'X-Goog-FieldMask':'routes.distanceMeters'},
+    body:JSON.stringify(body)
+  });
+  const j=await r.json();
+  if(!j.routes||!j.routes.length)throw new Error('No route found');
+  const meters=j.routes[0].distanceMeters;
+  return meters/1609.344; // meters -> miles
+}
+async function calcRoundTrip(customerAddress){
+  if(!appSettings.mapsApiKey)throw new Error('No Maps API key set. Add it in Tools → Settings.');
+  if(!appSettings.homeAddress)throw new Error('No home base address set. Add it in Tools → Settings.');
+  const home=await geocodeAddress(appSettings.homeAddress);
+  const cust=await geocodeAddress(customerAddress);
+  const oneWay=await drivingMiles(home,cust);
+  return oneWay*2; // there and back
+}
+
+// ===== PENDING CONFIRMATIONS (notification feed) =====
+// Called when a job is marked Completed
+async function createReviewPending(job){
+  const cust=data.customers.find(c=>c.id===job.customerId);
+  if(!cust)return;
+  // skip if already prompted for this job
+  if(data.pending.some(p=>p.type==='review'&&p.jobId===job.id))return;
+  await fbAdd('pending',{
+    type:'review',
+    jobId:job.id,
+    customerId:cust.id,
+    customerName:cust.name,
+    phone:cust.phone||'',
+    email:cust.email||'',
+    uid:currentUid||'',
+    userEmail:currentEmail||'',
+    created:new Date().toISOString()
+  });
+}
+
+async function createMileagePending(job){
+  const cust=data.customers.find(c=>c.id===job.customerId);
+  if(!cust||!cust.address){return;} // no address, can't auto-calc
+  // avoid duplicate pending for same job
+  if(data.pending.some(p=>p.type==='mileage'&&p.jobId===job.id))return;
+  if(data.mileage.some(m=>m.jobId===job.id))return; // already logged
+  let miles=0,err='';
+  try{miles=await calcRoundTrip(cust.address);}
+  catch(e){err=e.message;}
+  await fbAdd('pending',{
+    type:'mileage',
+    jobId:job.id,
+    customerId:cust.id,
+    customerName:cust.name,
+    address:cust.address,
+    miles:err?0:parseFloat(miles.toFixed(1)),
+    purpose:'Job — '+(cust.name||''),
+    date:job.date||new Date().toISOString().slice(0,10),
+    error:err,
+    uid:currentUid||'',
+    userEmail:currentEmail||'',
+    created:new Date().toISOString()
+  });
+}
+
+window.confirmPending=async function(id){
+  const p=data.pending.find(x=>x.id===id);if(!p)return;
+  if(p.type==='mileage'){
+    if(!p.miles||p.miles<=0){toast('Enter miles first');editPendingMiles(id);return;}
+    await fbAdd('mileage',{
+      customerId:p.customerId||'',customerName:p.customerName||'',
+      miles:p.miles,date:p.date,purpose:p.purpose||'Job',jobId:p.jobId||'',
+      uid:p.uid||currentUid||'',userEmail:p.userEmail||currentEmail||'',
+      created:new Date().toISOString()
+    });
+    await fbDelete('pending',id);
+    toast('Trip confirmed & logged');
+  }
+};
+window.dismissPending=async function(id){
+  if(!confirm('Dismiss this notification?'))return;
+  await fbDelete('pending',id);
+};
+window.editPendingMiles=function(id){
+  const p=data.pending.find(x=>x.id===id);if(!p)return;
+  const val=prompt('Round-trip miles for this trip:',p.miles||'');
+  if(val===null)return;
+  const mi=parseFloat(val);if(isNaN(mi)||mi<0){toast('Invalid number');return;}
+  fbUpdate('pending',id,{miles:parseFloat(mi.toFixed(1)),error:''});
+};
+
+// ===== REVIEW REQUESTS =====
+function reviewMessage(name){
+  const first=(name||'').split(' ')[0]||'there';
+  return `Hi ${first}, thank you for choosing Smudge Busters! We'd really appreciate it if you could leave us a quick review — it helps our small business a ton. ${REVIEW_LINK}`;
+}
+// Text: open Messages app pre-filled (sends from your number, no SMS fees)
+window.sendReviewText=async function(id){
+  const p=data.pending.find(x=>x.id===id);if(!p)return;
+  if(!p.phone){toast('No phone number on file');return;}
+  const body=encodeURIComponent(reviewMessage(p.customerName));
+  const num=p.phone.replace(/[^\d+]/g,'');
+  // ?&body= works on iOS; &body= on Android — include both for safety
+  window.location.href=`sms:${num}?&body=${body}`;
+  await fbUpdate('pending',id,{sentVia:'text',sentAt:new Date().toISOString()});
+  await addActivity('Review requested: '+(p.customerName||''),'Sent by text');
+  setTimeout(()=>dismissPendingSilent(id),600);
+};
+// Email: send directly via EmailJS
+window.sendReviewEmail=async function(id){
+  const p=data.pending.find(x=>x.id===id);if(!p)return;
+  if(!p.email){toast('No email on file');return;}
+  setSyncDot('syncing');
+  try{
+    if(!window.emailjs){
+      await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s);});
+      window.emailjs.init(EMAILJS_KEY);
+    }
+    const first=(p.customerName||'').split(' ')[0]||'there';
+    const htmlBody=`<div style="font-family:Arial,sans-serif;font-size:15px;line-height:1.6;color:#222">
+      <p>Hi ${first},</p>
+      <p>Thank you for choosing <strong>Smudge Busters</strong>! It was a pleasure serving you.</p>
+      <p>If you have a moment, we'd be incredibly grateful if you'd leave us a quick review — it makes a huge difference for our small business.</p>
+      <p style="margin:22px 0"><a href="${REVIEW_LINK}" style="background:#4caf80;color:#fff;padding:12px 22px;border-radius:6px;text-decoration:none;font-weight:bold">Leave a Review</a></p>
+      <p>Thanks again,<br>The Smudge Busters Team</p>
+    </div>`;
+    await window.emailjs.send(EMAILJS_SVC,EMAILJS_TPL,{to_email:p.email,to_name:p.customerName,from_name:'Smudge Busters',subject:'How did we do? Leave Smudge Busters a review',message:reviewMessage(p.customerName),html_body:htmlBody,reply_to:BIZ_EMAIL});
+    setSyncDot('ok');
+    await fbUpdate('pending',id,{sentVia:'email',sentAt:new Date().toISOString()});
+    await addActivity('Review requested: '+(p.customerName||''),'Sent by email');
+    toast('Review request emailed');
+    dismissPendingSilent(id);
+  }catch(e){setSyncDot('error');toast('Email failed — try text instead');console.error(e);}
+};
+async function dismissPendingSilent(id){try{await fbDelete('pending',id);}catch(e){}}
+
+// Send review request directly to a customer (from the customer detail sheet)
+window.reviewTextCustomer=function(custId){
+  const c=data.customers.find(x=>x.id===custId);if(!c)return;
+  if(!c.phone){toast('No phone number on file');return;}
+  const body=encodeURIComponent(reviewMessage(c.name));
+  const num=c.phone.replace(/[^\d+]/g,'');
+  window.location.href=`sms:${num}?&body=${body}`;
+  addActivity('Review requested: '+(c.name||''),'Sent by text');
+};
+window.reviewEmailCustomer=async function(custId){
+  const c=data.customers.find(x=>x.id===custId);if(!c)return;
+  if(!c.email){toast('No email on file');return;}
+  setSyncDot('syncing');
+  try{
+    if(!window.emailjs){
+      await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s);});
+      window.emailjs.init(EMAILJS_KEY);
+    }
+    const first=(c.name||'').split(' ')[0]||'there';
+    const htmlBody=`<div style="font-family:Arial,sans-serif;font-size:15px;line-height:1.6;color:#222">
+      <p>Hi ${first},</p>
+      <p>Thank you for choosing <strong>Smudge Busters</strong>! It was a pleasure serving you.</p>
+      <p>If you have a moment, we'd be incredibly grateful if you'd leave us a quick review — it makes a huge difference for our small business.</p>
+      <p style="margin:22px 0"><a href="${REVIEW_LINK}" style="background:#4caf80;color:#fff;padding:12px 22px;border-radius:6px;text-decoration:none;font-weight:bold">Leave a Review</a></p>
+      <p>Thanks again,<br>The Smudge Busters Team</p>
+    </div>`;
+    await window.emailjs.send(EMAILJS_SVC,EMAILJS_TPL,{to_email:c.email,to_name:c.name,from_name:'Smudge Busters',subject:'How did we do? Leave Smudge Busters a review',message:reviewMessage(c.name),html_body:htmlBody,reply_to:BIZ_EMAIL});
+    setSyncDot('ok');
+    await addActivity('Review requested: '+(c.name||''),'Sent by email');
+    toast('Review request emailed');
+  }catch(e){setSyncDot('error');toast('Email failed — try text instead');console.error(e);}
+};
+
+// ===== JOB COMPLETION PROMPTS =====
+window.jobPromptComplete=async function(jobId){
+  const job=data.jobs.find(j=>j.id===jobId);if(!job)return;
+  await fbUpdate('jobs',jobId,{status:'Completed'});
+  await addActivity('Job completed: '+(job.customerName||''),(job.services||[]).join(', ')||'');
+  toast('Marked complete');
+  // Fire mileage round-trip confirmation (same as the edit-sheet flow)
+  createMileagePending({...job,status:'Completed'}).catch(e=>console.error(e));
+  createReviewPending({...job,status:'Completed'}).catch(e=>console.error(e));
+};
+
+window.jobPromptNotComplete=function(jobId){
+  const job=data.jobs.find(j=>j.id===jobId);if(!job)return;
+  document.getElementById('job-reason-id').value=jobId;
+  document.getElementById('job-reason-customer').textContent=(job.customerName||'This job')+' — '+fmtDate(job.date)+'. What happened?';
+  document.getElementById('job-reason-notes').value='';
+  document.getElementById('job-reschedule-wrap').style.display='none';
+  document.getElementById('job-reason-resched-btn').textContent='Reschedule';
+  openModal('job-reason');
+};
+
+// First Reschedule tap reveals the date field; second tap (with a date) confirms
+window.jobReasonReschedule=async function(){
+  const wrap=document.getElementById('job-reschedule-wrap');
+  const dateInput=document.getElementById('job-reschedule-date');
+  if(wrap.style.display==='none'){
+    wrap.style.display='';
+    document.getElementById('job-reason-resched-btn').textContent='Confirm new date';
+    return;
+  }
+  const jobId=document.getElementById('job-reason-id').value;
+  const newDate=dateInput.value;
+  if(!newDate){toast('Pick a new date');return;}
+  const job=data.jobs.find(j=>j.id===jobId);if(!job)return;
+  const reason=document.getElementById('job-reason-notes').value.trim();
+  const stamp='[Rescheduled from '+fmtDate(job.date)+(reason?': '+reason:'')+']';
+  const newNotes=(job.notes?job.notes+'\n':'')+stamp;
+  await fbUpdate('jobs',jobId,{date:newDate,status:'Scheduled',notes:newNotes});
+  await addActivity('Job rescheduled: '+(job.customerName||''),fmtDate(job.date)+' → '+fmtDate(newDate)+(reason?' · '+reason:''));
+  closeModal('job-reason');toast('Rescheduled to '+fmtDate(newDate));
+};
+
+window.jobReasonCancel=async function(){
+  const jobId=document.getElementById('job-reason-id').value;
+  const job=data.jobs.find(j=>j.id===jobId);if(!job)return;
+  const reason=document.getElementById('job-reason-notes').value.trim();
+  if(!confirm('Cancel this job?'+(reason?'\n\nReason: '+reason:'')))return;
+  const stamp='[Cancelled '+new Date().toISOString().slice(0,10)+(reason?': '+reason:'')+']';
+  const newNotes=(job.notes?job.notes+'\n':'')+stamp;
+  await fbUpdate('jobs',jobId,{status:'Cancelled',notes:newNotes});
+  await addActivity('Job cancelled: '+(job.customerName||''),reason||'No reason given');
+  closeModal('job-reason');toast('Job cancelled');
+};
+
 // ===== GIVE BACK =====
 const GIVEBACK_STATUSES=['New','Reviewing','Shortlisted','Winner','Passed'];
 function givebackStatusColor(s){const m={'New':'blue','Reviewing':'orange','Shortlisted':'purple','Winner':'green','Passed':'red'};return m[s]||'blue';}
@@ -2049,14 +2889,45 @@ window.openJobDetail=function(id){
     </div>
     <div class="detail-section"><div class="detail-section-title">Notes</div>
       <textarea class="edit-input" id="edit-job-notes" rows="4" style="width:100%">${esc(j.notes||'')}</textarea>
-    </div>`;
+    </div>
+    ${j.seriesId?`<div class="detail-section">
+      <div class="detail-section-title">Recurring</div>
+      <div style="font-size:13px;color:var(--text-muted);margin-bottom:10px">↻ Part of a ${esc(j.recurring||'recurring')} series.</div>
+      <button class="btn-danger" style="width:100%;justify-content:center" onclick="deleteJobSeries()">Delete entire series</button>
+    </div>`:''}`;
   openSheet('job');
 };
 window.saveJobEdit=async function(){
-  await fbUpdate('jobs',currentJobId,{date:document.getElementById('edit-job-date').value,time:document.getElementById('edit-job-time').value,price:parseFloat(document.getElementById('edit-job-price').value)||0,status:document.getElementById('edit-job-status').value,notes:document.getElementById('edit-job-notes').value.trim(),services:getCheckedServices('edit-job-service-checks')});
+  const newStatus=document.getElementById('edit-job-status').value;
+  const job=data.jobs.find(j=>j.id===currentJobId);
+  const wasCompleted=job&&job.status==='Completed';
+  await fbUpdate('jobs',currentJobId,{date:document.getElementById('edit-job-date').value,time:document.getElementById('edit-job-time').value,price:parseFloat(document.getElementById('edit-job-price').value)||0,status:newStatus,notes:document.getElementById('edit-job-notes').value.trim(),services:getCheckedServices('edit-job-service-checks')});
   closeSheet('job');toast('Job updated!');
+  // Trigger round-trip mileage confirmation when newly completed
+  if(newStatus==='Completed'&&!wasCompleted&&job){
+    createMileagePending({...job,status:'Completed',date:document.getElementById('edit-job-date').value||job.date}).catch(e=>console.error(e));
+    createReviewPending({...job,status:'Completed'}).catch(e=>console.error(e));
+  }
 };
-window.deleteJob=async function(){if(!confirm('Delete this job?'))return;await fbDelete('jobs',currentJobId);closeSheet('job');};
+window.deleteJob=async function(){
+  const job=data.jobs.find(j=>j.id===currentJobId);
+  if(job&&job.seriesId){
+    const choice=confirm('This is a recurring job.\n\nOK = delete THIS one only\nCancel = keep (use the button below for the whole series)');
+    if(choice){await fbDelete('jobs',currentJobId);closeSheet('job');toast('This occurrence deleted');}
+    return;
+  }
+  if(!confirm('Delete this job?'))return;
+  await fbDelete('jobs',currentJobId);closeSheet('job');
+};
+window.deleteJobSeries=async function(){
+  const job=data.jobs.find(j=>j.id===currentJobId);
+  if(!job||!job.seriesId){return;}
+  if(!confirm('Delete the ENTIRE recurring series? This removes all future occurrences.'))return;
+  const sid=job.seriesId;
+  const toDelete=data.jobs.filter(j=>j.seriesId===sid);
+  for(const j of toDelete){await fbDelete('jobs',j.id);}
+  closeSheet('job');toast('Recurring series deleted');
+};
 
 // CAL DAY + JOB NOTES
 window.openCalDay=function(year,month,day){
@@ -2107,7 +2978,7 @@ window.openJobNotes=function(jobId){
 function timeAgo(iso){const d=(Date.now()-new Date(iso))/1000;if(d<60)return'Just now';if(d<3600)return Math.floor(d/60)+'m ago';if(d<86400)return Math.floor(d/3600)+'h ago';return Math.floor(d/86400)+'d ago';}
 function initials(n){return n.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);}
 function avatarCol(n){const c=[{bg:'rgba(76,175,128,0.2)',c:'#4caf80'},{bg:'rgba(74,159,212,0.2)',c:'#4a9fd4'},{bg:'rgba(240,160,96,0.2)',c:'#f0a060'}];let h=0;for(let ch of n)h+=ch.charCodeAt(0);return c[h%3];}
-function statusBadge(s){const m={Completed:'badge-green',Paid:'badge-green',Accepted:'badge-green',Scheduled:'badge-blue','In progress':'badge-blue',Pending:'badge-orange',Invoiced:'badge-orange',Partial:'badge-orange',Declined:'badge-red',Unpaid:'badge-red',Sent:'badge-blue'};return m[s]||'badge-orange';}
+function statusBadge(s){const m={Completed:'badge-green',Paid:'badge-green',Accepted:'badge-green',Scheduled:'badge-blue','In progress':'badge-blue',Pending:'badge-orange',Invoiced:'badge-orange',Partial:'badge-orange',Declined:'badge-red',Unpaid:'badge-red',Sent:'badge-blue',Cancelled:'badge-red'};return m[s]||'badge-orange';}
 function fmtDate(d){if(!d)return'—';const dt=new Date(d+'T00:00:00');return dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}
 function fmtTime(t){if(!t)return'';const[h,m]=t.split(':');const hr=parseInt(h);return(hr%12||12)+':'+m+(hr>=12?' PM':' AM');}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
@@ -2153,9 +3024,89 @@ function renderDashboard(){
   }
   const acts=[...data.activity].sort((a,b)=>new Date(b.time)-new Date(a.time)).slice(0,6);
   const actEl=document.getElementById('dash-activity');
-  if(acts.length===0){actEl.innerHTML='<div class="empty-state" style="padding:16px"><p>No activity yet.</p></div>';return;}
-  const dc={'New customer':'#4caf80','Job':'#4a9fd4','Payment':'#4caf80','Expense':'#e57373','Quote':'#f0a060','Online':'#4a9fd4'};
-  actEl.innerHTML=acts.map(a=>{let c='#4caf80';for(const[k,v] of Object.entries(dc)){if(a.text.startsWith(k)){c=v;break;}}return`<div class="activity-item"><div class="activity-dot" style="background:${c};box-shadow:0 0 5px ${c}"></div><div><div class="activity-text">${esc(a.text)}</div><div class="activity-sub">${esc(a.sub)} · ${timeAgo(a.time)}</div></div></div>`;}).join('');
+  if(actEl){
+    const pend=[...data.pending].filter(p=>!p.uid||p.uid===currentUid).sort((a,b)=>new Date(b.created)-new Date(a.created));
+    let pendHtml='';
+    if(pend.length){
+      pendHtml=pend.map(p=>{
+        if(p.type==='mileage'){
+          const milesTxt=p.error?'<span style="color:var(--red)">address lookup failed</span>':`${(parseFloat(p.miles)||0).toFixed(1)} mi · $${((parseFloat(p.miles)||0)*mileageRate()).toFixed(2)}`;
+          return`<div class="pending-item">
+            <div style="display:flex;align-items:flex-start;gap:8px">
+              <div class="pending-badge">!</div>
+              <div style="flex:1">
+                <div class="activity-text">Confirm trip — ${esc(p.customerName||'Job')}</div>
+                <div class="activity-sub">${milesTxt} · ${fmtDate(p.date)}</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:6px;margin-top:8px">
+              <button class="pending-btn confirm" onclick="confirmPending('${p.id}')">Confirm</button>
+              <button class="pending-btn edit" onclick="editPendingMiles('${p.id}')">Edit mi</button>
+              <button class="pending-btn dismiss" onclick="dismissPending('${p.id}')">Dismiss</button>
+            </div>
+          </div>`;
+        }
+        if(p.type==='review'){
+          const hasPhone=!!p.phone, hasEmail=!!p.email;
+          return`<div class="pending-item" style="border-color:var(--green);box-shadow:var(--glow-green);background:var(--green-dim)">
+            <div style="display:flex;align-items:flex-start;gap:8px">
+              <div class="pending-badge" style="background:var(--green)">★</div>
+              <div style="flex:1">
+                <div class="activity-text">Ask for a review — ${esc(p.customerName||'Customer')}</div>
+                <div class="activity-sub">Send them your Facebook review link</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:6px;margin-top:8px">
+              <button class="pending-btn confirm" ${hasPhone?'':'disabled style="opacity:0.4"'} onclick="sendReviewText('${p.id}')">Text</button>
+              <button class="pending-btn edit" ${hasEmail?'':'disabled style="opacity:0.4"'} onclick="sendReviewEmail('${p.id}')">Email</button>
+              <button class="pending-btn dismiss" onclick="dismissPending('${p.id}')">Dismiss</button>
+            </div>
+          </div>`;
+        }
+        return'';
+      }).join('');
+    }
+    // Job-completion prompts (computed live): jobs on/before today still awaiting confirmation
+    const jobPromptHtml=renderJobPrompts();
+
+    if(acts.length===0&&!pendHtml&&!jobPromptHtml){actEl.innerHTML='<div class="empty-state" style="padding:16px"><p>No activity yet.</p></div>';}
+    else{
+      const dc={'New customer':'#4caf80','Job':'#4a9fd4','Payment':'#4caf80','Expense':'#e57373','Quote':'#f0a060','Online':'#4a9fd4'};
+      const actHtml=acts.map(a=>{let c='#4caf80';for(const[k,v] of Object.entries(dc)){if(a.text.startsWith(k)){c=v;break;}}return`<div class="activity-item"><div class="activity-dot" style="background:${c};box-shadow:0 0 5px ${c}"></div><div><div class="activity-text">${esc(a.text)}</div><div class="activity-sub">${esc(a.sub)} · ${timeAgo(a.time)}</div></div></div>`;}).join('');
+      actEl.innerHTML=jobPromptHtml+pendHtml+actHtml;
+    }
+  }
+}
+
+// Build "Did this job happen?" prompts for jobs scheduled today or earlier, still unconfirmed
+function renderJobPrompts(){
+  const today=new Date();today.setHours(23,59,59,999);
+  const todayStr=new Date().toISOString().slice(0,10);
+  const due=data.jobs.filter(j=>{
+    if(!j.date)return false;
+    if(j.status==='Completed'||j.status==='Invoiced'||j.status==='Cancelled')return false; // already resolved
+    if(j.confirmSnooze&&j.confirmSnooze>todayStr)return false; // snoozed to future (not used now but safe)
+    const jd=new Date(j.date+'T12:00:00');
+    return jd<=today; // day-of or past
+  }).sort((a,b)=>new Date(a.date)-new Date(b.date));
+  if(due.length===0)return'';
+  return due.map(j=>{
+    const isPast=j.date<todayStr;
+    const when=isPast?`Was due ${fmtDate(j.date)}`:`Scheduled today`;
+    return`<div class="pending-item" style="border-color:var(--blue);box-shadow:var(--glow-blue);background:var(--blue-dim)">
+      <div style="display:flex;align-items:flex-start;gap:8px">
+        <div class="pending-badge" style="background:var(--blue)">?</div>
+        <div style="flex:1">
+          <div class="activity-text">${esc(j.customerName||'Job')}</div>
+          <div class="activity-sub">${when}${j.time?' · '+fmtTime(j.time):''}</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:8px">
+        <button class="pending-btn confirm" onclick="jobPromptComplete('${j.id}')">Job complete</button>
+        <button class="pending-btn dismiss" onclick="jobPromptNotComplete('${j.id}')">Job not complete</button>
+      </div>
+    </div>`;
+  }).join('');
 }
 
 function renderCustomers(){
