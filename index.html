@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Smudge Busters CRM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Righteous&family=Bungee&family=Pacifico&family=Poppins:wght@400;600;700&family=Lora:wght@400;600&family=Roboto+Mono:wght@400;600&family=Bebas+Neue&family=Comfortaa:wght@500;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --green:#4caf80;--green-dark:#2a7d4f;--green-dim:#0d1f0f;--green-border:#1e3d1e;
@@ -20,9 +23,54 @@
     --glow-purple:0 0 8px rgba(179,136,255,0.4);
     --nav-height:60px;--topbar-height:52px;
     --radius-sm:8px;--radius-md:12px;--radius-lg:14px;
+    --font-scale:1;
+  }
+  /* LIGHT MODE */
+  body.light-mode{
+    --bg:#f4f7f4;--surface:#ffffff;--border:#d4e0d8;
+    --text:#1a2a20;--text-muted:#5a7a68;--text-dim:#8aa89a;
+    --green-dim:#e8f5ed;--green-border:#bfe0cc;
+    --blue-dim:#e6f1fa;--blue-border:#bfdcf0;
+    --orange-dim:#fdf0e4;--orange-border:#f5d4b8;
+    --red-dim:#fce8e8;--red-border:#f0c8c8;
+    --purple-dim:#f0e8fc;--purple-border:#dcc8f0;
+    --glow-green:0 0 6px rgba(76,175,128,0.25);
+    --glow-blue:0 0 6px rgba(74,159,212,0.25);
+    --glow-orange:0 0 6px rgba(240,160,96,0.25);
+    --glow-red:0 0 6px rgba(229,115,115,0.25);
+    --glow-purple:0 0 6px rgba(179,136,255,0.25);
+  }
+  /* TEXT SIZE SCALING — scales most readable text, not structural icons */
+  body.text-scaled .activity-text,body.text-scaled .lead-name,body.text-scaled .detail-field-value,
+  body.text-scaled .detail-field-label,body.text-scaled .form-input,body.text-scaled .form-label,
+  body.text-scaled p,body.text-scaled .toggle-label,body.text-scaled .gv,body.text-scaled .tt-label,
+  body.text-scaled .lead-phone,body.text-scaled .activity-sub,body.text-scaled .detail-section-title,
+  body.text-scaled .sec-title,body.text-scaled button,body.text-scaled select,body.text-scaled textarea,
+  body.text-scaled .modal-title,body.text-scaled .detail-title{
+    font-size:calc(1em * var(--font-scale));
+  }
+  body.spacing-adjusted .activity-text,body.spacing-adjusted .lead-name,body.spacing-adjusted .card-text,
+  body.spacing-adjusted p,body.spacing-adjusted .detail-field-value,body.spacing-adjusted .toggle-label,
+  body.spacing-adjusted .lead-phone,body.spacing-adjusted .activity-sub,body.spacing-adjusted td,
+  body.spacing-adjusted .form-input{
+    letter-spacing:var(--letter-spacing,0) !important;line-height:var(--line-height,1.5) !important;
+  }
+  /* REDUCED MOTION — kill transitions, animations, and glows */
+  body.reduce-motion *,body.reduce-motion *::before,body.reduce-motion *::after{
+    transition:none !important;animation:none !important;box-shadow:none !important;
+    text-shadow:none !important;
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+  body{font-family:var(--app-font,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+  /* SURFACE STYLE: flat removes glows; soft swaps neon for subtle shadow */
+  body.surf-flat *,body.surf-flat *::before,body.surf-flat *::after{box-shadow:none !important;text-shadow:none !important;}
+  body.surf-soft .card,body.surf-soft .gc,body.surf-soft .lead-card,body.surf-soft .modal,body.surf-soft .detail-sheet-inner,body.surf-soft .detail-body{box-shadow:0 2px 12px rgba(0,0,0,0.18) !important;}
+  body.surf-soft *{text-shadow:none !important;}
+  /* Heading font for titles */
+  .topbar-name,.loading-name-wrap,.login-name,.sec-title,.modal-title,.detail-title{font-family:var(--heading-font,inherit);}
+  /* USER BACKGROUND: float app content above the image+dim layers */
+  body.has-user-bg .app-wrap,body.has-user-bg .topbar,body.has-user-bg .content,body.has-user-bg .nav{position:relative;z-index:1;}
+  body.has-user-bg .topbar,body.has-user-bg .nav{background:transparent;}
   .app-wrap{width:100%;max-width:100%;background:var(--bg);position:relative;min-height:100vh;}
 
   /* LOADING */
@@ -280,6 +328,19 @@
   .tslider:before{content:'';position:absolute;height:18px;width:18px;left:3px;top:3px;background:var(--text-muted);border-radius:50%;transition:0.2s;}
   .tswitch input:checked+.tslider{background:var(--green-dim);border:1px solid var(--green);box-shadow:var(--glow-green);}
   .tswitch input:checked+.tslider:before{transform:translateX(20px);background:var(--green);}
+  .a11y-size-btn{flex:1;padding:9px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-muted);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;}
+  .a11y-size-btn.active{border-color:var(--blue);color:var(--blue);background:var(--blue-dim);box-shadow:var(--glow-blue);}
+  /* Smooth, easy-to-drag sliders */
+  input[type="range"]{-webkit-appearance:none;appearance:none;height:8px;border-radius:5px;background:var(--border);outline:none;cursor:pointer;}
+  input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:24px;height:24px;border-radius:50%;background:var(--green);border:2px solid var(--surface);box-shadow:0 0 6px rgba(0,0,0,0.4);cursor:grab;}
+  input[type="range"]::-webkit-slider-thumb:active{cursor:grabbing;transform:scale(1.15);}
+  input[type="range"]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--green);border:2px solid var(--surface);cursor:grab;}
+  input[type="range"]::-moz-range-track{height:8px;border-radius:5px;background:var(--border);}
+  .settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px;}
+  .set-tile{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:16px 12px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;transition:border-color 0.15s;}
+  .set-tile:active{opacity:0.7;}
+  .set-tile svg{width:24px;height:24px;stroke-width:2;}
+  .set-tile-label{font-size:12px;font-weight:600;color:var(--text);text-align:center;}
 
   /* MONEY TABS */
   .money-tab-bar{display:flex;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:3px;margin-bottom:12px;}
@@ -452,11 +513,38 @@
       </div>
     </div>
 
+    <div class="card" id="daily-summary-card" style="display:none;border-color:var(--blue);box-shadow:var(--glow-blue);background:var(--blue-dim)">
+      <div style="font-size:11px;font-weight:800;color:var(--blue);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:4px">📋 <span id="daily-summary-title">Today</span></div>
+      <div style="font-size:13px;color:var(--text);line-height:1.5" id="daily-summary-text">—</div>
+    </div>
+
     <div class="quick-grid">
       <div class="quick-btn" onclick="openModal('customer')"><div class="qicon" style="background:rgba(76,175,128,0.15)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" width="18" height="18"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg></div><span style="color:var(--green)">New customer</span></div>
       <div class="quick-btn blue" onclick="openModal('schedule-job')"><div class="qicon" style="background:rgba(74,159,212,0.15)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" width="18" height="18"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg></div><span style="color:var(--blue)">New job</span></div>
       <div class="quick-btn" onclick="openModal('payment')"><div class="qicon" style="background:rgba(76,175,128,0.15)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" width="18" height="18"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div><span style="color:var(--green)">Log payment</span></div>
       <div class="quick-btn orange" onclick="openModal('expense')"><div class="qicon" style="background:rgba(240,160,96,0.15)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2" width="18" height="18"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><span style="color:var(--orange)">Log expense</span></div>
+    </div>
+
+    <div class="card" id="recurring-revenue-card" style="display:none;border-color:var(--green);box-shadow:var(--glow-green)">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:0.6px;text-shadow:0 0 6px rgba(76,175,128,0.4)">Recurring revenue</div>
+          <div style="font-size:26px;font-weight:900;color:var(--green);text-shadow:0 0 12px rgba(76,175,128,0.5);line-height:1.1" id="recurring-monthly">$0<span style="font-size:12px;font-weight:600;color:var(--text-muted)">/mo</span></div>
+          <div style="font-size:11px;color:var(--text-muted)" id="recurring-detail">Locked in from repeat jobs</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px">Per year</div>
+          <div style="font-size:18px;font-weight:800;color:var(--text)" id="recurring-yearly">$0</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" id="due-service-card" style="display:none;border-color:var(--orange);box-shadow:var(--glow-orange)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div style="font-size:12px;font-weight:800;color:var(--orange);text-shadow:0 0 6px rgba(240,160,96,0.4)">⏰ Due for service</div>
+        <div style="font-size:10px;color:var(--text-muted)" id="due-count">0</div>
+      </div>
+      <div id="due-service-list"></div>
     </div>
 
     <div class="tool-grid" id="home-tools-tile">
@@ -465,10 +553,22 @@
         <span class="tt-label">More Tools</span>
         <span class="tt-sub">Mileage & more</span>
       </div>
-      <div class="tool-tile placeholder">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        <span class="tt-sub">Coming soon</span>
+      <div class="tool-tile" onclick="openMileageSettings()" style="border-color:var(--green);box-shadow:var(--glow-green)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--green)"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span class="tt-label">Settings</span>
+        <span class="tt-sub">Design & options</span>
       </div>
+    </div>
+
+    <div class="card" id="messages-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div style="font-size:13px;font-weight:800;color:var(--blue);text-shadow:0 0 6px rgba(74,159,212,0.4)">Messages</div>
+        <button onclick="openCompose()" style="background:var(--blue-dim);border:1px solid var(--blue);color:var(--blue);border-radius:8px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
+          Write
+        </button>
+      </div>
+      <div id="messages-list"><div class="empty-state" style="padding:16px"><p>No messages yet.</p></div></div>
     </div>
 
     <div class="card">
@@ -939,8 +1039,50 @@
 
 <div class="modal-overlay" id="modal-mileage-settings">
   <div class="modal">
-    <div class="modal-title">Mileage settings</div>
-    <div style="font-size:11px;color:var(--blue);background:var(--blue-dim);border:1px solid var(--blue);border-radius:var(--radius-sm);padding:8px 10px;margin-bottom:14px;line-height:1.4">Signed in as <span id="set-user-label" style="font-weight:700">this login</span>. Your home base is saved just for you — each user keeps their own.</div>
+    <div class="modal-title">Settings</div>
+    <div style="font-size:11px;color:var(--blue);background:var(--blue-dim);border:1px solid var(--blue);border-radius:var(--radius-sm);padding:8px 10px;margin-bottom:14px;line-height:1.4">Signed in as <span id="set-user-label" style="font-weight:700">this login</span></div>
+    <div class="settings-grid">
+      <div class="set-tile" onclick="openSettingsPanel('mileage')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>
+        <span class="set-tile-label">Mileage & tax</span>
+      </div>
+      <div class="set-tile" onclick="openCustomization()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--orange)"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="10.5" r="2.5"/><circle cx="8.5" cy="7.5" r="2.5"/><circle cx="6.5" cy="12.5" r="2.5"/><path d="M12 2a10 10 0 0 0 0 20 1.5 1.5 0 0 0 1.06-2.56A1.5 1.5 0 0 1 14 18.5h1.76a4.24 4.24 0 0 0 4.24-4.24A8.26 8.26 0 0 0 12 2z"/></svg>
+        <span class="set-tile-label">Design</span>
+      </div>
+      <div class="set-tile" onclick="openSettingsPanel('access')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--green)"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2"/></svg>
+        <span class="set-tile-label">Accessibility</span>
+      </div>
+      <div class="set-tile" onclick="openSettingsPanel('business')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span class="set-tile-label">Business setup</span>
+      </div>
+      <div class="set-tile" onclick="openSettingsPanel('messages')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--orange)"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span class="set-tile-label">Templates</span>
+      </div>
+      <div class="set-tile" onclick="openSettingsPanel('display')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--green)"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        <span class="set-tile-label">Home cards</span>
+      </div>
+      <div class="set-tile" onclick="openSettingsPanel('features')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+        <span class="set-tile-label">Features</span>
+      </div>
+      <div class="set-tile" id="admin-tile" onclick="openSettingsPanel('admin')" style="display:none">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--orange)"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z"/><circle cx="12" cy="10" r="2"/></svg>
+        <span class="set-tile-label">Admin</span>
+      </div>
+    </div>
+    <div class="modal-actions"><button class="btn-primary" style="width:100%" onclick="closeModal('mileage-settings')">Done</button></div>
+  </div>
+</div>
+
+<!-- Mileage & tax sub-panel -->
+<div class="modal-overlay" id="modal-set-mileage">
+  <div class="modal">
+    <div class="modal-title">Mileage & tax</div>
     <div class="form-group">
       <label class="form-label">Your home base address <span style="color:var(--blue)">(per-user)</span></label>
       <input class="form-input" id="set-home-address" type="text" placeholder="123 Main St, Sparta IL 62286">
@@ -957,34 +1099,254 @@
       <div style="font-size:11px;color:var(--text-muted);margin-top:4px">2026 business rate is $0.725. Update each year.</div>
     </div>
     <div style="border-top:1px solid var(--border);margin:6px 0 14px;padding-top:14px">
-      <label class="form-label" style="margin-bottom:4px">Features <span style="color:var(--green)">(shared)</span></label>
-      <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px">Turn off anything you don't use to declutter the app.</div>
-      <div class="toggle-row">
-        <div><div class="toggle-label">Referral leads</div><div class="toggle-sub">Pipeline → Leads tab</div></div>
-        <label class="tswitch"><input type="checkbox" id="feat-leads"><span class="tslider"></span></label>
-      </div>
-      <div class="toggle-row">
-        <div><div class="toggle-label">Campaigns</div><div class="toggle-sub">Email/SMS blasts</div></div>
-        <label class="tswitch"><input type="checkbox" id="feat-campaigns"><span class="tslider"></span></label>
-      </div>
-      <div class="toggle-row">
-        <div><div class="toggle-label">Give Back</div><div class="toggle-sub">Monthly giveaway pipeline</div></div>
-        <label class="tswitch"><input type="checkbox" id="feat-giveback"><span class="tslider"></span></label>
-      </div>
-      <div class="toggle-row">
-        <div><div class="toggle-label">More Tools</div><div class="toggle-sub">Mileage tracker tile on home</div></div>
-        <label class="tswitch"><input type="checkbox" id="feat-tools"><span class="tslider"></span></label>
-      </div>
-    </div>
-    <div style="border-top:1px solid var(--border);margin:6px 0 14px;padding-top:14px">
       <label class="form-label" style="margin-bottom:8px">Tax export</label>
       <button class="btn-secondary" style="width:100%;justify-content:center" onclick="exportTaxBundle()">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         Export everything for taxes
       </button>
-      <div style="font-size:11px;color:var(--text-muted);margin-top:6px;line-height:1.4">Downloads your mileage, expenses, and revenue as separate CSVs — ready to drop into a tax spreadsheet as tabs.</div>
+      <div style="font-size:11px;color:var(--text-muted);margin-top:6px;line-height:1.4">Downloads mileage, expenses, and revenue as separate CSVs.</div>
     </div>
-    <div class="modal-actions"><button class="btn-secondary" onclick="closeModal('mileage-settings')">Cancel</button><button class="btn-primary" onclick="saveMileageSettings()">Save</button></div>
+    <div class="modal-actions"><button class="btn-secondary" onclick="closeModal('set-mileage')">Back</button><button class="btn-primary" onclick="saveMileageSettings()">Save</button></div>
+  </div>
+</div>
+
+<!-- Accessibility sub-panel -->
+<div class="modal-overlay" id="modal-set-access">
+  <div class="modal">
+    <div class="modal-title">Accessibility</div>
+    <div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">Personal display preferences — only affect your login.</div>
+    <div class="form-group">
+      <label class="form-label" style="font-size:11px">Text size</label>
+      <div style="display:flex;gap:6px">
+        <button type="button" class="a11y-size-btn" data-size="1" onclick="setTextSizeDraft(1)">Normal</button>
+        <button type="button" class="a11y-size-btn" data-size="1.15" onclick="setTextSizeDraft(1.15)">Large</button>
+        <button type="button" class="a11y-size-btn" data-size="1.3" onclick="setTextSizeDraft(1.3)">Larger</button>
+      </div>
+    </div>
+    <div class="toggle-row">
+      <div><div class="toggle-label">Light mode</div><div class="toggle-sub">Bright theme instead of dark</div></div>
+      <label class="tswitch"><input type="checkbox" id="set-lightmode"><span class="tslider"></span></label>
+    </div>
+    <div class="toggle-row">
+      <div><div class="toggle-label">Reduce motion</div><div class="toggle-sub">Turn off animations & glows</div></div>
+      <label class="tswitch"><input type="checkbox" id="set-reducemotion"><span class="tslider"></span></label>
+    </div>
+    <div style="padding:8px 0">
+      <label class="form-label" style="font-size:11px">Letter spacing: <span id="ls-val">0</span>px</label>
+      <input type="range" min="-2" max="12" step="0.1" value="0" id="set-letterspacing" style="width:100%;margin-bottom:10px" oninput="updateSpacing()">
+      <label class="form-label" style="font-size:11px">Line spacing: <span id="lh-val">1.5</span></label>
+      <input type="range" min="0.9" max="3" step="0.05" value="1.5" id="set-lineheight" style="width:100%" oninput="updateSpacing()">
+    </div>
+    <div class="modal-actions"><button class="btn-secondary" onclick="closeModal('set-access')">Back</button><button class="btn-primary" onclick="saveMileageSettings()">Save</button></div>
+  </div>
+</div>
+
+<!-- Business setup sub-panel -->
+<div class="modal-overlay" id="modal-set-business">
+  <div class="modal">
+    <div class="modal-title">Business setup</div>
+    <label class="form-label" style="margin-bottom:4px">Service types <span style="color:var(--green)">(shared)</span></label>
+    <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px">These become the checkboxes on customers, jobs, and quotes.</div>
+    <div id="svc-config-list"></div>
+    <button class="btn-secondary" style="width:100%;justify-content:center;margin-top:8px" onclick="addServiceType()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add a service</button>
+    <div class="toggle-row" style="margin-top:12px">
+      <div><div class="toggle-label">Auto-calculate prices</div><div class="toggle-sub">Use rates × quantity to fill job totals</div></div>
+      <label class="tswitch"><input type="checkbox" id="set-autoprice"><span class="tslider"></span></label>
+    </div>
+    <div class="modal-actions"><button class="btn-secondary" onclick="closeModal('set-business')">Back</button><button class="btn-primary" onclick="saveMileageSettings()">Save</button></div>
+  </div>
+</div>
+
+<!-- Message templates sub-panel -->
+<div class="modal-overlay" id="modal-set-messages">
+  <div class="modal">
+    <div class="modal-title">Message templates</div>
+    <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px">Use <code style="background:var(--bg);padding:1px 4px;border-radius:3px">{first}</code> for first name and <code style="background:var(--bg);padding:1px 4px;border-radius:3px">{link}</code> for your review link.</div>
+    <div class="form-group">
+      <label class="form-label" style="font-size:11px">Review request — text</label>
+      <textarea class="form-input" id="msg-review-text" rows="3" style="font-size:12px"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label" style="font-size:11px">Review request — email body</label>
+      <textarea class="form-input" id="msg-review-email" rows="3" style="font-size:12px"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label" style="font-size:11px">Due-for-service message</label>
+      <textarea class="form-input" id="msg-due" rows="3" style="font-size:12px"></textarea>
+    </div>
+    <div class="modal-actions"><button class="btn-secondary" onclick="closeModal('set-messages')">Back</button><button class="btn-primary" onclick="saveMileageSettings()">Save</button></div>
+  </div>
+</div>
+
+<!-- Home cards sub-panel -->
+<div class="modal-overlay" id="modal-set-display">
+  <div class="modal">
+    <div class="modal-title">Home cards</div>
+    <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px">Toggle on/off and reorder how they appear on your home screen.</div>
+    <div id="card-config-list"></div>
+    <div class="modal-actions"><button class="btn-secondary" onclick="closeModal('set-display')">Back</button><button class="btn-primary" onclick="saveMileageSettings()">Save</button></div>
+  </div>
+</div>
+
+<!-- Features sub-panel -->
+<div class="modal-overlay" id="modal-set-features">
+  <div class="modal">
+    <div class="modal-title">Features</div>
+    <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px">Turn off anything you don't use to declutter the app.</div>
+    <div class="toggle-row">
+      <div><div class="toggle-label">Referral leads</div><div class="toggle-sub">Pipeline → Leads tab</div></div>
+      <label class="tswitch"><input type="checkbox" id="feat-leads"><span class="tslider"></span></label>
+    </div>
+    <div class="toggle-row">
+      <div><div class="toggle-label">Campaigns</div><div class="toggle-sub">Email/SMS blasts</div></div>
+      <label class="tswitch"><input type="checkbox" id="feat-campaigns"><span class="tslider"></span></label>
+    </div>
+    <div class="toggle-row">
+      <div><div class="toggle-label">Give Back</div><div class="toggle-sub">Monthly giveaway pipeline</div></div>
+      <label class="tswitch"><input type="checkbox" id="feat-giveback"><span class="tslider"></span></label>
+    </div>
+    <div class="toggle-row">
+      <div><div class="toggle-label">More Tools</div><div class="toggle-sub">Mileage tracker tile on home</div></div>
+      <label class="tswitch"><input type="checkbox" id="feat-tools"><span class="tslider"></span></label>
+    </div>
+    <div class="modal-actions"><button class="btn-secondary" onclick="closeModal('set-features')">Back</button><button class="btn-primary" onclick="saveMileageSettings()">Save</button></div>
+  </div>
+</div>
+
+<!-- Admin sub-panel -->
+<div class="modal-overlay" id="modal-set-admin">
+  <div class="modal">
+    <div class="modal-title">Admin · Team</div>
+    <div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">Manage who's on your team and what they can do. You're the owner.</div>
+    <div id="admin-user-list"></div>
+    <div style="font-size:10px;color:var(--text-muted);margin-top:10px;line-height:1.4">Users appear here after they sign in for the first time. Admins can change settings & design; employees use the app.</div>
+    <div class="modal-actions"><button class="btn-primary" style="width:100%" onclick="closeModal('set-admin')">Done</button></div>
+  </div>
+</div>
+
+<!-- Compose message modal -->
+<div class="modal-overlay" id="modal-compose">
+  <div class="modal">
+    <div class="modal-title">New message</div>
+    <div class="form-group">
+      <label class="form-label">To</label>
+      <select class="form-input" id="compose-to"></select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Message</label>
+      <textarea class="form-input" id="compose-body" rows="4" placeholder="Type your message..."></textarea>
+    </div>
+    <div id="compose-attachment" style="display:none;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;margin-bottom:10px;font-size:12px;color:var(--text);display:flex;justify-content:space-between;align-items:center">
+      <span id="compose-attach-label"></span>
+      <span onclick="clearAttachment()" style="cursor:pointer;color:var(--red)">✕</span>
+    </div>
+    <button class="btn-secondary" style="width:100%;justify-content:center;margin-bottom:12px" onclick="openAttachPicker()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+      Attach a record
+    </button>
+    <div class="modal-actions"><button class="btn-secondary" onclick="closeModal('compose')">Cancel</button><button class="btn-primary" onclick="sendMessage()">Send</button></div>
+  </div>
+</div>
+
+<!-- Attach record picker -->
+<div class="modal-overlay" id="modal-attach-picker">
+  <div class="modal">
+    <div class="modal-title">Attach a record</div>
+    <div style="display:flex;gap:6px;margin-bottom:12px">
+      <button class="money-tab active-pay" id="atab-customer" onclick="switchAttachTab('customer')">Customers</button>
+      <button class="money-tab" id="atab-job" onclick="switchAttachTab('job')">Jobs</button>
+      <button class="money-tab" id="atab-money" onclick="switchAttachTab('money')">Money</button>
+    </div>
+    <input class="form-input" id="attach-search" placeholder="Search..." style="margin-bottom:10px" oninput="renderAttachList()">
+    <div id="attach-list" style="max-height:300px;overflow-y:auto"></div>
+    <div class="modal-actions"><button class="btn-secondary" onclick="closeModal('attach-picker')">Back</button></div>
+  </div>
+</div>
+
+<!-- Message thread modal -->
+<div class="modal-overlay" id="modal-thread">
+  <div class="modal" style="max-height:85vh;display:flex;flex-direction:column">
+    <div class="modal-title" id="thread-title">Conversation</div>
+    <div id="thread-messages" style="flex:1;overflow-y:auto;margin-bottom:12px;min-height:200px"></div>
+    <div style="display:flex;gap:8px;align-items:flex-end">
+      <textarea class="form-input" id="thread-reply" rows="1" placeholder="Reply..." style="flex:1;resize:none"></textarea>
+      <button class="btn-primary" style="padding:10px 16px" onclick="sendReply()">Send</button>
+    </div>
+    <div style="margin-top:8px"><button class="btn-secondary" style="width:100%;justify-content:center" onclick="closeModal('thread')">Close</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-customization">
+  <div class="modal" style="max-height:88vh;overflow-y:auto">
+    <div class="modal-title">Customize design</div>
+    <div class="money-tab-bar" style="margin-bottom:14px">
+      <button class="money-tab active-pay" id="ctab-templates" onclick="switchCustomTab('templates')">Templates</button>
+      <button class="money-tab" id="ctab-fine" onclick="switchCustomTab('fine')">Customize</button>
+    </div>
+
+    <div id="custom-view-templates">
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px" id="cust-scope-note">Pick a color scheme. Save to keep.</div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px;margin-bottom:14px">
+        <label class="form-label" style="font-size:11px;margin-bottom:6px">App font (changes everywhere)</label>
+        <select class="form-input" id="global-font" onchange="updateGlobalFont(this.value)">
+          <option value="">Default</option>
+          <option value="'Poppins',sans-serif">Poppins (clean modern)</option>
+          <option value="'Comfortaa',cursive">Comfortaa (rounded friendly)</option>
+          <option value="'Lora',serif">Lora (elegant serif)</option>
+          <option value="'Roboto Mono',monospace">Roboto Mono (techy)</option>
+          <option value="'Bebas Neue',sans-serif">Bebas Neue (tall bold)</option>
+          <option value="'Righteous',cursive">Righteous (retro groovy)</option>
+          <option value="'Bungee',cursive">Bungee (chunky 70s)</option>
+          <option value="'Pacifico',cursive">Pacifico (funky script)</option>
+        </select>
+      </div>
+      <label class="form-label" style="font-size:11px;margin-bottom:8px">Color scheme</label>
+      <div id="scheme-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px"></div>
+      <div onclick="switchCustomTab('fine')" style="cursor:pointer;text-align:center;padding:9px;border:1px dashed var(--text-muted);border-radius:var(--radius-sm);font-size:11px;color:var(--text-muted);margin-bottom:14px">+ Custom colors</div>
+
+      <label class="form-label" style="font-size:11px;margin-bottom:8px">Background image</label>
+      <div id="bg-preview-cust" style="display:none;height:64px;border-radius:var(--radius-sm);background-size:cover;background-position:center;border:1px solid var(--border);margin-bottom:8px"></div>
+      <div style="display:flex;gap:8px;margin-bottom:8px">
+        <button class="btn-secondary" style="flex:1;justify-content:center" onclick="document.getElementById('bg-file').click()">Upload</button>
+        <button class="btn-secondary" style="flex:1;justify-content:center" id="bg-remove-btn" onclick="removeUserBg()">Remove</button>
+      </div>
+      <input type="file" id="bg-file" accept="image/*" style="display:none" onchange="handleBgUpload(this)">
+      <div id="bg-dim-wrap" style="display:none;margin-bottom:8px">
+        <label class="form-label" style="font-size:11px">Dimming: <span id="bg-dim-val">50</span>%</label>
+        <input type="range" min="0" max="95" value="50" id="bg-dim" style="width:100%" oninput="updateBgDim(this.value)">
+      </div>
+    </div>
+
+    <div id="custom-view-fine" style="display:none">
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px">Fine-tune every detail. Changes preview live.</div>
+      <label class="form-label" style="font-size:11px;margin-bottom:6px">Colors</label>
+      <div id="custom-color-list" style="margin-bottom:14px"></div>
+      <label class="form-label" style="font-size:11px;margin-bottom:6px">Font</label>
+      <select class="form-input" id="cust-font" style="margin-bottom:14px" onchange="updateDesignField('font',this.value)">
+        <option value="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">System (clean sans)</option>
+        <option value="'Georgia','Times New Roman',serif">Georgia (elegant serif)</option>
+        <option value="'Helvetica Neue',Arial,sans-serif">Helvetica (modern)</option>
+        <option value="'Trebuchet MS','Comic Sans MS',cursive">Trebuchet (funky)</option>
+        <option value="'SF Mono','Roboto Mono',monospace">Monospace (techy)</option>
+        <option value="'Courier New',monospace">Courier (typewriter)</option>
+      </select>
+      <label class="form-label" style="font-size:11px;margin-bottom:6px">Corner roundness: <span id="cust-radius-val">12</span>px</label>
+      <input type="range" min="0" max="26" value="12" id="cust-radius" style="width:100%;margin-bottom:14px" oninput="updateDesignField('radius',parseInt(this.value));document.getElementById('cust-radius-val').textContent=this.value">
+      <label class="form-label" style="font-size:11px;margin-bottom:6px">Surface style</label>
+      <div style="display:flex;gap:6px;margin-bottom:14px">
+        <button type="button" class="a11y-size-btn" data-surf="glow" onclick="updateDesignField('surfaceStyle','glow')">Glow</button>
+        <button type="button" class="a11y-size-btn" data-surf="flat" onclick="updateDesignField('surfaceStyle','flat')">Flat</button>
+        <button type="button" class="a11y-size-btn" data-surf="soft" onclick="updateDesignField('surfaceStyle','soft')">Soft shadow</button>
+      </div>
+      <label class="form-label" style="font-size:11px;margin-bottom:6px">Border weight: <span id="cust-bw-val">1</span>px</label>
+      <input type="range" min="1" max="3" value="1" id="cust-bw" style="width:100%;margin-bottom:14px" oninput="updateDesignField('borderWeight',parseInt(this.value));document.getElementById('cust-bw-val').textContent=this.value">
+    </div>
+
+    <div class="toggle-row" id="theme-lock-row" style="margin-top:8px">
+      <div><div class="toggle-label">Lock for everyone</div><div class="toggle-sub">Owner only · forces this design on all users</div></div>
+      <label class="tswitch"><input type="checkbox" id="set-theme-lock"><span class="tslider"></span></label>
+    </div>
+    <div class="modal-actions"><button class="btn-secondary" onclick="closeCustomization()">Cancel</button><button class="btn-primary" onclick="saveCustomization()">Save design</button></div>
   </div>
 </div>
 
@@ -1094,11 +1456,55 @@ const BREVO_API_KEY="xkeysib-267b482e462d11df5ef1a96e4e15967b8293a3612e36dc1d71d
 const app=initializeApp(firebaseConfig);
 const db=getFirestore(app);
 const auth=getAuth(app);
-let data={customers:[],jobs:[],payments:[],expenses:[],quotes:[],activity:[],leads:[],campaigns:[],givebacks:[],mileage:[],pending:[]};
+let data={customers:[],jobs:[],payments:[],expenses:[],quotes:[],activity:[],leads:[],campaigns:[],givebacks:[],mileage:[],pending:[],messages:[]};
 let appSettings={mapsApiKey:'',homeAddress:'',mileageRate:0.725}; // effective merged settings
 let sharedSettings={mapsApiKey:'',mileageRate:0.725}; // business-wide (key + default rate)
 let userSettings={homeAddress:'',mileageRate:null}; // per-login (home base, optional rate override)
+let a11y={textSize:1,lightMode:false,reduceMotion:false,letterSpacing:0,lineHeight:1.5}; // per-user accessibility prefs
+let userBg={image:'',dim:0.5}; // per-user custom background (compressed dataURL + dim level)
+// COLOR SCHEMES — flat list (templates removed; design levers live in Customize)
+const COLOR_SCHEMES={
+  'neon-green':{label:'Neon Green',accent1:'#4caf80',accent2:'#4a9fd4',accent3:'#f0a060',bg:'#0a0f0a',surface:'#0d1a0f',border:'#1e3528',text:'#e8f5ee',textMuted:'#4a7a5a'},
+  'cyan':{label:'Cyan',accent1:'#2de2e6',accent2:'#4a9fd4',accent3:'#ff6ac1',bg:'#080d12',surface:'#0d1620',border:'#1e3040',text:'#e0f7fa',textMuted:'#4a8090'},
+  'magenta':{label:'Magenta',accent1:'#ff2d95',accent2:'#b388ff',accent3:'#2de2e6',bg:'#0d0810',surface:'#170d1a',border:'#3a1e40',text:'#f8e0f5',textMuted:'#906a90'},
+  'amber':{label:'Amber',accent1:'#ffb627',accent2:'#ff6b35',accent3:'#4a9fd4',bg:'#0f0c08',surface:'#1a140d',border:'#3a2e1e',text:'#f8f0e0',textMuted:'#90805a'},
+  'lime':{label:'Lime',accent1:'#aaff00',accent2:'#00e5ff',accent3:'#ff5e7e',bg:'#0a0f08',surface:'#101a0d',border:'#28381e',text:'#eef8e0',textMuted:'#6a8050'},
+  'ocean':{label:'Ocean',accent1:'#4a9fd4',accent2:'#5ec8c8',accent3:'#f0a060',bg:'#070d12',surface:'#0d1620',border:'#1e3040',text:'#e8f2f8',textMuted:'#4a7090'},
+  'gold':{label:'Gold & Charcoal',accent1:'#c9a85c',accent2:'#8a7a9a',accent3:'#a86b4a',bg:'#14110d',surface:'#1c1813',border:'#3a3225',text:'#f0e8dc',textMuted:'#9a8c70'},
+  'emerald':{label:'Emerald',accent1:'#3a9968',accent2:'#c9a85c',accent3:'#7a9a8a',bg:'#0d1410',surface:'#131c16',border:'#243a2d',text:'#e8f0ea',textMuted:'#708a78'},
+  'burgundy':{label:'Burgundy',accent1:'#a04050',accent2:'#c9a85c',accent3:'#7a6a8a',bg:'#14100f',surface:'#1c1614',border:'#3a2825',text:'#f0e6e2',textMuted:'#9a7c74'},
+  'harvest':{label:'70s Harvest',accent1:'#e8893a',accent2:'#c44e2a',accent3:'#d4a82a',bg:'#2a1a10',surface:'#3a2618',border:'#6a4528',text:'#f5e6d0',textMuted:'#b89068'},
+  'avocado':{label:'70s Avocado',accent1:'#8a9a3a',accent2:'#d4882a',accent3:'#c4683a',bg:'#1f2110',surface:'#2c3018',border:'#4e5628',text:'#eef0d0',textMuted:'#9aa068'},
+  'psychedelic':{label:'Psychedelic',accent1:'#e84a8a',accent2:'#f0a02a',accent3:'#5a9ad4',bg:'#1a0f1f',surface:'#26182c',border:'#48284e',text:'#f5e0f0',textMuted:'#a070a0'},
+  'sage':{label:'Sage (light)',accent1:'#5a9e8e',accent2:'#3a7ca5',accent3:'#d89048',bg:'#f6f4f0',surface:'#ffffff',border:'#e2ddd4',text:'#2a2622',textMuted:'#7a7268',light:true},
+  'terracotta':{label:'Terracotta (light)',accent1:'#c4683a',accent2:'#5a9e8e',accent3:'#d4a82a',bg:'#f8f4f0',surface:'#ffffff',border:'#e8ddd2',text:'#2e2620',textMuted:'#80706a',light:true},
+  'paper':{label:'Paper (light)',accent1:'#4a6a7a',accent2:'#7a8a90',accent3:'#a07850',bg:'#f4f4f2',surface:'#ffffff',border:'#dadcd8',text:'#22262a',textMuted:'#6a7078',light:true},
+  'graphite':{label:'Graphite',accent1:'#6a8a9a',accent2:'#8a9aa0',accent3:'#b0906a',bg:'#16181a',surface:'#1e2124',border:'#2e3338',text:'#dfe4e8',textMuted:'#6a7480'}
+};
+let theme={scheme:'neon-green',custom:null,locked:false}; // shared theme config (color scheme + custom overrides)
+let globalFont=''; // optional app-wide font override (shared)
+let teamUsers={}; // uid -> {email, role:'admin'|'employee', name}
+let myRole='employee'; // current user's role
 let features={giveback:true,campaigns:true,leads:true,tools:true}; // feature toggles (business-wide)
+const DEFAULT_SERVICES=[
+  {name:'Window cleaning',model:'custom',rate:0},
+  {name:'Pressure washing',model:'custom',rate:0},
+  {name:'Pest control',model:'custom',rate:0}
+];
+let serviceTypes=JSON.parse(JSON.stringify(DEFAULT_SERVICES)); // business-wide service list
+let autoPrice=false; // master toggle: auto-calc job prices from rates
+const DEFAULT_MESSAGES={
+  reviewText:"Hi {first}, thank you for choosing Smudge Busters! We'd really appreciate it if you could leave us a quick review — it helps our small business a ton. {link}",
+  reviewEmail:"Thank you for choosing Smudge Busters! It was a pleasure serving you. If you have a moment, we'd be incredibly grateful if you'd leave us a quick review — it makes a huge difference for our small business.",
+  dueService:"Hi {first}, it's Smudge Busters! It's been a while since we last serviced your home — would you like to schedule a refresh? We'd love to get your windows sparkling again. Just reply and we'll set it up!"
+};
+let messages=JSON.parse(JSON.stringify(DEFAULT_MESSAGES));
+const DEFAULT_CARDS=[
+  {id:'daily',label:'Daily summary',on:true},
+  {id:'recurring',label:'Recurring revenue',on:true},
+  {id:'due',label:'Due for service',on:true}
+];
+let cardConfig=JSON.parse(JSON.stringify(DEFAULT_CARDS));
 let currentUid=null;
 let currentEmail=null;
 let currentCustomerId=null,currentJobId=null,currentQuoteId=null,currentLeadId=null;
@@ -1131,6 +1537,12 @@ function startListeners(){
       if(key==='mileage')renderMileage();
     });
   }
+  // Messages listener (separate, since it drives the messages card + thread)
+  onSnapshot(collection(db,'messages'),snap=>{
+    data.messages=snap.docs.map(d=>({id:d.id,...d.data()}));
+    renderMessagesList();
+    if(currentThreadId)renderThread(currentThreadId);
+  });
 }
 
 let appStarted=false;
@@ -1231,7 +1643,33 @@ window.switchPipelineTab=function(tab){
   else if(isGive)renderGivebacks();
 };
 
-window.toggleCheck=function(btn){btn.classList.toggle('checked');};
+window.toggleCheck=function(btn){
+  btn.classList.toggle('checked');
+  if(!autoPrice)return;
+  // Only auto-price inside the new-job modal
+  const inJobModal=btn.closest('#job-service-checks');
+  if(!inJobModal)return;
+  const svcName=btn.dataset.value;
+  const svc=serviceTypes.find(s=>s.name===svcName);
+  if(!svc||svc.model==='custom'||!svc.rate)return;
+  const priceField=document.getElementById('job-price');
+  if(!priceField)return;
+  if(btn.classList.contains('checked')){
+    const unit=svc.model==='sqft'?'square feet':'items';
+    const qty=parseFloat(prompt(`${svcName}: how many ${unit}? ($${svc.rate} each)`,''));
+    if(!qty||qty<=0)return;
+    const add=qty*svc.rate;
+    const cur=parseFloat(priceField.value)||0;
+    priceField.value=(cur+add).toFixed(2);
+    btn.dataset.autoAdded=add.toFixed(2);
+    toast('+$'+add.toFixed(2)+' added');
+  }else if(btn.dataset.autoAdded){
+    // unchecking — subtract what we added
+    const cur=parseFloat(priceField.value)||0;
+    priceField.value=Math.max(0,cur-parseFloat(btn.dataset.autoAdded)).toFixed(2);
+    delete btn.dataset.autoAdded;
+  }
+};
 function getCheckedServices(cid){return Array.from(document.querySelectorAll('#'+cid+' .check-item.checked')).map(b=>b.dataset.value);}
 function resetChecks(cid){document.querySelectorAll('#'+cid+' .check-item').forEach(b=>b.classList.remove('checked'));}
 
@@ -1267,6 +1705,9 @@ window.closeModal=function(type){
   if(type==='customer')resetChecks('cust-service-checks');
   if(type==='schedule-job')resetChecks('job-service-checks');
   if(type==='add-trip'){document.getElementById('trip-edit-id').value='';document.getElementById('trip-customer').value='';document.getElementById('trip-ded-preview').textContent='$0.00';}
+  if(type==='mileage-settings'){applyA11y();applyTheme();applyUserBg();} // revert any unsaved live preview to saved prefs
+  if(type==='customization'){applyTheme();} // revert unsaved theme preview
+  if(type==='thread'){currentThreadId=null;}
 };
 document.querySelectorAll('.modal-overlay').forEach(o=>{o.addEventListener('click',e=>{if(e.target===o)closeModal(o.id.replace('modal-',''));});});
 function populateCustomerDropdown(type){
@@ -1560,12 +2001,7 @@ window.openCustomerDetail=function(id){
       <div class="detail-field"><span class="detail-field-label">Address</span><input class="edit-input" id="edit-cust-address" value="${esc(addr)}" style="max-width:190px"></div>
     </div>
     <div class="detail-section"><div class="detail-section-title">Services</div>
-      <div class="service-checks" id="edit-cust-service-checks">
-        <button type="button" class="check-item ${services.includes('Window cleaning')?'checked':''}" onclick="toggleCheck(this)" data-value="Window cleaning"><div class="check-box"><span class="check-mark">✓</span></div>Window cleaning</button>
-        <button type="button" class="check-item ${services.includes('Pressure washing')?'checked':''}" onclick="toggleCheck(this)" data-value="Pressure washing"><div class="check-box"><span class="check-mark">✓</span></div>Pressure washing</button>
-        <button type="button" class="check-item ${services.includes('Pest control')?'checked':''}" onclick="toggleCheck(this)" data-value="Pest control"><div class="check-box"><span class="check-mark">✓</span></div>Pest control</button>
-        <button type="button" class="check-item ${services.includes('Quote')?'checked':''}" onclick="toggleCheck(this)" data-value="Quote"><div class="check-box"><span class="check-mark">✓</span></div>Quote only</button>
-      </div>
+      <div class="service-checks" id="edit-cust-service-checks">${serviceCheckboxHTML('edit-cust-service-checks',services)}<button type="button" class="check-item ${services.includes('Quote')?'checked':''}" onclick="toggleCheck(this)" data-value="Quote"><div class="check-box"><span class="check-mark">✓</span></div>Quote only</button></div>
     </div>
     <div class="detail-section"><div class="detail-section-title">Notes</div>
       <textarea class="edit-input" id="edit-cust-notes" rows="3" style="width:100%">${esc(c.notes||'')}</textarea>
@@ -2067,18 +2503,438 @@ async function loadSettings(){
     const snap=await getDoc(doc(db,'settings','config'));
     if(snap.exists()){const d=snap.data();sharedSettings.mapsApiKey=d.mapsApiKey||'';sharedSettings.mileageRate=d.mileageRate||0.725;
       if(d.features)features={...features,...d.features};
+      if(Array.isArray(d.serviceTypes)&&d.serviceTypes.length)serviceTypes=d.serviceTypes;
+      if(typeof d.autoPrice==='boolean')autoPrice=d.autoPrice;
+      if(d.messages)messages={...messages,...d.messages};
+      if(Array.isArray(d.cardConfig)&&d.cardConfig.length)cardConfig=d.cardConfig;
+      if(d.theme)theme={...theme,...d.theme};
+      if(typeof d.globalFont==='string')globalFont=d.globalFont;
       // Migrate: if an old shared homeAddress exists and this user has none yet, we leave it as a fallback default
       if(d.homeAddress&&!userSettings.homeAddress)userSettings.homeAddress=userSettings.homeAddress||'';
     }
   }catch(e){console.error('shared settings load',e);}
+  // Register this user into the team directory & load roles
+  try{
+    if(currentUid){
+      const teamSnap=await getDoc(doc(db,'settings','team'));
+      let team=teamSnap.exists()?(teamSnap.data().users||{}):{};
+      const isFirstUser=Object.keys(team).length===0;
+      if(!team[currentUid]){
+        // First user ever becomes admin; everyone after is employee
+        team[currentUid]={email:currentEmail||'',role:isFirstUser?'admin':'employee',name:(currentEmail||'').split('@')[0]};
+        await setDoc(doc(db,'settings','team'),{users:team},{merge:true});
+      }else if(team[currentUid].email!==currentEmail){
+        team[currentUid].email=currentEmail||'';
+        await setDoc(doc(db,'settings','team'),{users:team},{merge:true});
+      }
+      teamUsers=team;
+      myRole=(team[currentUid]&&team[currentUid].role)||'employee';
+    }
+  }catch(e){console.error('team load',e);}
   try{
     if(currentUid){
       const usnap=await getDoc(doc(db,'settings','user_'+currentUid));
-      if(usnap.exists()){const u=usnap.data();userSettings.homeAddress=u.homeAddress||'';userSettings.mileageRate=(u.mileageRate!=null?u.mileageRate:null);}
+      if(usnap.exists()){const u=usnap.data();userSettings.homeAddress=u.homeAddress||'';userSettings.mileageRate=(u.mileageRate!=null?u.mileageRate:null);
+        if(u.a11y)a11y={...a11y,...u.a11y};
+        if(u.userBg)userBg={...userBg,...u.userBg};
+        // Per-user theme override applies only if the owner hasn't locked the theme
+        if(u.userTheme&&!theme.locked)theme={...theme,...u.userTheme};
+      }
     }
   }catch(e){console.error('user settings load',e);}
   applyEffectiveSettings();
   applyFeatureFlags();
+  applyTheme();
+  applyA11y();
+  applyUserBg();
+  renderServiceCheckboxes();
+}
+
+// Apply the user's custom background image app-wide, behind everything, with dimming
+function applyUserBg(){
+  let layer=document.getElementById('user-bg-layer');
+  if(!layer){
+    layer=document.createElement('div');layer.id='user-bg-layer';
+    document.body.insertBefore(layer,document.body.firstChild);
+  }
+  if(userBg.image){
+    layer.style.cssText=`position:fixed;inset:0;z-index:0;pointer-events:none;background-image:url('${userBg.image}');background-size:cover;background-position:center;background-attachment:fixed;`;
+    let dim=document.getElementById('user-bg-dim');
+    if(!dim){dim=document.createElement('div');dim.id='user-bg-dim';document.body.insertBefore(dim,layer.nextSibling);}
+    dim.style.cssText=`position:fixed;inset:0;z-index:0;pointer-events:none;background:var(--bg);opacity:${userBg.dim!=null?userBg.dim:0.5};`;
+    // Make app surfaces sit above the background
+    document.body.classList.add('has-user-bg');
+  }else{
+    layer.style.display='none';
+    const dim=document.getElementById('user-bg-dim');if(dim)dim.style.display='none';
+    document.body.classList.remove('has-user-bg');
+  }
+}
+
+// ===== CUSTOM BACKGROUND UPLOAD =====
+let bgDraft={image:'',dim:0.5}; // working copy while customize modal open
+window.handleBgUpload=function(input){
+  const file=input.files&&input.files[0];if(!file)return;
+  if(!file.type.startsWith('image/')){toast('Please pick an image');return;}
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const img=new Image();
+    img.onload=()=>{
+      const max=1280;let{width,height}=img;
+      if(width>height&&width>max){height=Math.round(height*max/width);width=max;}
+      else if(height>max){width=Math.round(width*max/height);height=max;}
+      const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;
+      canvas.getContext('2d').drawImage(img,0,0,width,height);
+      let dataUrl=canvas.toDataURL('image/jpeg',0.7);
+      let q=0.6;
+      while(dataUrl.length>900000&&q>0.3){dataUrl=canvas.toDataURL('image/jpeg',q);q-=0.1;}
+      if(dataUrl.length>900000){toast('Image too large even compressed — try a smaller one');return;}
+      bgDraft.image=dataUrl;
+      const prev=document.getElementById('bg-preview-cust');
+      if(prev){prev.style.display='';prev.style.backgroundImage=`url('${dataUrl}')`;}
+      document.getElementById('bg-dim-wrap').style.display='';
+      document.getElementById('bg-remove-btn').style.display='';
+      const savedImg=userBg.image,savedDim=userBg.dim;
+      userBg.image=dataUrl;userBg.dim=bgDraft.dim;applyUserBg();userBg.image=savedImg;userBg.dim=savedDim;
+      toast('Background set — Save to keep');
+    };
+    img.src=e.target.result;
+  };
+  reader.readAsDataURL(file);
+};
+window.updateBgDim=function(val){
+  bgDraft.dim=parseInt(val)/100;
+  document.getElementById('bg-dim-val').textContent=val;
+  const savedImg=userBg.image,savedDim=userBg.dim;
+  userBg.image=bgDraft.image;userBg.dim=bgDraft.dim;applyUserBg();userBg.image=savedImg;userBg.dim=savedDim;
+};
+window.removeUserBg=function(){
+  bgDraft.image='';
+  const prev=document.getElementById('bg-preview-cust');if(prev)prev.style.display='none';
+  document.getElementById('bg-dim-wrap').style.display='none';
+  document.getElementById('bg-remove-btn').style.display='none';
+  const savedImg=userBg.image;userBg.image='';applyUserBg();userBg.image=savedImg;
+};
+
+// Apply per-user accessibility preferences to the document
+function applyA11y(){
+  const b=document.body;
+  b.classList.toggle('light-mode',!!a11y.lightMode);
+  b.classList.toggle('reduce-motion',!!a11y.reduceMotion);
+  const scaled=a11y.textSize&&a11y.textSize!==1;
+  b.classList.toggle('text-scaled',!!scaled);
+  document.documentElement.style.setProperty('--font-scale',a11y.textSize||1);
+  document.documentElement.style.setProperty('--letter-spacing',(a11y.letterSpacing||0)+'px');
+  document.documentElement.style.setProperty('--line-height',a11y.lineHeight||1.5);
+  b.classList.toggle('spacing-adjusted',(a11y.letterSpacing&&a11y.letterSpacing!==0)||(a11y.lineHeight&&a11y.lineHeight!==1.5));
+}
+
+// ===== THEMING =====
+function hexToRgb(hex){const h=(hex||'').replace('#','');const n=parseInt(h.length===3?h.split('').map(c=>c+c).join(''):h,16);return{r:(n>>16)&255,g:(n>>8)&255,b:n&255};}
+function mix(hex,target,amt){const a=hexToRgb(hex),b=hexToRgb(target);const r=Math.round(a.r+(b.r-a.r)*amt),g=Math.round(a.g+(b.g-a.g)*amt),bl=Math.round(a.b+(b.b-a.b)*amt);return'#'+[r,g,bl].map(x=>x.toString(16).padStart(2,'0')).join('');}
+function rgbaStr(hex,alpha){const c=hexToRgb(hex);return`rgba(${c.r},${c.g},${c.b},${alpha})`;}
+
+// Resolve the active theme colors (custom overrides template+palette)
+function activeThemeColors(){
+  if(theme.custom)return theme.custom;
+  return COLOR_SCHEMES[theme.scheme]||COLOR_SCHEMES['neon-green'];
+}
+
+// Apply theme by setting CSS variables and deriving related shades
+function applyTheme(){
+  const t=activeThemeColors();
+  const root=document.documentElement.style;
+  const isLight=!!t.light;
+  // Core accents map to green/blue/orange variable slots (the app's 3 accent system)
+  const accents={green:t.accent1,blue:t.accent2,orange:t.accent3};
+  Object.entries(accents).forEach(([name,hex])=>{
+    root.setProperty('--'+name,hex);
+    root.setProperty('--'+name+'-dark',mix(hex,'#000000',0.35));
+    root.setProperty('--'+name+'-dim',isLight?mix(hex,'#ffffff',0.85):mix(hex,t.bg||'#000000',0.82));
+    root.setProperty('--'+name+'-border',isLight?mix(hex,'#ffffff',0.6):mix(hex,t.bg||'#000000',0.55));
+    root.setProperty('--glow-'+name,(isLight?'0 0 6px ':'0 0 8px ')+rgbaStr(hex,isLight?0.25:0.4));
+  });
+  // Base surfaces
+  root.setProperty('--bg',t.bg);
+  root.setProperty('--surface',t.surface);
+  root.setProperty('--border',t.border);
+  root.setProperty('--text',t.text);
+  root.setProperty('--text-muted',t.textMuted);
+  root.setProperty('--text-dim',mix(t.textMuted,t.bg,0.4));
+  // Keep red/purple sane against the background
+  root.setProperty('--red-dim',isLight?'#fce8e8':mix('#e57373',t.bg,0.82));
+  root.setProperty('--red-border',isLight?'#f0c8c8':mix('#e57373',t.bg,0.55));
+  root.setProperty('--purple-dim',isLight?'#f0e8fc':mix('#b388ff',t.bg,0.82));
+  root.setProperty('--purple-border',isLight?'#dcc8f0':mix('#b388ff',t.bg,0.55));
+  // Light themes need dark-on-light text contrast handled by the light flag
+  document.body.classList.toggle('theme-light',isLight);
+
+  // ===== DESIGN PERSONALITY (beyond color) =====
+  // Font family
+  // Font family — global override wins, else template font
+  if(globalFont)root.setProperty('--app-font',globalFont);
+  else if(t.font)root.setProperty('--app-font',t.font);
+  else root.setProperty('--app-font',"-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif");
+  root.setProperty('--heading-font',globalFont||t.heading||t.font||"-apple-system,sans-serif");
+  // Corner radius (scales the three radius vars proportionally)
+  const r=t.radius!=null?t.radius:12;
+  root.setProperty('--radius-sm',Math.round(r*0.65)+'px');
+  root.setProperty('--radius-md',r+'px');
+  root.setProperty('--radius-lg',Math.round(r*1.15)+'px');
+  // Border weight
+  root.setProperty('--border-weight',(t.borderWeight||1)+'px');
+  // Density (spacing multiplier)
+  root.setProperty('--density',(t.density||1));
+  // Surface style: glow / flat / soft — controls shadows app-wide via body class
+  document.body.classList.remove('surf-glow','surf-flat','surf-soft');
+  document.body.classList.add('surf-'+(t.surfaceStyle||'glow'));
+}
+
+function _applyA11y_orig(){
+}
+
+// ===== THEME EDITOR (customization modal) =====
+let themeDraft={scheme:'neon-green',custom:null,locked:false};
+const CUSTOM_FIELDS=[
+  {key:'accent1',label:'Primary accent'},
+  {key:'accent2',label:'Secondary accent'},
+  {key:'accent3',label:'Third accent'},
+  {key:'bg',label:'Background'},
+  {key:'surface',label:'Cards / surface'},
+  {key:'border',label:'Borders'},
+  {key:'text',label:'Text'},
+  {key:'textMuted',label:'Muted text'}
+];
+
+// Compact square preview for the template grid
+function miniPreviewSquare(c){
+  const glow=c.surfaceStyle==='glow';
+  const soft=c.surfaceStyle==='soft';
+  const cardShadow=glow?'0 0 4px '+rgbaStr(c.accent1,0.4):soft?'0 1px 4px rgba(0,0,0,0.25)':'none';
+  const r=c.radius!=null?c.radius:12;
+  const rs=Math.max(2,Math.round(r*0.4));
+  const bw=c.borderWeight||1;
+  return `<div style="background:${c.bg};padding:8px;font-family:${c.font};height:96px;display:flex;flex-direction:column;gap:5px">
+    <div style="font-family:${c.heading||c.font};font-size:8px;font-weight:800;font-style:italic;color:${c.accent1}">SMUDGE</div>
+    <div style="display:flex;gap:4px">
+      <div style="flex:1;background:${c.surface};border:${bw}px solid ${c.border};border-radius:${rs}px;box-shadow:${cardShadow};padding:4px 2px;text-align:center">
+        <div style="font-size:9px;font-weight:900;color:${c.accent1};line-height:1">$2k</div>
+      </div>
+      <div style="flex:1;background:${c.surface};border:${bw}px solid ${c.border};border-radius:${rs}px;box-shadow:${cardShadow};padding:4px 2px;text-align:center">
+        <div style="font-size:9px;font-weight:900;color:${c.accent2};line-height:1">8</div>
+      </div>
+    </div>
+    <div style="flex:1;background:${c.surface};border:${bw}px solid ${c.border};border-radius:${rs}px;box-shadow:${cardShadow};padding:4px">
+      <div style="width:60%;height:3px;background:${c.accent3};border-radius:2px;margin-bottom:3px"></div>
+      <div style="width:85%;height:2px;background:${c.textMuted};border-radius:2px;opacity:0.5"></div>
+    </div>
+    <div style="display:flex;gap:4px">
+      <div style="flex:1;background:${c.accent1};border-radius:${rs}px;height:9px;box-shadow:${glow?'0 0 4px '+rgbaStr(c.accent1,0.5):'none'}"></div>
+      <div style="flex:1;background:${c.surface};border:${bw}px solid ${c.accent3};border-radius:${rs}px;height:9px"></div>
+    </div>
+  </div>`;
+}
+// Mini home-screen preview rendered in a template+palette's look
+function miniPreviewHTML(c){
+  const glow=c.surfaceStyle==='glow';
+  const soft=c.surfaceStyle==='soft';
+  const cardShadow=glow?'0 0 6px '+rgbaStr(c.accent1,0.4):soft?'0 1px 5px rgba(0,0,0,0.25)':'none';
+  const r=c.radius!=null?c.radius:12;
+  const rs=Math.max(2,Math.round(r*0.5));
+  const bw=c.borderWeight||1;
+  return `<div style="background:${c.bg};padding:9px;font-family:${c.font};border-radius:6px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
+      <div style="font-family:${c.heading||c.font};font-size:11px;font-weight:800;font-style:italic;color:${c.accent1}">SMUDGE <span style="color:${c.accent2}">BUSTERS</span></div>
+      <div style="width:6px;height:6px;border-radius:50%;background:${c.accent1};box-shadow:${glow?'0 0 4px '+c.accent1:'none'}"></div>
+    </div>
+    <div style="display:flex;gap:5px;margin-bottom:6px">
+      <div style="flex:1;background:${c.surface};border:${bw}px solid ${c.border};border-radius:${rs}px;box-shadow:${cardShadow};padding:6px 4px;text-align:center">
+        <div style="font-size:5px;color:${c.textMuted};text-transform:uppercase;letter-spacing:0.3px">Revenue</div>
+        <div style="font-size:11px;font-weight:900;color:${c.accent1}">$2.4k</div>
+      </div>
+      <div style="flex:1;background:${c.surface};border:${bw}px solid ${c.border};border-radius:${rs}px;box-shadow:${cardShadow};padding:6px 4px;text-align:center">
+        <div style="font-size:5px;color:${c.textMuted};text-transform:uppercase;letter-spacing:0.3px">Jobs</div>
+        <div style="font-size:11px;font-weight:900;color:${c.accent2}">8</div>
+      </div>
+    </div>
+    <div style="background:${c.surface};border:${bw}px solid ${c.border};border-radius:${rs}px;box-shadow:${cardShadow};padding:6px;margin-bottom:6px">
+      <div style="font-size:6px;font-weight:700;color:${c.accent3};margin-bottom:3px">📋 Today</div>
+      <div style="font-size:6px;color:${c.text};line-height:1.4">3 jobs · $420 expected</div>
+    </div>
+    <div style="display:flex;gap:4px">
+      <div style="flex:1;background:${c.accent1};border-radius:${rs}px;padding:4px;text-align:center;font-size:6px;font-weight:700;color:${c.bg};box-shadow:${glow?'0 0 5px '+rgbaStr(c.accent1,0.5):'none'}">Log payment</div>
+      <div style="flex:1;background:${c.surface};border:${bw}px solid ${c.accent3};border-radius:${rs}px;padding:4px;text-align:center;font-size:6px;font-weight:700;color:${c.accent3}">Log expense</div>
+    </div>
+  </div>`;
+}
+
+let globalFontDraft='';
+window.updateGlobalFont=function(val){
+  globalFontDraft=val;
+  // live preview
+  const saved=globalFont;globalFont=val;applyTheme();globalFont=saved;
+};
+window.openCustomization=function(){
+  themeDraft=JSON.parse(JSON.stringify(theme));
+  if(!themeDraft.scheme){themeDraft.scheme='neon-green';}
+  const isOwner=isThemeOwner();
+  document.getElementById('theme-lock-row').style.display=isOwner?'':'none';
+  document.getElementById('set-theme-lock').checked=!!themeDraft.locked;
+  document.getElementById('set-theme-lock').onchange=function(){themeDraft.locked=this.checked;};
+  const note=document.getElementById('cust-scope-note');
+  if(theme.locked&&!isOwner)note.textContent='The owner locked the design. You can preview but not change it.';
+  else if(isOwner)note.textContent='Pick a color scheme. Lock it below to set it for everyone.';
+  else note.textContent='Pick your own color scheme. Save to keep it.';
+  switchCustomTab('templates');
+  renderSchemeGrid();
+  globalFontDraft=globalFont;
+  const gf=document.getElementById('global-font');if(gf)gf.value=globalFont||'';
+  populateBgControlsCust();
+  document.getElementById('modal-customization').classList.add('open');
+};
+window.closeCustomization=function(){
+  document.getElementById('modal-customization').classList.remove('open');
+  applyTheme();applyUserBg();
+};
+window.switchCustomTab=function(tab){
+  document.getElementById('custom-view-templates').style.display=tab==='templates'?'':'none';
+  document.getElementById('custom-view-fine').style.display=tab==='fine'?'':'none';
+  document.getElementById('ctab-templates').className='money-tab'+(tab==='templates'?' active-pay':'');
+  document.getElementById('ctab-fine').className='money-tab'+(tab==='fine'?' active-pay':'');
+  if(tab==='fine'){renderCustomColors();syncFineControls();}
+};
+function isThemeOwner(){return !theme.ownerUid||theme.ownerUid===currentUid;}
+
+// Color scheme grid — each tile a mini preview in that scheme
+function renderSchemeGrid(){
+  const g=document.getElementById('scheme-grid');if(!g)return;
+  const locked=theme.locked&&!isThemeOwner();
+  g.innerHTML=Object.entries(COLOR_SCHEMES).map(([id,c])=>{
+    const active=(!themeDraft.custom&&themeDraft.scheme===id);
+    return`<div onclick="${locked?'':`pickScheme('${id}')`}" style="cursor:${locked?'default':'pointer'};border:${active?'2px solid '+c.accent1:'1px solid var(--border)'};border-radius:9px;overflow:hidden;${locked?'opacity:0.5':''}">
+      ${miniPreviewSquare({...c,font:globalFontDraft||"-apple-system,sans-serif",radius:12,surfaceStyle:c.light?'flat':'glow',borderWeight:1})}
+      <div style="padding:5px 6px;background:var(--surface);text-align:center">
+        <div style="font-size:10px;font-weight:700;color:var(--text)">${c.label}</div>
+        ${active?`<div style="font-size:8px;font-weight:700;color:var(--green)">✓</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+window.pickScheme=function(id){
+  themeDraft.scheme=id;themeDraft.custom=null;
+  renderSchemeGrid();
+  previewTheme();
+};
+
+function renderCustomColors(){
+  const el=document.getElementById('custom-color-list');if(!el)return;
+  const src=themeDraft.custom||COLOR_SCHEMES[themeDraft.scheme];
+  el.innerHTML=CUSTOM_FIELDS.map(f=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:12px;color:var(--text)">${f.label}</span>
+      <input type="color" value="${src[f.key]||'#000000'}" oninput="updateCustomColor('${f.key}',this.value)" style="width:40px;height:28px;border:none;background:none;cursor:pointer;padding:0">
+    </div>`).join('');
+}
+function ensureCustom(){
+  if(!themeDraft.custom){themeDraft.custom={...COLOR_SCHEMES[themeDraft.scheme]};delete themeDraft.custom.label;}
+}
+window.updateCustomColor=function(key,val){ensureCustom();themeDraft.custom[key]=val;previewTheme();};
+window.updateDesignField=function(key,val){
+  ensureCustom();themeDraft.custom[key]=val;
+  if(key==='surfaceStyle'){document.querySelectorAll('[data-surf]').forEach(b=>b.classList.toggle('active',b.dataset.surf===val));}
+  previewTheme();
+};
+function syncFineControls(){
+  const src=themeDraft.custom||COLOR_SCHEMES[themeDraft.scheme];
+  const fontSel=document.getElementById('cust-font');if(fontSel&&src.font)fontSel.value=src.font;
+  const r=src.radius!=null?src.radius:12;
+  const rs=document.getElementById('cust-radius');if(rs){rs.value=r;document.getElementById('cust-radius-val').textContent=r;}
+  const bw=src.borderWeight||1;
+  const bwEl=document.getElementById('cust-bw');if(bwEl){bwEl.value=bw;document.getElementById('cust-bw-val').textContent=bw;}
+  document.querySelectorAll('[data-surf]').forEach(b=>b.classList.toggle('active',b.dataset.surf===(src.surfaceStyle||'glow')));
+}
+function previewTheme(){
+  const saved={scheme:theme.scheme,custom:theme.custom};
+  theme.scheme=themeDraft.scheme;theme.custom=themeDraft.custom;
+  applyTheme();
+  theme.scheme=saved.scheme;theme.custom=saved.custom;
+}
+// Background controls inside the customization modal
+function populateBgControlsCust(){
+  bgDraft={...userBg};
+  const prev=document.getElementById('bg-preview-cust');
+  const dimWrap=document.getElementById('bg-dim-wrap');
+  const removeBtn=document.getElementById('bg-remove-btn');
+  if(bgDraft.image){
+    if(prev){prev.style.display='';prev.style.backgroundImage=`url('${bgDraft.image}')`;}
+    if(dimWrap)dimWrap.style.display='';if(removeBtn)removeBtn.style.display='';
+  }else{
+    if(prev)prev.style.display='none';if(dimWrap)dimWrap.style.display='none';if(removeBtn)removeBtn.style.display='none';
+  }
+  const dimEl=document.getElementById('bg-dim');
+  if(dimEl){dimEl.value=Math.round((bgDraft.dim!=null?bgDraft.dim:0.5)*100);document.getElementById('bg-dim-val').textContent=dimEl.value;}
+}
+window.saveCustomization=async function(){
+  setSyncDot('syncing');
+  try{
+    const owner=isThemeOwner();
+    await setDoc(doc(db,'settings','config'),{globalFont:globalFontDraft},{merge:true});
+    globalFont=globalFontDraft;
+    if(owner){
+      const sharedTheme={scheme:themeDraft.scheme,custom:themeDraft.custom||null,locked:!!themeDraft.locked,ownerUid:theme.ownerUid||currentUid};
+      await setDoc(doc(db,'settings','config'),{theme:sharedTheme},{merge:true});
+      theme={...theme,...sharedTheme};
+      if(currentUid)await setDoc(doc(db,'settings','user_'+currentUid),{userTheme:null},{merge:true});
+    }else if(!theme.locked){
+      const userTheme={scheme:themeDraft.scheme,custom:themeDraft.custom||null};
+      if(currentUid)await setDoc(doc(db,'settings','user_'+currentUid),{userTheme:userTheme},{merge:true});
+      theme={...theme,scheme:themeDraft.scheme,custom:themeDraft.custom||null};
+    }
+    // Background (per-user)
+    userBg={...bgDraft};
+    if(currentUid)await setDoc(doc(db,'settings','user_'+currentUid),{userBg:bgDraft},{merge:true});
+    applyTheme();applyUserBg();
+    setSyncDot('ok');toast('Design saved');
+  }catch(e){setSyncDot('error');toast('Could not save');console.error(e);}
+  document.getElementById('modal-customization').classList.remove('open');
+};
+let a11yDraft={textSize:1,lightMode:false,reduceMotion:false};
+// Live-preview the draft while the settings modal is open
+function previewA11y(){
+  const b=document.body;
+  b.classList.toggle('light-mode',!!a11yDraft.lightMode);
+  b.classList.toggle('reduce-motion',!!a11yDraft.reduceMotion);
+  b.classList.toggle('text-scaled',a11yDraft.textSize&&a11yDraft.textSize!==1);
+  document.documentElement.style.setProperty('--font-scale',a11yDraft.textSize||1);
+  document.documentElement.style.setProperty('--letter-spacing',(a11yDraft.letterSpacing||0)+'px');
+  document.documentElement.style.setProperty('--line-height',a11yDraft.lineHeight||1.5);
+  b.classList.toggle('spacing-adjusted',(a11yDraft.letterSpacing&&a11yDraft.letterSpacing!==0)||(a11yDraft.lineHeight&&a11yDraft.lineHeight!==1.5));
+}
+window.setTextSizeDraft=function(size){a11yDraft.textSize=size;markTextSizeBtn(size);previewA11y();};
+window.updateSpacing=function(){
+  a11yDraft.letterSpacing=parseFloat(document.getElementById('set-letterspacing').value);
+  a11yDraft.lineHeight=parseFloat(document.getElementById('set-lineheight').value);
+  document.getElementById('ls-val').textContent=a11yDraft.letterSpacing;
+  document.getElementById('lh-val').textContent=a11yDraft.lineHeight;
+  previewA11y();
+};
+function markTextSizeBtn(size){
+  document.querySelectorAll('.a11y-size-btn').forEach(b=>{
+    b.classList.toggle('active',parseFloat(b.dataset.size)===size);
+  });
+}
+
+// Render all service checkbox groups from the configurable serviceTypes list
+function serviceCheckboxHTML(containerId,selected){
+  selected=selected||[];
+  return serviceTypes.map(s=>{
+    const checked=selected.includes(s.name)?'checked':'';
+    return`<button type="button" class="check-item ${checked}" onclick="toggleCheck(this)" data-value="${esc(s.name)}"><div class="check-box"><span class="check-mark">✓</span></div>${esc(s.name)}</button>`;
+  }).join('');
+}
+function renderServiceCheckboxes(){
+  const addBoxes=['cust-service-checks','job-service-checks'];
+  addBoxes.forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=serviceCheckboxHTML(id,[]);});
 }
 
 // Show/hide optional features based on toggles
@@ -2113,8 +2969,284 @@ window.openMileageSettings=function(){
   document.getElementById('feat-campaigns').checked=!!features.campaigns;
   document.getElementById('feat-giveback').checked=!!features.giveback;
   document.getElementById('feat-tools').checked=!!features.tools;
+  document.getElementById('set-autoprice').checked=!!autoPrice;
+  // Accessibility (per-user) — draft + live preview
+  a11yDraft={...a11y};
+  document.getElementById('set-lightmode').checked=!!a11y.lightMode;
+  document.getElementById('set-reducemotion').checked=!!a11y.reduceMotion;
+  markTextSizeBtn(a11y.textSize||1);
+  const lsEl=document.getElementById('set-letterspacing');if(lsEl){lsEl.value=a11y.letterSpacing||0;document.getElementById('ls-val').textContent=a11y.letterSpacing||0;}
+  const lhEl=document.getElementById('set-lineheight');if(lhEl){lhEl.value=a11y.lineHeight||1.5;document.getElementById('lh-val').textContent=a11y.lineHeight||1.5;}
+  document.getElementById('set-lightmode').onchange=function(){a11yDraft.lightMode=this.checked;previewA11y();};
+  document.getElementById('set-reducemotion').onchange=function(){a11yDraft.reduceMotion=this.checked;previewA11y();};
+  document.getElementById('msg-review-text').value=messages.reviewText||'';
+  document.getElementById('msg-review-email').value=messages.reviewEmail||'';
+  document.getElementById('msg-due').value=messages.dueService||'';
+  cardDraft=JSON.parse(JSON.stringify(cardConfig));
+  renderCardConfig();
+  svcDraft=JSON.parse(JSON.stringify(serviceTypes));
+  renderServiceConfig();
   const who=document.getElementById('set-user-label');if(who)who.textContent=currentEmail||'this login';
+  // Show admin tile only to admins
+  const adminTile=document.getElementById('admin-tile');if(adminTile)adminTile.style.display=(myRole==='admin')?'':'none';
   openModal('mileage-settings');
+};
+
+// Open a focused settings sub-panel
+window.openSettingsPanel=function(panel){
+  if(panel==='admin')renderAdminUsers();
+  openModal('set-'+panel);
+};
+
+// ===== ADMIN: team / roles =====
+function renderAdminUsers(){
+  const el=document.getElementById('admin-user-list');if(!el)return;
+  const entries=Object.entries(teamUsers);
+  if(entries.length===0){el.innerHTML='<div style="font-size:12px;color:var(--text-muted);padding:8px 0">No users yet.</div>';return;}
+  el.innerHTML=entries.map(([uid,u])=>{
+    const isMe=uid===currentUid;
+    return`<div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:8px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <div style="width:34px;height:34px;border-radius:50%;background:var(--blue-dim);border:1px solid var(--blue);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--blue);flex-shrink:0">${esc(((u.name||u.email||'?')[0]||'?').toUpperCase())}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:11px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(u.email||'')}${isMe?' · you':''}</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input class="form-input" style="flex:1;font-size:13px;padding:8px" value="${esc(u.name||'')}" placeholder="Display name" id="uname-${uid}" onblur="saveUserName('${uid}',this.value)">
+        <select onchange="setUserRole('${uid}',this.value)" ${isMe?'disabled':''} style="background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:8px;font-size:12px;${isMe?'opacity:0.5':''}">
+          <option value="admin" ${u.role==='admin'?'selected':''}>Admin</option>
+          <option value="employee" ${u.role==='employee'?'selected':''}>Employee</option>
+        </select>
+      </div>
+    </div>`;
+  }).join('');
+}
+window.saveUserName=async function(uid,name){
+  if(myRole!=='admin')return;
+  if(!teamUsers[uid])return;
+  const clean=(name||'').trim();
+  if(teamUsers[uid].name===clean)return; // no change
+  teamUsers[uid].name=clean;
+  setSyncDot('syncing');
+  try{
+    await setDoc(doc(db,'settings','team'),{users:teamUsers},{merge:true});
+    setSyncDot('ok');toast('Name updated');
+    renderMessagesList(); // names show in messages too
+  }catch(e){setSyncDot('error');toast('Could not save');console.error(e);}
+};
+window.setUserRole=async function(uid,role){
+  if(myRole!=='admin'){toast('Admins only');return;}
+  if(uid===currentUid){toast("You can't change your own role");return;}
+  if(!teamUsers[uid])return;
+  teamUsers[uid].role=role;
+  setSyncDot('syncing');
+  try{
+    await setDoc(doc(db,'settings','team'),{users:teamUsers},{merge:true});
+    setSyncDot('ok');toast('Role updated');
+    renderAdminUsers();
+  }catch(e){setSyncDot('error');toast('Could not update');console.error(e);}
+};
+
+// ===== MESSAGING =====
+let currentThreadId=null;
+let composeAttachment=null;
+let attachTab='customer';
+
+function threadIdFor(a,b){return[a,b].sort().join('__');}
+function userName(uid){const u=teamUsers[uid];return u?(u.name||u.email||'User'):'User';}
+
+// Group messages into threads (1:1 for now)
+function myThreads(){
+  const msgs=(data.messages||[]).filter(m=>m.from===currentUid||m.to===currentUid);
+  const threads={};
+  msgs.forEach(m=>{
+    const other=m.from===currentUid?m.to:m.from;
+    const tid=m.threadId||threadIdFor(m.from,m.to);
+    if(!threads[tid])threads[tid]={tid,other,last:m,unread:0,messages:[]};
+    threads[tid].messages.push(m);
+    if((m.created||0)>(threads[tid].last.created||0))threads[tid].last=m;
+    if(m.to===currentUid&&!(m.readBy||[]).includes(currentUid))threads[tid].unread++;
+  });
+  return Object.values(threads).sort((a,b)=>(b.last.created||0)-(a.last.created||0));
+}
+
+function renderMessagesList(){
+  const el=document.getElementById('messages-list');if(!el)return;
+  const threads=myThreads();
+  if(threads.length===0){el.innerHTML='<div class="empty-state" style="padding:16px"><p>No messages yet.</p></div>';return;}
+  el.innerHTML=threads.map(t=>{
+    const preview=(t.last.body||'').slice(0,42)+((t.last.body||'').length>42?'…':'');
+    const mine=t.last.from===currentUid;
+    return`<div onclick="openThread('${t.tid}','${t.other}')" style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer">
+      <div style="width:36px;height:36px;border-radius:50%;background:var(--blue-dim);border:1px solid var(--blue);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--blue);flex-shrink:0">${esc((userName(t.other)[0]||'?').toUpperCase())}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:600;color:var(--text)">${esc(userName(t.other))}</div>
+        <div style="font-size:11px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${mine?'You: ':''}${esc(preview)||'(attachment)'}</div>
+      </div>
+      ${t.unread>0?`<div style="background:var(--blue);color:#fff;border-radius:10px;min-width:18px;height:18px;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 5px">${t.unread}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+window.openCompose=function(){
+  const sel=document.getElementById('compose-to');
+  const others=Object.entries(teamUsers).filter(([uid])=>uid!==currentUid);
+  if(others.length===0){toast('No teammates yet — they appear after first sign-in');return;}
+  sel.innerHTML=others.map(([uid,u])=>`<option value="${uid}">${esc(u.name||u.email)}</option>`).join('');
+  document.getElementById('compose-body').value='';
+  composeAttachment=null;
+  document.getElementById('compose-attachment').style.display='none';
+  openModal('compose');
+};
+
+window.sendMessage=async function(){
+  const to=document.getElementById('compose-to').value;
+  const body=document.getElementById('compose-body').value.trim();
+  if(!to){toast('Pick a recipient');return;}
+  if(!body&&!composeAttachment){toast('Write a message');return;}
+  const msg={from:currentUid,to,body,threadId:threadIdFor(currentUid,to),created:Date.now(),readBy:[currentUid],attachment:composeAttachment||null};
+  await fbAdd('messages',msg);
+  closeModal('compose');
+  toast('Sent');
+  openThread(msg.threadId,to);
+};
+
+window.openThread=async function(tid,other){
+  currentThreadId=tid;
+  document.getElementById('thread-title').textContent=userName(other);
+  document.getElementById('thread-reply').value='';
+  document.getElementById('thread-reply').dataset.other=other;
+  renderThread(tid);
+  openModal('thread');
+  // Mark unread messages in this thread as read
+  const unread=(data.messages||[]).filter(m=>m.threadId===tid&&m.to===currentUid&&!(m.readBy||[]).includes(currentUid));
+  for(const m of unread){await fbUpdate('messages',m.id,{readBy:[...(m.readBy||[]),currentUid]});}
+};
+
+function renderThread(tid){
+  const el=document.getElementById('thread-messages');if(!el)return;
+  const msgs=(data.messages||[]).filter(m=>m.threadId===tid).sort((a,b)=>(a.created||0)-(b.created||0));
+  el.innerHTML=msgs.map(m=>{
+    const mine=m.from===currentUid;
+    const att=m.attachment?attachmentChip(m.attachment):'';
+    return`<div style="display:flex;justify-content:${mine?'flex-end':'flex-start'};margin-bottom:8px">
+      <div style="max-width:78%;background:${mine?'var(--blue)':'var(--surface)'};color:${mine?'#fff':'var(--text)'};border:1px solid ${mine?'var(--blue)':'var(--border)'};border-radius:14px;padding:8px 12px">
+        ${m.body?`<div style="font-size:13px;line-height:1.4;word-wrap:break-word">${esc(m.body)}</div>`:''}
+        ${att}
+        <div style="font-size:9px;opacity:0.6;margin-top:3px;text-align:right">${timeAgo(m.created)}</div>
+      </div>
+    </div>`;
+  }).join('');
+  el.scrollTop=el.scrollHeight;
+}
+
+window.sendReply=async function(){
+  const ta=document.getElementById('thread-reply');
+  const body=ta.value.trim();
+  const other=ta.dataset.other;
+  if(!body||!other)return;
+  const msg={from:currentUid,to:other,body,threadId:currentThreadId,created:Date.now(),readBy:[currentUid],attachment:null};
+  ta.value='';
+  await fbAdd('messages',msg);
+};
+
+// ===== ATTACHMENTS =====
+function attachmentChip(att){
+  const icons={customer:'👤',job:'🧹',payment:'💵',expense:'🧾',revenue:'📈'};
+  return`<div style="background:rgba(0,0,0,0.15);border-radius:8px;padding:6px 9px;margin-top:5px;font-size:12px;display:flex;align-items:center;gap:6px">
+    <span>${icons[att.type]||'📎'}</span><span>${esc(att.label)}</span></div>`;
+}
+window.openAttachPicker=function(){attachTab='customer';switchAttachTab('customer');openModal('attach-picker');};
+window.switchAttachTab=function(tab){
+  attachTab=tab;
+  ['customer','job','money'].forEach(t=>{document.getElementById('atab-'+t).className='money-tab'+(t===tab?' active-pay':'');});
+  document.getElementById('attach-search').value='';
+  renderAttachList();
+};
+window.renderAttachList=function(){
+  const el=document.getElementById('attach-list');if(!el)return;
+  const q=(document.getElementById('attach-search').value||'').toLowerCase();
+  let items=[];
+  if(attachTab==='customer'){
+    items=(data.customers||[]).filter(c=>(c.name||'').toLowerCase().includes(q)).map(c=>({type:'customer',id:c.id,label:c.name||'Customer',sub:c.phone||c.address||''}));
+  }else if(attachTab==='job'){
+    items=(data.jobs||[]).filter(j=>(j.customerName||'').toLowerCase().includes(q)).slice(0,50).map(j=>({type:'job',id:j.id,label:(j.customerName||'Job')+' — '+(j.date||''),sub:'$'+(j.price||0)}));
+  }else{
+    const pays=(data.payments||[]).filter(p=>(p.customerName||'').toLowerCase().includes(q)).map(p=>({type:'payment',id:p.id,label:'Payment: '+(p.customerName||'')+' $'+(p.amount||0),sub:p.date||''}));
+    const exps=(data.expenses||[]).filter(e=>(e.description||e.category||'').toLowerCase().includes(q)).map(e=>({type:'expense',id:e.id,label:'Expense: '+(e.category||'')+' $'+(e.amount||0),sub:e.description||''}));
+    items=[...pays,...exps];
+  }
+  if(items.length===0){el.innerHTML='<div style="font-size:12px;color:var(--text-muted);padding:12px 0;text-align:center">Nothing found.</div>';return;}
+  el.innerHTML=items.slice(0,40).map(it=>`
+    <div onclick='pickAttachment(${JSON.stringify(it).replace(/'/g,"&#39;")})' style="padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:6px;cursor:pointer">
+      <div style="font-size:13px;font-weight:600;color:var(--text)">${esc(it.label)}</div>
+      ${it.sub?`<div style="font-size:11px;color:var(--text-muted)">${esc(it.sub)}</div>`:''}
+    </div>`).join('');
+};
+window.pickAttachment=function(it){
+  composeAttachment={type:it.type,id:it.id,label:it.label};
+  document.getElementById('compose-attach-label').textContent=it.label;
+  document.getElementById('compose-attachment').style.display='flex';
+  closeModal('attach-picker');
+};
+window.clearAttachment=function(){
+  composeAttachment=null;
+  document.getElementById('compose-attachment').style.display='none';
+};
+
+let svcDraft=[];
+let cardDraft=[];
+function renderCardConfig(){
+  const el=document.getElementById('card-config-list');if(!el)return;
+  el.innerHTML=cardDraft.map((c,i)=>`
+    <div style="display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;margin-bottom:6px">
+      <div style="display:flex;flex-direction:column;gap:2px">
+        <button onclick="moveCard(${i},-1)" ${i===0?'disabled style=\"opacity:0.3\"':''} style="background:var(--surface);border:1px solid var(--border);color:var(--text-muted);border-radius:4px;width:22px;height:16px;font-size:9px;cursor:pointer;line-height:1;padding:0">▲</button>
+        <button onclick="moveCard(${i},1)" ${i===cardDraft.length-1?'disabled style=\"opacity:0.3\"':''} style="background:var(--surface);border:1px solid var(--border);color:var(--text-muted);border-radius:4px;width:22px;height:16px;font-size:9px;cursor:pointer;line-height:1;padding:0">▼</button>
+      </div>
+      <div style="flex:1;font-size:13px;font-weight:600;color:var(--text)">${esc(c.label)}</div>
+      <label class="tswitch"><input type="checkbox" ${c.on?'checked':''} onchange="toggleCardDraft(${i},this.checked)"><span class="tslider"></span></label>
+    </div>`).join('');
+}
+window.moveCard=function(i,dir){
+  const j=i+dir;if(j<0||j>=cardDraft.length)return;
+  [cardDraft[i],cardDraft[j]]=[cardDraft[j],cardDraft[i]];
+  renderCardConfig();
+};
+window.toggleCardDraft=function(i,val){if(cardDraft[i])cardDraft[i].on=val;};
+function renderServiceConfig(){
+  const el=document.getElementById('svc-config-list');if(!el)return;
+  if(svcDraft.length===0){el.innerHTML='<div style="font-size:12px;color:var(--text-muted);padding:8px 0">No services yet — add one below.</div>';return;}
+  el.innerHTML=svcDraft.map((s,i)=>`
+    <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px;margin-bottom:8px">
+      <div style="display:flex;gap:6px;align-items:center;margin-bottom:8px">
+        <input class="form-input" style="flex:1;font-size:13px" value="${esc(s.name)}" placeholder="Service name" oninput="updateSvcDraft(${i},'name',this.value)">
+        <button onclick="removeServiceType(${i})" style="background:var(--red-dim);border:1px solid var(--red);color:var(--red);border-radius:6px;width:30px;height:30px;font-size:14px;cursor:pointer;flex-shrink:0">✕</button>
+      </div>
+      <div style="display:flex;gap:6px">
+        <select class="form-input" style="flex:1;font-size:12px" onchange="updateSvcDraft(${i},'model',this.value)">
+          <option value="custom" ${s.model==='custom'?'selected':''}>Custom / flat</option>
+          <option value="sqft" ${s.model==='sqft'?'selected':''}>Per sq ft</option>
+          <option value="item" ${s.model==='item'?'selected':''}>Per item</option>
+        </select>
+        <input class="form-input" type="number" step="0.01" style="width:90px;font-size:12px;${s.model==='custom'?'opacity:0.4':''}" value="${s.rate||''}" placeholder="$ rate" ${s.model==='custom'?'disabled':''} oninput="updateSvcDraft(${i},'rate',this.value)">
+      </div>
+    </div>`).join('');
+}
+window.updateSvcDraft=function(i,field,val){
+  if(!svcDraft[i])return;
+  if(field==='rate')svcDraft[i][field]=parseFloat(val)||0;
+  else svcDraft[i][field]=val;
+  if(field==='model')renderServiceConfig(); // re-render to enable/disable rate field
+};
+window.addServiceType=function(){
+  svcDraft.push({name:'',model:'custom',rate:0});
+  renderServiceConfig();
+};
+window.removeServiceType=function(i){
+  svcDraft.splice(i,1);
+  renderServiceConfig();
 };
 window.saveMileageSettings=async function(){
   const home=document.getElementById('set-home-address').value.trim();
@@ -2126,19 +3258,38 @@ window.saveMileageSettings=async function(){
     giveback:document.getElementById('feat-giveback').checked,
     tools:document.getElementById('feat-tools').checked
   };
+  // Clean service draft: drop blank names, keep order
+  const cleanedServices=svcDraft.map(s=>({name:(s.name||'').trim(),model:s.model||'custom',rate:parseFloat(s.rate)||0})).filter(s=>s.name);
+  const newAutoPrice=document.getElementById('set-autoprice').checked;
+  const newMessages={
+    reviewText:document.getElementById('msg-review-text').value.trim()||DEFAULT_MESSAGES.reviewText,
+    reviewEmail:document.getElementById('msg-review-email').value.trim()||DEFAULT_MESSAGES.reviewEmail,
+    dueService:document.getElementById('msg-due').value.trim()||DEFAULT_MESSAGES.dueService
+  };
+  const newCardConfig=JSON.parse(JSON.stringify(cardDraft));
   setSyncDot('syncing');
   try{
-    // Per-user: home address
-    if(currentUid){await setDoc(doc(db,'settings','user_'+currentUid),{homeAddress:home,email:currentEmail||''},{merge:true});}
+    // Per-user: home address + accessibility + background
+    if(currentUid){await setDoc(doc(db,'settings','user_'+currentUid),{homeAddress:home,email:currentEmail||'',a11y:a11yDraft,userBg:bgDraft},{merge:true});}
     userSettings.homeAddress=home;
-    // Shared: API key + business default rate + feature flags
-    await setDoc(doc(db,'settings','config'),{mapsApiKey:key,mileageRate:rate,features:features},{merge:true});
+    a11y={...a11yDraft};
+    userBg={...bgDraft};
+    applyA11y();
+    applyUserBg();
+    // Shared: API key + business default rate + feature flags + services + messages + cards
+    await setDoc(doc(db,'settings','config'),{mapsApiKey:key,mileageRate:rate,features:features,serviceTypes:cleanedServices,autoPrice:newAutoPrice,messages:newMessages,cardConfig:newCardConfig},{merge:true});
     sharedSettings.mapsApiKey=key;sharedSettings.mileageRate=rate;
+    serviceTypes=cleanedServices.length?cleanedServices:JSON.parse(JSON.stringify(DEFAULT_SERVICES));
+    autoPrice=newAutoPrice;
+    messages=newMessages;
+    cardConfig=newCardConfig;
     applyEffectiveSettings();
     applyFeatureFlags();
+    renderServiceCheckboxes();
+    renderDashboard();
     setSyncDot('ok');toast('Settings saved');
   }catch(e){setSyncDot('error');toast('Could not save');console.error(e);}
-  closeModal('mileage-settings');
+  ['set-mileage','set-access','set-business','set-messages','set-display','set-features'].forEach(p=>closeModal(p));
   renderMileage();
 };
 
@@ -2427,9 +3578,22 @@ window.editPendingMiles=function(id){
 };
 
 // ===== REVIEW REQUESTS =====
-function reviewMessage(name){
+function fillTemplate(tpl,name){
   const first=(name||'').split(' ')[0]||'there';
-  return `Hi ${first}, thank you for choosing Smudge Busters! We'd really appreciate it if you could leave us a quick review — it helps our small business a ton. ${REVIEW_LINK}`;
+  return (tpl||'').replace(/\{first\}/g,first).replace(/\{link\}/g,REVIEW_LINK);
+}
+function reviewMessage(name){
+  return fillTemplate(messages.reviewText||DEFAULT_MESSAGES.reviewText,name);
+}
+function reviewEmailHTML(name){
+  const first=(name||'').split(' ')[0]||'there';
+  const body=fillTemplate(messages.reviewEmail||DEFAULT_MESSAGES.reviewEmail,name);
+  return `<div style="font-family:Arial,sans-serif;font-size:15px;line-height:1.6;color:#222">
+      <p>Hi ${first},</p>
+      <p>${esc(body)}</p>
+      <p style="margin:22px 0"><a href="${REVIEW_LINK}" style="background:#4caf80;color:#fff;padding:12px 22px;border-radius:6px;text-decoration:none;font-weight:bold">Leave a Review</a></p>
+      <p>Thanks again,<br>The Smudge Busters Team</p>
+    </div>`;
 }
 // Text: open Messages app pre-filled (sends from your number, no SMS fees)
 window.sendReviewText=async function(id){
@@ -2453,14 +3617,7 @@ window.sendReviewEmail=async function(id){
       await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s);});
       window.emailjs.init(EMAILJS_KEY);
     }
-    const first=(p.customerName||'').split(' ')[0]||'there';
-    const htmlBody=`<div style="font-family:Arial,sans-serif;font-size:15px;line-height:1.6;color:#222">
-      <p>Hi ${first},</p>
-      <p>Thank you for choosing <strong>Smudge Busters</strong>! It was a pleasure serving you.</p>
-      <p>If you have a moment, we'd be incredibly grateful if you'd leave us a quick review — it makes a huge difference for our small business.</p>
-      <p style="margin:22px 0"><a href="${REVIEW_LINK}" style="background:#4caf80;color:#fff;padding:12px 22px;border-radius:6px;text-decoration:none;font-weight:bold">Leave a Review</a></p>
-      <p>Thanks again,<br>The Smudge Busters Team</p>
-    </div>`;
+    const htmlBody=reviewEmailHTML(p.customerName);
     await window.emailjs.send(EMAILJS_SVC,EMAILJS_TPL,{to_email:p.email,to_name:p.customerName,from_name:'Smudge Busters',subject:'How did we do? Leave Smudge Busters a review',message:reviewMessage(p.customerName),html_body:htmlBody,reply_to:BIZ_EMAIL});
     setSyncDot('ok');
     await fbUpdate('pending',id,{sentVia:'email',sentAt:new Date().toISOString()});
@@ -2489,14 +3646,7 @@ window.reviewEmailCustomer=async function(custId){
       await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s);});
       window.emailjs.init(EMAILJS_KEY);
     }
-    const first=(c.name||'').split(' ')[0]||'there';
-    const htmlBody=`<div style="font-family:Arial,sans-serif;font-size:15px;line-height:1.6;color:#222">
-      <p>Hi ${first},</p>
-      <p>Thank you for choosing <strong>Smudge Busters</strong>! It was a pleasure serving you.</p>
-      <p>If you have a moment, we'd be incredibly grateful if you'd leave us a quick review — it makes a huge difference for our small business.</p>
-      <p style="margin:22px 0"><a href="${REVIEW_LINK}" style="background:#4caf80;color:#fff;padding:12px 22px;border-radius:6px;text-decoration:none;font-weight:bold">Leave a Review</a></p>
-      <p>Thanks again,<br>The Smudge Busters Team</p>
-    </div>`;
+    const htmlBody=reviewEmailHTML(c.name);
     await window.emailjs.send(EMAILJS_SVC,EMAILJS_TPL,{to_email:c.email,to_name:c.name,from_name:'Smudge Busters',subject:'How did we do? Leave Smudge Busters a review',message:reviewMessage(c.name),html_body:htmlBody,reply_to:BIZ_EMAIL});
     setSyncDot('ok');
     await addActivity('Review requested: '+(c.name||''),'Sent by email');
@@ -2880,12 +4030,7 @@ window.openJobDetail=function(id){
       <div class="detail-field"><span class="detail-field-label">Status</span><select class="edit-input" id="edit-job-status" style="max-width:155px">${['Scheduled','In progress','Completed','Invoiced'].map(s=>`<option ${j.status===s?'selected':''}>${s}</option>`).join('')}</select></div>
     </div>
     <div class="detail-section"><div class="detail-section-title">Services</div>
-      <div class="service-checks" id="edit-job-service-checks">
-        <button type="button" class="check-item ${services.includes('Window cleaning')?'checked':''}" onclick="toggleCheck(this)" data-value="Window cleaning"><div class="check-box"><span class="check-mark">✓</span></div>Window cleaning</button>
-        <button type="button" class="check-item ${services.includes('Pressure washing')?'checked':''}" onclick="toggleCheck(this)" data-value="Pressure washing"><div class="check-box"><span class="check-mark">✓</span></div>Pressure washing</button>
-        <button type="button" class="check-item ${services.includes('Pest control')?'checked':''}" onclick="toggleCheck(this)" data-value="Pest control"><div class="check-box"><span class="check-mark">✓</span></div>Pest control</button>
-        <button type="button" class="check-item ${services.includes('Quote')?'checked':''}" onclick="toggleCheck(this)" data-value="Quote"><div class="check-box"><span class="check-mark">✓</span></div>Quote</button>
-      </div>
+      <div class="service-checks" id="edit-job-service-checks">${serviceCheckboxHTML('edit-job-service-checks',services)}<button type="button" class="check-item ${services.includes('Quote')?'checked':''}" onclick="toggleCheck(this)" data-value="Quote"><div class="check-box"><span class="check-mark">✓</span></div>Quote</button></div>
     </div>
     <div class="detail-section"><div class="detail-section-title">Notes</div>
       <textarea class="edit-input" id="edit-job-notes" rows="4" style="width:100%">${esc(j.notes||'')}</textarea>
@@ -3076,6 +4221,160 @@ function renderDashboard(){
       actEl.innerHTML=jobPromptHtml+pendHtml+actHtml;
     }
   }
+  renderRecurringRevenue();
+  renderDueForService();
+  renderDailySummary();
+  applyCardConfig();
+}
+
+// Apply on/off + order to the dashboard cards
+function applyCardConfig(){
+  const map={daily:'daily-summary-card',recurring:'recurring-revenue-card',due:'due-service-card'};
+  const anchor=document.getElementById('home-tools-tile');
+  if(!anchor||!anchor.parentNode)return;
+  // Reorder: insert each enabled card (in config order) right before the tools tile
+  cardConfig.forEach(c=>{
+    const el=document.getElementById(map[c.id]);if(!el)return;
+    if(!c.on){el.dataset.cardOff='1';el.style.display='none';return;}
+    delete el.dataset.cardOff;
+    anchor.parentNode.insertBefore(el,anchor); // move into order
+  });
+}
+
+// ===== RECURRING REVENUE =====
+// Normalize each recurring series to a monthly dollar figure
+const RECUR_PER_YEAR={monthly:12,bimonthly:6,quarterly:4,biannual:2,yearly:1};
+function renderRecurringRevenue(){
+  const card=document.getElementById('recurring-revenue-card');if(!card)return;
+  const cfg=cardConfig.find(c=>c.id==='recurring');if(cfg&&!cfg.on){card.style.display='none';return;}
+  // Group recurring jobs by series, take one representative price per series
+  const series={};
+  data.jobs.forEach(j=>{
+    if(j.seriesId&&j.recurring&&RECUR_PER_YEAR[j.recurring]&&j.status!=='Cancelled'){
+      if(!series[j.seriesId])series[j.seriesId]={price:parseFloat(j.price)||0,interval:j.recurring};
+    }
+  });
+  const seriesArr=Object.values(series);
+  if(seriesArr.length===0){card.style.display='none';return;}
+  let yearly=0;
+  seriesArr.forEach(s=>{yearly+=s.price*RECUR_PER_YEAR[s.interval];});
+  const monthly=yearly/12;
+  card.style.display='';
+  document.getElementById('recurring-monthly').innerHTML='$'+monthly.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,',')+'<span style="font-size:12px;font-weight:600;color:var(--text-muted)">/mo</span>';
+  document.getElementById('recurring-yearly').textContent='$'+yearly.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+  document.getElementById('recurring-detail').textContent=seriesArr.length+' recurring '+(seriesArr.length===1?'plan':'plans')+' · projected';
+}
+
+// ===== DUE FOR SERVICE RADAR =====
+function renderDueForService(){
+  const card=document.getElementById('due-service-card');if(!card)return;
+  const cfg=cardConfig.find(c=>c.id==='due');if(cfg&&!cfg.on){card.style.display='none';return;}
+  const listEl=document.getElementById('due-service-list');
+  const now=new Date();
+  // Customers on a recurring plan are excluded (they're already scheduled)
+  const recurringCustomerIds=new Set(data.jobs.filter(j=>j.seriesId&&j.status!=='Cancelled').map(j=>j.customerId));
+  const due=[];
+  data.customers.forEach(c=>{
+    if(recurringCustomerIds.has(c.id))return;
+    const custJobs=data.jobs.filter(j=>j.customerId===c.id&&j.status!=='Cancelled'&&j.date);
+    if(custJobs.length===0)return; // never serviced — not "due", that's a lead
+    const lastDate=custJobs.map(j=>new Date(j.date+'T00:00:00')).sort((a,b)=>b-a)[0];
+    const monthsAgo=(now-lastDate)/(1000*60*60*24*30.44);
+    // Don't re-flag if they already have a FUTURE job booked
+    const hasFuture=custJobs.some(j=>new Date(j.date+'T00:00:00')>now);
+    if(hasFuture)return;
+    if(monthsAgo>=3){
+      due.push({cust:c,monthsAgo:Math.floor(monthsAgo),lastDate});
+    }
+  });
+  due.sort((a,b)=>b.monthsAgo-a.monthsAgo);
+  if(due.length===0){card.style.display='none';return;}
+  card.style.display='';
+  document.getElementById('due-count').textContent=due.length+' customer'+(due.length>1?'s':'');
+  listEl.innerHTML=due.slice(0,8).map(d=>`
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
+      <div style="flex:1;cursor:pointer" onclick="openCustomerDetail('${d.cust.id}')">
+        <div style="font-size:13px;font-weight:600;color:var(--text)">${esc(d.cust.name)}</div>
+        <div style="font-size:11px;color:var(--text-muted)">Last job ${d.monthsAgo} mo ago</div>
+      </div>
+      <div style="display:flex;gap:5px">
+        ${d.cust.phone?`<button onclick="reviewTextCustomerDue('${d.cust.id}')" style="background:var(--green-dim);border:1px solid var(--green);color:var(--green);border-radius:6px;padding:5px 9px;font-size:11px;font-weight:700;cursor:pointer">Text</button>`:''}
+        ${d.cust.email?`<button onclick="dueEmailCustomer('${d.cust.id}')" style="background:var(--blue-dim);border:1px solid var(--blue);color:var(--blue);border-radius:6px;padding:5px 9px;font-size:11px;font-weight:700;cursor:pointer">Email</button>`:''}
+      </div>
+    </div>`).join('');
+}
+
+function dueMessage(name){
+  return fillTemplate(messages.dueService||DEFAULT_MESSAGES.dueService,name);
+}
+window.reviewTextCustomerDue=function(custId){
+  const c=data.customers.find(x=>x.id===custId);if(!c||!c.phone)return;
+  const body=encodeURIComponent(dueMessage(c.name));
+  window.location.href=`sms:${c.phone.replace(/[^\d+]/g,'')}?&body=${body}`;
+  addActivity('Re-engagement sent: '+(c.name||''),'Due-for-service text');
+};
+window.dueEmailCustomer=async function(custId){
+  const c=data.customers.find(x=>x.id===custId);if(!c||!c.email)return;
+  setSyncDot('syncing');
+  try{
+    if(!window.emailjs){
+      await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s);});
+      window.emailjs.init(EMAILJS_KEY);
+    }
+    const first=(c.name||'').split(' ')[0]||'there';
+    const htmlBody=`<div style="font-family:Arial,sans-serif;font-size:15px;line-height:1.6;color:#222">
+      <p>Hi ${first},</p>
+      <p>It's been a while since we last serviced your home, and we'd love to get it looking its best again!</p>
+      <p>Ready for a refresh? Just reply to this email or give us a call and we'll get you scheduled.</p>
+      <p>Thanks,<br>The Smudge Busters Team</p>
+    </div>`;
+    await window.emailjs.send(EMAILJS_SVC,EMAILJS_TPL,{to_email:c.email,to_name:c.name,from_name:'Smudge Busters',subject:'Time for a refresh from Smudge Busters?',message:dueMessage(c.name),html_body:htmlBody,reply_to:BIZ_EMAIL});
+    setSyncDot('ok');
+    addActivity('Re-engagement sent: '+(c.name||''),'Due-for-service email');
+    toast('Re-engagement emailed');
+  }catch(e){setSyncDot('error');toast('Email failed');console.error(e);}
+};
+
+// ===== DAILY SUMMARY =====
+function renderDailySummary(){
+  const card=document.getElementById('daily-summary-card');if(!card)return;
+  const cfg=cardConfig.find(c=>c.id==='daily');if(cfg&&!cfg.on){card.style.display='none';return;}
+  const now=new Date();
+  const todayStr=now.toISOString().slice(0,10);
+  const dow=now.getDay();
+  const isMonday=dow===1;
+  // Today's jobs
+  const todayJobs=data.jobs.filter(j=>j.date===todayStr&&j.status!=='Cancelled');
+  // This week's jobs (for Monday rundown)
+  const ws=new Date(now);ws.setHours(0,0,0,0);ws.setDate(now.getDate()-now.getDay());
+  const we=new Date(ws);we.setDate(ws.getDate()+6);we.setHours(23,59,59,999);
+  const weekJobs=data.jobs.filter(j=>{if(!j.date||j.status==='Cancelled')return false;const d=new Date(j.date+'T12:00:00');return d>=ws&&d<=we;});
+  const unpaid=data.payments.filter(p=>p.status==='Unpaid');
+  const unpaidTotal=unpaid.reduce((s,p)=>s+(parseFloat(p.amount)||0),0);
+
+  let parts=[];
+  if(isMonday){
+    document.getElementById('daily-summary-title').textContent='This week';
+    const weekRev=weekJobs.reduce((s,j)=>s+(parseFloat(j.price)||0),0);
+    if(weekJobs.length){parts.push(`<strong>${weekJobs.length} job${weekJobs.length>1?'s':''}</strong> booked this week ($${weekRev.toFixed(0)} expected)`);}
+    else{parts.push('No jobs booked yet this week');}
+  }else{
+    document.getElementById('daily-summary-title').textContent='Today';
+    if(todayJobs.length){
+      const todayRev=todayJobs.reduce((s,j)=>s+(parseFloat(j.price)||0),0);
+      const names=todayJobs.map(j=>j.customerName).filter(Boolean).slice(0,3).join(', ');
+      parts.push(`<strong>${todayJobs.length} job${todayJobs.length>1?'s':''}</strong> today${names?': '+esc(names):''} ($${todayRev.toFixed(0)})`);
+    }else{
+      parts.push('No jobs scheduled today');
+    }
+  }
+  if(unpaid.length){parts.push(`${unpaid.length} unpaid invoice${unpaid.length>1?'s':''} ($${unpaidTotal.toFixed(0)})`);}
+
+  // Only show the card if there's something worth surfacing
+  const hasContent=todayJobs.length>0||(isMonday&&weekJobs.length>0)||unpaid.length>0;
+  if(!hasContent){card.style.display='none';return;}
+  card.style.display='';
+  document.getElementById('daily-summary-text').innerHTML=parts.join(' · ');
 }
 
 // Build "Did this job happen?" prompts for jobs scheduled today or earlier, still unconfirmed
