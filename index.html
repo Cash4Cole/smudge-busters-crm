@@ -70,6 +70,7 @@
   .topbar-name,.loading-name-wrap,.login-name,.sec-title,.modal-title,.detail-title{font-family:var(--heading-font,inherit);}
   /* USER BACKGROUND: float app content above the image+dim layers */
   body.has-user-bg .app-wrap,body.has-user-bg .topbar,body.has-user-bg .content,body.has-user-bg .nav{position:relative;z-index:1;}
+  body.has-user-bg .app-wrap{background:transparent;}
   body.has-user-bg .topbar,body.has-user-bg .nav{background:transparent;}
   .app-wrap{width:100%;max-width:100%;background:var(--bg);position:relative;min-height:100vh;}
 
@@ -233,6 +234,9 @@
   /* DETAIL SHEETS */
   .detail-sheet{display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.7);align-items:flex-end;}
   .detail-sheet.open{display:flex;}
+  /* Modals that can open from inside a detail-sheet must stack above it (z 300) */
+  #modal-quick-customer{z-index:400;}
+  .assign-chip.assigned{border-color:var(--green) !important;background:var(--green-dim) !important;color:var(--green) !important;font-weight:700;}
   .detail-body{background:#0d1a0f;border-radius:var(--radius-lg) var(--radius-lg) 0 0;border:1px solid var(--green);border-bottom:none;box-shadow:0 -4px 24px rgba(76,175,128,0.2);width:100%;max-height:88vh;overflow-y:auto;}
   .detail-handle{width:40px;height:3px;background:var(--green);border-radius:2px;margin:12px auto 0;box-shadow:var(--glow-green);}
   .detail-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 12px;border-bottom:1px solid var(--border);}
@@ -921,6 +925,9 @@
       </div>
     </div>
     <div class="form-group"><label class="form-label">Status</label><select class="form-input" id="job-status"><option>Scheduled</option><option>In progress</option><option>Completed</option><option>Invoiced</option></select></div>
+    <div class="form-group"><label class="form-label">Assign to</label>
+      <div id="job-assign-list" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+    </div>
     <div class="form-group"><label class="form-label">Repeat</label>
       <select class="form-input" id="job-recurring">
         <option value="none">One time</option>
@@ -1218,13 +1225,101 @@
   <div class="modal">
     <div class="modal-title">Admin · Team</div>
     <div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">Manage who's on your team and what they can do. You're the owner.</div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:14px">
+      <label class="form-label" style="font-size:11px;margin-bottom:6px">Business name (shows at top of screen)</label>
+      <input class="form-input" id="admin-bizname" placeholder="Smudge Busters" style="margin-bottom:8px" oninput="previewBizName()">
+      <div style="font-size:10px;color:var(--text-muted);margin-bottom:12px">Leave blank for the default.</div>
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px">
+        <label class="tswitch" style="flex-shrink:0"><input type="checkbox" id="admin-name-glow" onchange="previewBizName()"><span class="tslider"></span></label>
+        <span style="font-size:12px;color:var(--text)">Glow</span>
+        <input type="color" id="admin-name-glowcolor" value="#4a9fd4" oninput="previewBizName()" style="width:34px;height:26px;border:none;background:none;cursor:pointer;padding:0;margin-left:auto">
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px">
+        <span style="font-size:12px;color:var(--text);flex-shrink:0">Text color</span>
+        <input type="color" id="admin-name-color" value="#e8f5ee" oninput="previewBizName()" style="width:34px;height:26px;border:none;background:none;cursor:pointer;padding:0;margin-left:auto">
+        <button onclick="document.getElementById('admin-name-color').value='';previewBizName()" style="background:var(--bg);border:1px solid var(--border);color:var(--text-muted);border-radius:6px;padding:5px 8px;font-size:10px;cursor:pointer">Reset</button>
+      </div>
+      <label class="form-label" style="font-size:10px">Size: <span id="admin-name-size-val">1.0</span>×</label>
+      <input type="range" min="0.7" max="1.8" step="0.05" value="1" id="admin-name-size" style="width:100%;margin-bottom:10px" oninput="document.getElementById('admin-name-size-val').textContent=parseFloat(this.value).toFixed(2);previewBizName()">
+      <label class="form-label" style="font-size:10px;margin-bottom:4px">Font</label>
+      <select class="form-input" id="admin-name-font" style="font-size:12px" onchange="previewBizName()">
+        <option value="">Default</option>
+        <option value="'Poppins',sans-serif">Poppins</option>
+        <option value="'Comfortaa',cursive">Comfortaa</option>
+        <option value="'Lora',serif">Lora</option>
+        <option value="'Bebas Neue',sans-serif">Bebas Neue</option>
+        <option value="'Righteous',cursive">Righteous</option>
+        <option value="'Bungee',cursive">Bungee</option>
+        <option value="'Pacifico',cursive">Pacifico</option>
+      </select>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:14px">
+      <label class="form-label" style="font-size:11px;margin-bottom:8px">Links</label>
+      <div style="font-size:10px;color:var(--text-muted);margin-bottom:10px">These are the links sent out in messages and emails. Tap Test to open one.</div>
+      <div class="form-group" style="margin-bottom:8px">
+        <label class="form-label" style="font-size:10px">Review link</label>
+        <div style="display:flex;gap:6px"><input class="form-input" id="admin-link-review" placeholder="https://..." style="font-size:12px;flex:1"><button onclick="testLink('admin-link-review')" class="btn-secondary" style="padding:0 12px;font-size:11px">Test</button></div>
+      </div>
+      <div class="form-group" style="margin-bottom:8px">
+        <label class="form-label" style="font-size:10px">Referral link</label>
+        <div style="display:flex;gap:6px"><input class="form-input" id="admin-link-referral" placeholder="https://..." style="font-size:12px;flex:1"><button onclick="testLink('admin-link-referral')" class="btn-secondary" style="padding:0 12px;font-size:11px">Test</button></div>
+      </div>
+      <div class="form-group" style="margin-bottom:8px">
+        <label class="form-label" style="font-size:10px">Booking link</label>
+        <div style="display:flex;gap:6px"><input class="form-input" id="admin-link-booking" placeholder="https://..." style="font-size:12px;flex:1"><button onclick="testLink('admin-link-booking')" class="btn-secondary" style="padding:0 12px;font-size:11px">Test</button></div>
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label" style="font-size:10px">Website</label>
+        <div style="display:flex;gap:6px"><input class="form-input" id="admin-link-website" placeholder="https://..." style="font-size:12px;flex:1"><button onclick="testLink('admin-link-website')" class="btn-secondary" style="padding:0 12px;font-size:11px">Test</button></div>
+      </div>
+    </div>
+    <label class="form-label" style="font-size:11px;margin-bottom:8px">Team members</label>
     <div id="admin-user-list"></div>
+    <button class="btn-secondary" style="width:100%;justify-content:center;margin-top:10px" onclick="openModal('emp-pay');renderEmpPay()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      View employee pay
+    </button>
     <div style="font-size:10px;color:var(--text-muted);margin-top:10px;line-height:1.4">Users appear here after they sign in for the first time. Admins can change settings & design; employees use the app.</div>
-    <div class="modal-actions"><button class="btn-primary" style="width:100%" onclick="closeModal('set-admin')">Done</button></div>
+    <div class="modal-actions"><button class="btn-secondary" onclick="closeModal('set-admin')">Cancel</button><button class="btn-primary" onclick="saveAdminConfig()">Save</button></div>
   </div>
 </div>
 
 <!-- Compose message modal -->
+<!-- Employee pay -->
+<div class="modal-overlay" id="modal-emp-pay">
+  <div class="modal" style="max-height:85vh;overflow-y:auto">
+    <div class="modal-title">Employee pay</div>
+    <div style="display:flex;gap:6px;margin-bottom:12px">
+      <button class="money-tab active-pay" id="payperiod-month" onclick="setPayPeriod('month')">This month</button>
+      <button class="money-tab" id="payperiod-all" onclick="setPayPeriod('all')">All time</button>
+      <button class="money-tab" id="payperiod-unpaid" onclick="setPayPeriod('unpaid')">Completed</button>
+    </div>
+    <div id="emp-pay-list"></div>
+    <div style="font-size:10px;color:var(--text-muted);margin-top:10px;line-height:1.4">Pay is calculated from completed jobs each employee is assigned to, using their pay setting (hourly × hours, flat per job, or % of job price). Flat/% jobs split evenly among assigned employees.</div>
+    <div class="modal-actions"><button class="btn-primary" style="width:100%" onclick="closeModal('emp-pay')">Done</button></div>
+  </div>
+</div>
+
+<!-- Photo viewer -->
+<div class="modal-overlay" id="modal-photo-viewer" style="z-index:500;align-items:center">
+  <div style="max-width:92vw;max-height:88vh;display:flex;flex-direction:column;align-items:center;gap:12px">
+    <img id="photo-viewer-img" style="max-width:92vw;max-height:78vh;border-radius:10px;object-fit:contain">
+    <button class="btn-secondary" onclick="closeModal('photo-viewer')" style="padding:10px 24px">Close</button>
+  </div>
+</div>
+
+<!-- Quick add customer (from quote builder) -->
+<div class="modal-overlay" id="modal-quick-customer">
+  <div class="modal">
+    <div class="modal-title">New customer</div>
+    <div class="form-group"><label class="form-label">Name</label><input class="form-input" id="qc-name" placeholder="Customer name"></div>
+    <div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="qc-phone" type="tel" placeholder="(555) 123-4567"></div>
+    <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="qc-email" type="email" placeholder="name@email.com"></div>
+    <div class="form-group"><label class="form-label">Address</label><input class="form-input" id="qc-address" type="text" placeholder="123 Main St, Your City"></div>
+    <div class="modal-actions"><button class="btn-secondary" onclick="closeModal('quick-customer')">Cancel</button><button class="btn-primary" onclick="saveQuickCustomer()">Add customer</button></div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="modal-compose">
   <div class="modal">
     <div class="modal-title">New message</div>
@@ -1356,7 +1451,9 @@
     <div class="detail-handle"></div>
     <div class="detail-header"><div class="detail-title">New quote</div><button class="detail-close" onclick="closeSheet('quote-builder')">✕</button></div>
     <div class="detail-content">
-      <div class="form-group"><label class="form-label">Customer</label><select class="form-input" id="qb-customer"></select></div>
+      <div class="form-group"><label class="form-label">Customer</label>
+        <div style="display:flex;gap:6px"><select class="form-input" id="qb-customer" style="flex:1"></select><button class="btn-secondary" style="padding:0 12px;font-size:11px;white-space:nowrap" onclick="openQuickCustomer('quote')">+ New</button></div>
+      </div>
       <div class="form-group"><label class="form-label">Valid for</label><select class="form-input" id="qb-valid"><option value="14">14 days</option><option value="30" selected>30 days</option><option value="60">60 days</option></select></div>
       <div class="form-group"><label class="form-label">Note to customer</label><textarea class="form-input" id="qb-notes" rows="2" placeholder="Any special notes..."></textarea></div>
       <div class="form-group"><label class="form-label">Services & pricing</label>
@@ -1483,6 +1580,17 @@ const COLOR_SCHEMES={
 };
 let theme={scheme:'neon-green',custom:null,locked:false}; // shared theme config (color scheme + custom overrides)
 let globalFont=''; // optional app-wide font override (shared)
+let businessName=''; // custom business name (shared, admin-set)
+// NOTE: For the productized/sellable version, blank these defaults out.
+let bizLinks={
+  review:'https://www.facebook.com/profile.php?id=61559142696043&sk=reviews',
+  referral:'https://the-smudge-busters.netlify.app/referral.html',
+  booking:'',
+  website:'https://the-smudge-busters.netlify.app'
+};
+// Business name styling (shared, admin-set)
+let bizNameStyle={glow:true,glowColor:'#4a9fd4',size:1,color:'',font:''};
+function bizName(){return businessName||'Smudge Busters';}
 let teamUsers={}; // uid -> {email, role:'admin'|'employee', name}
 let myRole='employee'; // current user's role
 let features={giveback:true,campaigns:true,leads:true,tools:true}; // feature toggles (business-wide)
@@ -1679,6 +1787,7 @@ window.openModal=function(type){
   const df=document.getElementById('modal-'+type).querySelector('input[type="date"]');
   if(df&&!df.value)df.value=today;
   if(['schedule-job','payment'].includes(type))populateCustomerDropdown(type);
+  if(type==='schedule-job')renderAssignList('job-assign-list',[]);
   if(type==='send-referral'){
     document.getElementById('ref-customer-search').value='';
     document.getElementById('ref-customer').value='';
@@ -1708,6 +1817,7 @@ window.closeModal=function(type){
   if(type==='mileage-settings'){applyA11y();applyTheme();applyUserBg();} // revert any unsaved live preview to saved prefs
   if(type==='customization'){applyTheme();} // revert unsaved theme preview
   if(type==='thread'){currentThreadId=null;}
+  if(type==='set-admin'){applyBusinessName();} // revert unsaved name preview
 };
 document.querySelectorAll('.modal-overlay').forEach(o=>{o.addEventListener('click',e=>{if(e.target===o)closeModal(o.id.replace('modal-',''));});});
 function populateCustomerDropdown(type){
@@ -1744,8 +1854,9 @@ window.saveJob=async function(){
   const notes=document.getElementById('job-notes').value.trim();
   const recurring=document.getElementById('job-recurring').value;
   if(!dateStr){alert('Please pick a date.');return;}
+  const assignedTo=getAssignedEmployees('job-assign-list');
 
-  const base={customerId:custId,customerName:cust?cust.name:'Unknown',services,status,date:dateStr,time,price,notes,photoCount:document.getElementById('job-photos').files.length};
+  const base={customerId:custId,customerName:cust?cust.name:'Unknown',services,status,date:dateStr,time,price,notes,assignedTo,photoCount:document.getElementById('job-photos').files.length};
 
   if(recurring&&recurring!=='none'){
     // Create a recurring series with a rolling window of future dates
@@ -1915,6 +2026,55 @@ window.openQuoteBuilder=function(){
 };
 
 window.toggleQSvc=function(btn,idx){btn.classList.toggle('checked');document.getElementById('qsn-'+idx).classList.toggle('sel',btn.classList.contains('checked'));updateQTotal();};
+
+// Quick-add a customer from inside the quote builder (or standalone)
+let quickCustomerReturn=null;
+window.openQuickCustomer=function(returnTo){
+  quickCustomerReturn=returnTo||null;
+  document.getElementById('qc-name').value='';
+  document.getElementById('qc-phone').value='';
+  document.getElementById('qc-email').value='';
+  document.getElementById('qc-address').value='';
+  openModal('quick-customer');
+};
+window.saveQuickCustomer=async function(){
+  const name=document.getElementById('qc-name').value.trim();
+  if(!name){toast('Enter a name');return;}
+  const newCust={
+    name,
+    phone:document.getElementById('qc-phone').value.trim(),
+    email:document.getElementById('qc-email').value.trim(),
+    address:document.getElementById('qc-address').value.trim(),
+    services:[],notes:'',created:Date.now()
+  };
+  setSyncDot('syncing');
+  try{
+    const ref=await fbAdd('customers',newCust);
+    setSyncDot('ok');toast('Customer added');
+    closeModal('quick-customer');
+    // If we came from the quote builder, select the new customer there
+    if(quickCustomerReturn==='quote'){
+      const sel=document.getElementById('qb-customer');
+      // wait a tick for the snapshot to repopulate, then select
+      setTimeout(()=>{
+        sel.innerHTML=data.customers.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');
+        sel.value=ref.id;
+      },150);
+    }
+    quickCustomerReturn=null;
+  }catch(e){setSyncDot('error');toast('Could not add');console.error(e);}
+};
+
+// Open the quote builder pre-set to a specific customer (from their profile)
+window.quoteForCustomer=function(custId){
+  closeSheet('customer');
+  setTimeout(()=>{
+    openQuoteBuilder();
+    const sel=document.getElementById('qb-customer');
+    sel.value=custId;
+  },200);
+};
+
 window.updateQTotal=function(){let t=0;QUOTE_SERVICES.forEach((_,i)=>{const b=document.querySelector(`[data-idx="${i}"]`);if(b&&b.classList.contains('checked'))t+=parseFloat(document.getElementById('qsp-'+i).value)||0;});document.getElementById('qb-total').textContent='$'+t.toFixed(2);};
 
 window.sendQuote=async function(){
@@ -1964,7 +2124,13 @@ window.sendQuote=async function(){
       window.emailjs.init(EMAILJS_KEY);
     }
     toast('Sending quote...');
-    await window.emailjs.send(EMAILJS_SVC,EMAILJS_TPL,{to_email:cust.email,to_name:cust.name,from_name:'Smudge Busters',subject:`Your quote from Smudge Busters — ${quoteNum}`,message:serviceLines+'\n\nTotal: $'+total.toFixed(2)+'\n\nValid until: '+validUntil+(notes?'\n\nNote: '+notes:''),html_body:htmlBody,reply_to:BIZ_EMAIL});
+    // Build the plain-text message with the custom note FIRST and prominent,
+    // since the EmailJS template displays {{message}}.
+    const greeting=`Hi ${cust.name.split(' ')[0]},\n\n`;
+    const customPart=notes?(notes+'\n\n'):'Thank you for your interest! Here is your personalized quote.\n\n';
+    const breakdown='— — — — — — — — — —\nYOUR QUOTE ('+quoteNum+')\n'+serviceLines+'\n\nTotal estimate: $'+total.toFixed(2)+'\nValid until: '+validUntil+'\n— — — — — — — — — —';
+    const fullMessage=greeting+customPart+breakdown;
+    await window.emailjs.send(EMAILJS_SVC,EMAILJS_TPL,{to_email:cust.email,to_name:cust.name,from_name:bizName(),subject:`Your quote from ${bizName()} — ${quoteNum}`,message:fullMessage,html_body:htmlBody,reply_to:BIZ_EMAIL});
     await fbAdd('quotes',{customerId:custId,customerName:cust.name,customerEmail:cust.email,services:selectedServices,total,quoteNum,validDays,validUntil,notes,status:'Sent',created:new Date().toISOString()});
     await addActivity('Quote sent: '+cust.name,'#'+quoteNum+' · $'+total.toFixed(2));
     closeSheet('quote-builder');toast('Quote sent to '+cust.email+'!');
@@ -2012,11 +2178,15 @@ window.openCustomerDetail=function(id){
         <a href="https://www.google.com/maps/search/?api=1&query=${enc}" class="map-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Google Maps</a>
       </div>
     </div>`:''}
+    <div class="detail-section"><div class="detail-section-title">Photos</div>
+      <div id="photo-grid-customer">${photoGridHTML(c.photos,'customer')}</div>
+    </div>
     <div class="detail-section"><div class="detail-section-title">Job history</div>
       <button class="btn-primary" style="width:100%;justify-content:center;margin-bottom:10px" onclick="scheduleJobForCustomer('${id}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="12" y1="14" x2="12" y2="18"/><line x1="10" y1="16" x2="14" y2="16"/></svg>Schedule a job</button>
       ${data.jobs.filter(j=>j.customerId===id).length===0?'<div style="font-size:13px;color:var(--text-muted)">No jobs yet</div>':data.jobs.filter(j=>j.customerId===id).sort((a,b)=>new Date(b.date)-new Date(a.date)).map(j=>`<div class="detail-field"><span class="detail-field-label">${fmtDate(j.date)}</span><span class="detail-field-value">${(j.services||[]).join(', ')} · $${(parseFloat(j.price)||0).toFixed(2)}${j.recurring&&j.recurring!=='none'?' · <span class="badge badge-blue">↻</span>':''}</span></div>`).join('')}
     </div>
     <div class="detail-section"><div class="detail-section-title">Quotes sent</div>
+      <button class="btn-secondary" style="width:100%;justify-content:center;margin-bottom:10px" onclick="quoteForCustomer('${id}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Create a quote</button>
       ${data.quotes.filter(q=>q.customerId===id).length===0?'<div style="font-size:13px;color:var(--text-muted)">No quotes yet</div>':data.quotes.filter(q=>q.customerId===id).sort((a,b)=>new Date(b.created)-new Date(a.created)).map(q=>`<div class="detail-field"><span class="detail-field-label">#${q.quoteNum}</span><span class="detail-field-value">$${(parseFloat(q.total)||0).toFixed(2)} · <span class="badge badge-blue">${q.status}</span></span></div>`).join('')}
     </div>`;
   openSheet('customer');
@@ -2509,6 +2679,9 @@ async function loadSettings(){
       if(Array.isArray(d.cardConfig)&&d.cardConfig.length)cardConfig=d.cardConfig;
       if(d.theme)theme={...theme,...d.theme};
       if(typeof d.globalFont==='string')globalFont=d.globalFont;
+      if(typeof d.businessName==='string')businessName=d.businessName;
+      if(d.bizLinks)bizLinks={...bizLinks,...d.bizLinks};
+      if(d.bizNameStyle)bizNameStyle={...bizNameStyle,...d.bizNameStyle};
       // Migrate: if an old shared homeAddress exists and this user has none yet, we leave it as a fallback default
       if(d.homeAddress&&!userSettings.homeAddress)userSettings.homeAddress=userSettings.homeAddress||'';
     }
@@ -2547,8 +2720,36 @@ async function loadSettings(){
   applyTheme();
   applyA11y();
   applyUserBg();
+  applyBusinessName();
   renderServiceCheckboxes();
 }
+
+// Apply custom business name + styling to the topbar
+function applyBusinessName(){
+  const el=document.querySelector('.topbar-name');
+  if(!el)return;
+  if(businessName){
+    el.textContent=businessName;
+  }else{
+    el.innerHTML='<span class="topbar-smudge">SMUDGE</span> <span class="topbar-busters">BUSTERS</span>';
+  }
+  // Apply styling (only when a custom name is set, so default keeps its two-tone look)
+  const s=bizNameStyle||{};
+  if(businessName){
+    el.style.fontSize=(s.size&&s.size!==1)?`calc(var(--topbar-name-size,20px) * ${s.size})`:'';
+    el.style.color=s.color||'';
+    el.style.fontFamily=s.font||'';
+    if(s.glow){
+      const gc=s.glowColor||'#4a9fd4';
+      el.style.textShadow=`0 0 10px ${gc}, 0 0 20px ${hexToRgbA(gc,0.5)}`;
+    }else{
+      el.style.textShadow='none';
+    }
+  }else{
+    el.style.fontSize='';el.style.color='';el.style.fontFamily='';el.style.textShadow='';
+  }
+}
+function hexToRgbA(hex,a){const c=hexToRgb(hex);return`rgba(${c.r},${c.g},${c.b},${a})`;}
 
 // Apply the user's custom background image app-wide, behind everything, with dimming
 function applyUserBg(){
@@ -2558,10 +2759,10 @@ function applyUserBg(){
     document.body.insertBefore(layer,document.body.firstChild);
   }
   if(userBg.image){
-    layer.style.cssText=`position:fixed;inset:0;z-index:0;pointer-events:none;background-image:url('${userBg.image}');background-size:cover;background-position:center;background-attachment:fixed;`;
+    layer.style.cssText=`position:fixed;inset:0;z-index:0;pointer-events:none;background-image:url('${userBg.image}');background-size:cover;background-position:center;background-attachment:fixed;display:block;`;
     let dim=document.getElementById('user-bg-dim');
     if(!dim){dim=document.createElement('div');dim.id='user-bg-dim';document.body.insertBefore(dim,layer.nextSibling);}
-    dim.style.cssText=`position:fixed;inset:0;z-index:0;pointer-events:none;background:var(--bg);opacity:${userBg.dim!=null?userBg.dim:0.5};`;
+    dim.style.cssText=`position:fixed;inset:0;z-index:0;pointer-events:none;background:var(--bg);opacity:${userBg.dim!=null?userBg.dim:0.5};display:block;`;
     // Make app surfaces sit above the background
     document.body.classList.add('has-user-bg');
   }else{
@@ -2994,8 +3195,67 @@ window.openMileageSettings=function(){
 
 // Open a focused settings sub-panel
 window.openSettingsPanel=function(panel){
-  if(panel==='admin')renderAdminUsers();
+  if(panel==='admin'){
+    renderAdminUsers();
+    const bn=document.getElementById('admin-bizname');if(bn)bn.value=businessName||'';
+    const lr=document.getElementById('admin-link-review');if(lr)lr.value=bizLinks.review||'';
+    const lf=document.getElementById('admin-link-referral');if(lf)lf.value=bizLinks.referral||'';
+    const lb=document.getElementById('admin-link-booking');if(lb)lb.value=bizLinks.booking||'';
+    const lw=document.getElementById('admin-link-website');if(lw)lw.value=bizLinks.website||'';
+    // styling controls
+    const s=bizNameStyle||{};
+    document.getElementById('admin-name-glow').checked=s.glow!==false;
+    document.getElementById('admin-name-glowcolor').value=s.glowColor||'#4a9fd4';
+    document.getElementById('admin-name-color').value=s.color||'#e8f5ee';
+    document.getElementById('admin-name-size').value=s.size||1;
+    document.getElementById('admin-name-size-val').textContent=(s.size||1).toFixed(2);
+    document.getElementById('admin-name-font').value=s.font||'';
+  }
   openModal('set-'+panel);
+};
+// Live-preview the business name styling from the admin controls
+window.previewBizName=function(){
+  const savedName=businessName,savedStyle=bizNameStyle;
+  businessName=document.getElementById('admin-bizname').value.trim();
+  bizNameStyle={
+    glow:document.getElementById('admin-name-glow').checked,
+    glowColor:document.getElementById('admin-name-glowcolor').value,
+    color:document.getElementById('admin-name-color').value,
+    size:parseFloat(document.getElementById('admin-name-size').value),
+    font:document.getElementById('admin-name-font').value
+  };
+  applyBusinessName();
+  businessName=savedName;bizNameStyle=savedStyle; // keep saved until Save pressed
+};
+window.testLink=function(inputId){
+  const url=(document.getElementById(inputId).value||'').trim();
+  if(!url){toast('Enter a link first');return;}
+  const full=/^https?:\/\//i.test(url)?url:'https://'+url;
+  window.open(full,'_blank');
+};
+window.saveAdminConfig=async function(){
+  if(myRole!=='admin'){toast('Admins only');return;}
+  businessName=document.getElementById('admin-bizname').value.trim();
+  bizLinks={
+    review:document.getElementById('admin-link-review').value.trim(),
+    referral:document.getElementById('admin-link-referral').value.trim(),
+    booking:document.getElementById('admin-link-booking').value.trim(),
+    website:document.getElementById('admin-link-website').value.trim()
+  };
+  bizNameStyle={
+    glow:document.getElementById('admin-name-glow').checked,
+    glowColor:document.getElementById('admin-name-glowcolor').value,
+    color:document.getElementById('admin-name-color').value,
+    size:parseFloat(document.getElementById('admin-name-size').value),
+    font:document.getElementById('admin-name-font').value
+  };
+  setSyncDot('syncing');
+  try{
+    await setDoc(doc(db,'settings','config'),{businessName,bizLinks,bizNameStyle},{merge:true});
+    applyBusinessName();
+    setSyncDot('ok');toast('Saved');
+    closeModal('set-admin');
+  }catch(e){setSyncDot('error');toast('Could not save');console.error(e);}
 };
 
 // ===== ADMIN: team / roles =====
@@ -3019,6 +3279,16 @@ function renderAdminUsers(){
           <option value="employee" ${u.role==='employee'?'selected':''}>Employee</option>
         </select>
       </div>
+      <div style="display:flex;gap:8px;align-items:center;margin-top:8px">
+        <span style="font-size:11px;color:var(--text-muted);flex-shrink:0">Pay:</span>
+        <select id="paytype-${uid}" onchange="savePay('${uid}')" style="background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:6px;font-size:11px">
+          <option value="" ${!u.pay||!u.pay.type?'selected':''}>None</option>
+          <option value="hourly" ${u.pay&&u.pay.type==='hourly'?'selected':''}>Hourly $</option>
+          <option value="perjob" ${u.pay&&u.pay.type==='perjob'?'selected':''}>Flat $/job</option>
+          <option value="percent" ${u.pay&&u.pay.type==='percent'?'selected':''}>% of job</option>
+        </select>
+        <input class="form-input" id="payrate-${uid}" type="number" step="0.01" value="${u.pay&&u.pay.rate!=null?u.pay.rate:''}" placeholder="rate" onblur="savePay('${uid}')" style="width:80px;font-size:12px;padding:6px">
+      </div>
     </div>`;
   }).join('');
 }
@@ -3035,6 +3305,18 @@ window.saveUserName=async function(uid,name){
     renderMessagesList(); // names show in messages too
   }catch(e){setSyncDot('error');toast('Could not save');console.error(e);}
 };
+window.savePay=async function(uid){
+  if(myRole!=='admin')return;
+  if(!teamUsers[uid])return;
+  const type=document.getElementById('paytype-'+uid).value;
+  const rate=parseFloat(document.getElementById('payrate-'+uid).value)||0;
+  teamUsers[uid].pay=type?{type,rate}:null;
+  setSyncDot('syncing');
+  try{
+    await setDoc(doc(db,'settings','team'),{users:teamUsers},{merge:true});
+    setSyncDot('ok');toast('Pay updated');
+  }catch(e){setSyncDot('error');toast('Could not save');console.error(e);}
+};
 window.setUserRole=async function(uid,role){
   if(myRole!=='admin'){toast('Admins only');return;}
   if(uid===currentUid){toast("You can't change your own role");return;}
@@ -3047,6 +3329,85 @@ window.setUserRole=async function(uid,role){
     renderAdminUsers();
   }catch(e){setSyncDot('error');toast('Could not update');console.error(e);}
 };
+
+// ===== EMPLOYEE ASSIGNMENT =====
+// Render selectable employee chips into a container; selected = array of uids
+function renderAssignList(containerId,selected){
+  const el=document.getElementById(containerId);if(!el)return;
+  selected=selected||[];
+  const entries=Object.entries(teamUsers);
+  if(entries.length===0){el.innerHTML='<div style="font-size:12px;color:var(--text-muted)">No team members yet</div>';return;}
+  el.innerHTML=entries.map(([uid,u])=>{
+    const on=selected.includes(uid);
+    return`<button type="button" data-uid="${uid}" onclick="this.classList.toggle('assigned')" class="assign-chip${on?' assigned':''}" style="border:1px solid var(--border);background:var(--bg);color:var(--text);border-radius:20px;padding:6px 12px;font-size:12px;cursor:pointer">${esc(u.name||u.email||'User')}</button>`;
+  }).join('');
+}
+function getAssignedEmployees(containerId){
+  const el=document.getElementById(containerId);if(!el)return[];
+  return Array.from(el.querySelectorAll('.assign-chip.assigned')).map(b=>b.dataset.uid);
+}
+function assignedNames(uids){
+  if(!uids||!uids.length)return'';
+  return uids.map(uid=>(teamUsers[uid]&&(teamUsers[uid].name||teamUsers[uid].email))||'?').join(', ');
+}
+
+// ===== EMPLOYEE PAY =====
+// Each employee in teamUsers can have: pay={type:'hourly'|'perjob'|'percent', rate:number}
+// Compute what an employee earned from a completed job
+function jobPayForEmployee(job,uid){
+  const u=teamUsers[uid];if(!u||!u.pay)return 0;
+  const pay=u.pay;const price=parseFloat(job.price)||0;
+  // Split among assigned employees so a flat/% job isn't double-paid
+  const assignedCount=(job.assignedTo||[]).length||1;
+  if(pay.type==='percent'){return (price*(parseFloat(pay.rate)||0)/100)/assignedCount;}
+  if(pay.type==='perjob'){return (parseFloat(pay.rate)||0);}
+  if(pay.type==='hourly'){
+    // hourly needs hours logged on the job; fall back to job.hours or 0
+    const hours=parseFloat(job.hours)||0;return hours*(parseFloat(pay.rate)||0);
+  }
+  return 0;
+}
+
+let payPeriod='month';
+window.setPayPeriod=function(p){
+  payPeriod=p;
+  ['month','all','unpaid'].forEach(x=>{const el=document.getElementById('payperiod-'+x);if(el)el.className='money-tab'+(x===p?' active-pay':'');});
+  renderEmpPay();
+};
+window.renderEmpPay=function(){
+  const el=document.getElementById('emp-pay-list');if(!el)return;
+  const now=new Date();
+  const jobs=(data.jobs||[]).filter(j=>{
+    if(j.status!=='Completed')return false;
+    if(!j.assignedTo||!j.assignedTo.length)return false;
+    if(payPeriod==='month'){if(!j.date)return false;const d=new Date(j.date+'T00:00:00');return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();}
+    return true;
+  });
+  const entries=Object.entries(teamUsers);
+  const rows=entries.map(([uid,u])=>{
+    const myJobs=jobs.filter(j=>(j.assignedTo||[]).includes(uid));
+    let total=0;myJobs.forEach(j=>{total+=jobPayForEmployee(j,uid);});
+    const payDesc=u.pay&&u.pay.type?(u.pay.type==='hourly'?`$${u.pay.rate}/hr`:u.pay.type==='perjob'?`$${u.pay.rate}/job`:`${u.pay.rate}% of job`):'No pay set';
+    return{uid,name:u.name||u.email||'User',payDesc,jobCount:myJobs.length,total};
+  });
+  if(rows.length===0){el.innerHTML='<div style="font-size:13px;color:var(--text-muted);padding:12px 0;text-align:center">No team members yet.</div>';return;}
+  const grandTotal=rows.reduce((s,r)=>s+r.total,0);
+  el.innerHTML=rows.map(r=>`
+    <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-size:14px;font-weight:700;color:var(--text)">${esc(r.name)}</div>
+          <div style="font-size:11px;color:var(--text-muted)">${r.payDesc} · ${r.jobCount} job${r.jobCount!==1?'s':''}</div>
+        </div>
+        <div style="font-size:20px;font-weight:900;color:var(--green)">$${r.total.toFixed(2)}</div>
+      </div>
+    </div>`).join('')+
+    `<div style="display:flex;justify-content:space-between;align-items:center;padding:12px;border-top:2px solid var(--border);margin-top:4px">
+      <span style="font-size:13px;font-weight:700;color:var(--text)">Total payroll</span>
+      <span style="font-size:22px;font-weight:900;color:var(--green)">$${grandTotal.toFixed(2)}</span>
+    </div>`;
+};
+
 
 // ===== MESSAGING =====
 let currentThreadId=null;
@@ -3578,9 +3939,10 @@ window.editPendingMiles=function(id){
 };
 
 // ===== REVIEW REQUESTS =====
+function reviewLink(){return (bizLinks&&bizLinks.review)||REVIEW_LINK;}
 function fillTemplate(tpl,name){
   const first=(name||'').split(' ')[0]||'there';
-  return (tpl||'').replace(/\{first\}/g,first).replace(/\{link\}/g,REVIEW_LINK);
+  return (tpl||'').replace(/\{first\}/g,first).replace(/\{link\}/g,reviewLink());
 }
 function reviewMessage(name){
   return fillTemplate(messages.reviewText||DEFAULT_MESSAGES.reviewText,name);
@@ -3591,7 +3953,7 @@ function reviewEmailHTML(name){
   return `<div style="font-family:Arial,sans-serif;font-size:15px;line-height:1.6;color:#222">
       <p>Hi ${first},</p>
       <p>${esc(body)}</p>
-      <p style="margin:22px 0"><a href="${REVIEW_LINK}" style="background:#4caf80;color:#fff;padding:12px 22px;border-radius:6px;text-decoration:none;font-weight:bold">Leave a Review</a></p>
+      <p style="margin:22px 0"><a href="${reviewLink()}" style="background:#4caf80;color:#fff;padding:12px 22px;border-radius:6px;text-decoration:none;font-weight:bold">Leave a Review</a></p>
       <p>Thanks again,<br>The Smudge Busters Team</p>
     </div>`;
 }
@@ -4017,6 +4379,74 @@ function renderRevenue(){
 
 
 // JOB DETAIL
+// ===== PHOTO UPLOADS (customers & jobs) =====
+function compressImageFile(file,maxSize,cb){
+  if(!file.type.startsWith('image/')){toast('Please pick an image');return;}
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const img=new Image();
+    img.onload=()=>{
+      const max=maxSize||1000;let{width,height}=img;
+      if(width>height&&width>max){height=Math.round(height*max/width);width=max;}
+      else if(height>max){width=Math.round(width*max/height);height=max;}
+      const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;
+      canvas.getContext('2d').drawImage(img,0,0,width,height);
+      let dataUrl=canvas.toDataURL('image/jpeg',0.7);
+      let q=0.6;
+      while(dataUrl.length>600000&&q>0.3){dataUrl=canvas.toDataURL('image/jpeg',q);q-=0.1;}
+      if(dataUrl.length>700000){toast('Image too large — try a smaller one');return;}
+      cb(dataUrl);
+    };
+    img.src=e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+function photoGridHTML(photos,type){
+  photos=photos||[];
+  const thumbs=photos.map((p,i)=>`
+    <div style="position:relative;width:72px;height:72px;border-radius:8px;overflow:hidden;border:1px solid var(--border)">
+      <img src="${p}" style="width:100%;height:100%;object-fit:cover;cursor:pointer" onclick="viewPhoto('${type}',${i})">
+      <button onclick="removePhoto('${type}',${i})" style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,0.6);border:none;color:#fff;border-radius:50%;width:18px;height:18px;font-size:11px;cursor:pointer;line-height:1;padding:0">✕</button>
+    </div>`).join('');
+  return`<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px">${thumbs}
+    <button onclick="document.getElementById('photo-file-${type}').click()" style="width:72px;height:72px;border-radius:8px;border:1px dashed var(--text-muted);background:var(--bg);color:var(--text-muted);font-size:24px;cursor:pointer">+</button>
+  </div>
+  <input type="file" id="photo-file-${type}" accept="image/*" style="display:none" onchange="addPhoto('${type}',this)">`;
+}
+window.addPhoto=function(type,input){
+  const file=input.files&&input.files[0];if(!file)return;
+  compressImageFile(file,1000,async(dataUrl)=>{
+    const col=type==='customer'?'customers':'jobs';
+    const id=type==='customer'?currentCustomerId:currentJobId;
+    const rec=data[col].find(r=>r.id===id);if(!rec)return;
+    const photos=[...(rec.photos||[]),dataUrl];
+    setSyncDot('syncing');
+    try{await fbUpdate(col,id,{photos});rec.photos=photos;setSyncDot('ok');
+      const wrap=document.getElementById('photo-grid-'+type);if(wrap)wrap.innerHTML=photoGridHTML(photos,type);
+      toast('Photo added');
+    }catch(e){setSyncDot('error');toast('Could not add photo');console.error(e);}
+  });
+  input.value='';
+};
+window.removePhoto=async function(type,idx){
+  const col=type==='customer'?'customers':'jobs';
+  const id=type==='customer'?currentCustomerId:currentJobId;
+  const rec=data[col].find(r=>r.id===id);if(!rec)return;
+  const photos=(rec.photos||[]).filter((_,i)=>i!==idx);
+  setSyncDot('syncing');
+  try{await fbUpdate(col,id,{photos});rec.photos=photos;setSyncDot('ok');
+    const wrap=document.getElementById('photo-grid-'+type);if(wrap)wrap.innerHTML=photoGridHTML(photos,type);
+  }catch(e){setSyncDot('error');toast('Could not remove');console.error(e);}
+};
+window.viewPhoto=function(type,idx){
+  const col=type==='customer'?'customers':'jobs';
+  const id=type==='customer'?currentCustomerId:currentJobId;
+  const rec=data[col].find(r=>r.id===id);if(!rec||!rec.photos)return;
+  const url=rec.photos[idx];if(!url)return;
+  document.getElementById('photo-viewer-img').src=url;
+  openModal('photo-viewer');
+};
+
 window.openJobDetail=function(id){
   currentJobId=id;const j=data.jobs.find(x=>x.id===id);if(!j)return;
   const services=j.services||(j.service?[j.service]:[]);
@@ -4032,6 +4462,15 @@ window.openJobDetail=function(id){
     <div class="detail-section"><div class="detail-section-title">Services</div>
       <div class="service-checks" id="edit-job-service-checks">${serviceCheckboxHTML('edit-job-service-checks',services)}<button type="button" class="check-item ${services.includes('Quote')?'checked':''}" onclick="toggleCheck(this)" data-value="Quote"><div class="check-box"><span class="check-mark">✓</span></div>Quote</button></div>
     </div>
+    <div class="detail-section"><div class="detail-section-title">Assigned to</div>
+      <div id="job-detail-assign" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px"></div>
+      <div class="detail-field"><span class="detail-field-label">Hours worked</span><input class="edit-input" id="edit-job-hours" type="number" step="0.25" value="${j.hours||''}" placeholder="0" style="max-width:100px"></div>
+      <div style="font-size:10px;color:var(--text-muted);margin-top:4px">Used for hourly pay calculation.</div>
+    </div>
+    <div class="detail-section"><div class="detail-section-title">Photos</div>
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px">What the job looks like / before & after.</div>
+      <div id="photo-grid-job">${photoGridHTML(j.photos,'job')}</div>
+    </div>
     <div class="detail-section"><div class="detail-section-title">Notes</div>
       <textarea class="edit-input" id="edit-job-notes" rows="4" style="width:100%">${esc(j.notes||'')}</textarea>
     </div>
@@ -4041,12 +4480,13 @@ window.openJobDetail=function(id){
       <button class="btn-danger" style="width:100%;justify-content:center" onclick="deleteJobSeries()">Delete entire series</button>
     </div>`:''}`;
   openSheet('job');
+  renderAssignList('job-detail-assign',j.assignedTo||[]);
 };
 window.saveJobEdit=async function(){
   const newStatus=document.getElementById('edit-job-status').value;
   const job=data.jobs.find(j=>j.id===currentJobId);
   const wasCompleted=job&&job.status==='Completed';
-  await fbUpdate('jobs',currentJobId,{date:document.getElementById('edit-job-date').value,time:document.getElementById('edit-job-time').value,price:parseFloat(document.getElementById('edit-job-price').value)||0,status:newStatus,notes:document.getElementById('edit-job-notes').value.trim(),services:getCheckedServices('edit-job-service-checks')});
+  await fbUpdate('jobs',currentJobId,{date:document.getElementById('edit-job-date').value,time:document.getElementById('edit-job-time').value,price:parseFloat(document.getElementById('edit-job-price').value)||0,status:newStatus,notes:document.getElementById('edit-job-notes').value.trim(),services:getCheckedServices('edit-job-service-checks'),assignedTo:getAssignedEmployees('job-detail-assign'),hours:parseFloat(document.getElementById('edit-job-hours').value)||0});
   closeSheet('job');toast('Job updated!');
   // Trigger round-trip mileage confirmation when newly completed
   if(newStatus==='Completed'&&!wasCompleted&&job){
