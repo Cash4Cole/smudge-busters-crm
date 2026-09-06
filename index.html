@@ -80,6 +80,12 @@
   #login-screen{position:fixed;inset:0;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:1000;padding:24px;}
   #login-screen.show{display:flex;}
   .login-box{width:100%;max-width:340px;text-align:center;}
+  #welcome-screen{position:fixed;inset:0;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:1000;padding:24px;}
+  #welcome-screen.show{display:flex;}
+  .welcome-btn{width:100%;padding:15px;border-radius:var(--radius-sm);font-size:15px;font-weight:800;cursor:pointer;margin-top:10px;transition:transform .15s;}
+  .welcome-btn:hover{transform:translateY(-1px);}
+  .welcome-btn.primary{background:var(--green);border:none;color:#06120a;box-shadow:inset 0 1px 0 rgba(255,255,255,0.35),inset 0 -3px 6px rgba(0,0,0,0.15),0 3px 10px -2px rgba(0,0,0,0.4),0 0 10px rgba(76,175,128,0.4);}
+  .welcome-btn.secondary{background:var(--surface);border:1px solid var(--blue);color:var(--blue);box-shadow:var(--glow-blue);}
   #onboarding-screen{position:fixed;inset:0;background:var(--bg);display:none;flex-direction:column;align-items:center;z-index:1000;padding:24px;overflow-y:auto;}
   #onboarding-screen.show{display:flex;}
   .onboard-box{width:100%;max-width:420px;margin:24px auto 40px;text-align:left;}
@@ -467,6 +473,37 @@
   <div class="loading-status" id="loading-status">Connecting to database...</div>
 </div>
 
+<div id="welcome-screen">
+  <div class="login-box">
+    <div class="brandmark login-brandmark"><div class="half a"></div><div class="half b"></div></div>
+    <div class="login-name"><span class="s">FLOW</span></div>
+    <div class="login-sub" style="margin-bottom:6px">by Nexivo</div>
+    <div class="login-sub" style="margin-bottom:8px">Welcome</div>
+    <button class="welcome-btn primary" onclick="document.getElementById('welcome-screen').classList.remove('show');document.getElementById('login-screen').classList.add('show');setTimeout(()=>document.getElementById('login-email').focus(),100)">Sign in</button>
+    <button class="welcome-btn secondary" id="welcome-create-btn" onclick="document.getElementById('welcome-screen').classList.remove('show');document.getElementById('signup-screen').classList.add('show');setTimeout(()=>document.getElementById('signup-email').focus(),100)" style="display:none">Create your business account</button>
+  </div>
+</div>
+
+<div id="signup-screen">
+  <div class="login-box">
+    <div class="brandmark login-brandmark"><div class="half a"></div><div class="half b"></div></div>
+    <div class="login-name"><span class="s">FLOW</span></div>
+    <div class="login-sub" style="margin-bottom:6px">by Nexivo</div>
+    <div class="login-sub">Create your account</div>
+    <div class="login-field">
+      <label for="signup-email">Email</label>
+      <input type="email" id="signup-email" autocomplete="username" placeholder="you@yourbusiness.com">
+    </div>
+    <div class="login-field">
+      <label for="signup-password">Password</label>
+      <input type="password" id="signup-password" autocomplete="new-password" placeholder="At least 6 characters">
+    </div>
+    <button class="login-btn" id="signup-btn" onclick="doSignup()">Create account</button>
+    <div class="login-error" id="signup-error"></div>
+    <button class="btn-secondary" style="width:100%;justify-content:center;margin-top:14px" onclick="document.getElementById('signup-screen').classList.remove('show');document.getElementById('welcome-screen').classList.add('show')">Back</button>
+  </div>
+</div>
+
 <div id="login-screen">
   <div class="login-box">
     <div class="brandmark login-brandmark"><div class="half a"></div><div class="half b"></div></div>
@@ -760,7 +797,11 @@
     <div class="sec-header"><div class="sec-title">Customers</div><button class="btn-primary" onclick="openModal('customer')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add</button></div>
     <div style="position:relative;margin-bottom:10px">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);pointer-events:none"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input class="form-input" id="customer-search" placeholder="Search customers by name, phone, or email..." style="padding-left:34px" oninput="renderCustomers()">
+      <input class="form-input" id="customer-search" placeholder="Search customers by name, phone, or email..." autocomplete="off" style="padding-left:34px;padding-right:44px" oninput="updateCustomerSuggestions()" onkeydown="if(event.key==='Enter'){event.preventDefault();runCustomerSearch();}" onblur="setTimeout(()=>{const b=document.getElementById('customer-suggestions');if(b)b.style.display='none';},150)" onfocus="updateCustomerSuggestions()">
+      <button onclick="runCustomerSearch()" title="Search" style="position:absolute;right:5px;top:5px;bottom:5px;width:32px;background:var(--blue-dim);border:1px solid var(--blue);color:var(--blue);border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </button>
+      <div id="customer-suggestions" style="display:none;position:absolute;top:100%;left:0;right:0;z-index:60;background:var(--surface);border:1px solid var(--blue);border-radius:var(--radius-sm);box-shadow:var(--glow-blue);margin-top:4px;max-height:260px;overflow-y:auto"></div>
     </div>
     <div style="display:flex;gap:8px;margin-bottom:10px">
       <button class="btn-secondary" style="flex:1;justify-content:center" onclick="exportCustomersCSV()">
@@ -1398,6 +1439,19 @@
       </div>
     </div>
     <label class="form-label" style="font-size:11px;margin-bottom:8px">Team members</label>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:12px">
+      <label class="form-label" style="font-size:11px;margin-bottom:6px">Add a team member</label>
+      <input class="form-input" id="new-user-email" type="email" placeholder="their@email.com" style="margin-bottom:6px">
+      <input class="form-input" id="new-user-password" type="text" placeholder="Temporary password (share with them)" style="margin-bottom:6px">
+      <div style="display:flex;gap:6px">
+        <select id="new-user-role" class="form-input" style="flex:1;font-size:12px">
+          <option value="employee">Employee</option>
+          <option value="admin">Admin</option>
+        </select>
+        <button class="btn-primary" style="flex-shrink:0" onclick="addTeamMember()">Add</button>
+      </div>
+      <div style="font-size:10px;color:var(--text-muted);margin-top:8px;line-height:1.4">Creates their login right away. Share the email and password with them so they can sign in and change their password later in their own account.</div>
+    </div>
     <div id="admin-user-list"></div>
     <button class="btn-secondary" style="width:100%;justify-content:center;margin-top:10px" onclick="openModal('emp-pay');renderEmpPay()">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
@@ -1672,7 +1726,7 @@
 // onboarding screen below).
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, onSnapshot, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey:"AIzaSyCxXdYaK1fKls9rPdEKDC1xW3AmdLlZJCI",
@@ -1863,12 +1917,16 @@ setPersistence(auth,browserLocalPersistence).catch(()=>{});
 
 onAuthStateChanged(auth,async user=>{
   const loginScreen=document.getElementById('login-screen');
+  const welcomeScreen=document.getElementById('welcome-screen');
+  const signupScreen=document.getElementById('signup-screen');
   const loadingScreen=document.getElementById('loading-screen');
   const onboardingScreen=document.getElementById('onboarding-screen');
   if(user){
     currentUid=user.uid;
     currentEmail=user.email||'';
     loginScreen.classList.remove('show');
+    welcomeScreen.classList.remove('show');
+    signupScreen.classList.remove('show');
     // First login for this business? Show setup instead of jumping into the app.
     try{
       const cfgSnap=await getDoc(doc(db,'settings','config'));
@@ -1883,12 +1941,50 @@ onAuthStateChanged(auth,async user=>{
     loadingScreen.style.display='';loadingScreen.classList.remove('fade-out');
     init();
   }else{
-    // Signed out: hide the app, show login
+    // Signed out: hide the app
     loadingScreen.style.display='none';
     onboardingScreen.classList.remove('show');
-    loginScreen.classList.add('show');
+    loginScreen.classList.remove('show');
+    signupScreen.classList.remove('show');
+    // Brand new business (no team yet)? Show Welcome with a Create option.
+    // Once a team exists, skip straight to the plain sign-in screen for everyone.
+    try{
+      const teamSnap=await getDoc(doc(db,'settings','team'));
+      const hasTeam=teamSnap.exists()&&teamSnap.data().users&&Object.keys(teamSnap.data().users).length>0;
+      if(hasTeam){
+        welcomeScreen.classList.remove('show');
+        loginScreen.classList.add('show');
+      }else{
+        document.getElementById('welcome-create-btn').style.display='';
+        welcomeScreen.classList.add('show');
+      }
+    }catch(e){
+      console.error('team check',e);
+      loginScreen.classList.add('show'); // if the check fails, default to plain sign-in
+    }
   }
 });
+
+window.doSignup=async function(){
+  const email=document.getElementById('signup-email').value.trim();
+  const pass=document.getElementById('signup-password').value;
+  const errEl=document.getElementById('signup-error');
+  const btn=document.getElementById('signup-btn');
+  errEl.textContent='';
+  if(!email||!pass){errEl.textContent='Enter an email and password.';return;}
+  if(pass.length<6){errEl.textContent='Password must be at least 6 characters.';return;}
+  btn.disabled=true;btn.textContent='Creating account...';
+  try{
+    await createUserWithEmailAndPassword(auth,email,pass);
+    document.getElementById('signup-password').value='';
+    // onAuthStateChanged takes over — this becomes the business's first admin, then onboarding.
+  }catch(e){
+    const m={'auth/email-already-in-use':'That email already has an account — try signing in instead.','auth/invalid-email':'That email doesn\'t look right.','auth/weak-password':'Password is too weak — use at least 6 characters.'};
+    errEl.textContent=m[e.code]||'Could not create that account.';
+  }finally{
+    btn.disabled=false;btn.textContent='Create account';
+  }
+};
 
 window.doLogin=async function(){
   const email=document.getElementById('login-email').value.trim();
@@ -1918,6 +2014,8 @@ window.doLogout=async function(){
 // Allow Enter key to submit login
 document.getElementById('login-password').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 document.getElementById('login-email').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('login-password').focus();});
+document.getElementById('signup-password').addEventListener('keydown',e=>{if(e.key==='Enter')doSignup();});
+document.getElementById('signup-email').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('signup-password').focus();});
 
 async function addActivity(text,sub){await fbAdd('activity',{text,sub,time:new Date().toISOString()});}
 
@@ -3507,6 +3605,37 @@ window.deleteAllCustomersStep1=async function(){
     toast('All customers deleted');
     closeModal('set-admin');
   }catch(e){setSyncDot('error');toast('Something went wrong deleting customers');console.error(e);}
+};
+
+// ===== ADMIN: add a new team member (creates their real login) =====
+window.addTeamMember=async function(){
+  if(myRole!=='admin'){toast('Admins only');return;}
+  const email=document.getElementById('new-user-email').value.trim();
+  const password=document.getElementById('new-user-password').value;
+  const role=document.getElementById('new-user-role').value;
+  if(!email||!password){toast('Enter an email and password');return;}
+  if(password.length<6){toast('Password must be at least 6 characters');return;}
+  setSyncDot('syncing');
+  const secondaryName='AddUser_'+Date.now();
+  try{
+    const secondaryApp=initializeApp(firebaseConfig,secondaryName);
+    const secondaryAuth=getAuth(secondaryApp);
+    const cred=await createUserWithEmailAndPassword(secondaryAuth,email,password);
+    const newUid=cred.user.uid;
+    await signOut(secondaryAuth); // don't disturb the admin's own session
+    teamUsers[newUid]={email,role,name:email.split('@')[0]};
+    await setDoc(doc(db,'settings','team'),{users:teamUsers},{merge:true});
+    setSyncDot('ok');
+    toast('Team member added');
+    document.getElementById('new-user-email').value='';
+    document.getElementById('new-user-password').value='';
+    renderAdminUsers();
+  }catch(e){
+    setSyncDot('error');
+    const m={'auth/email-already-in-use':'That email already has an account.','auth/invalid-email':"That email doesn't look right.",'auth/weak-password':'Password is too weak — use at least 6 characters.'};
+    toast(m[e.code]||'Could not create that account');
+    console.error(e);
+  }
 };
 
 // ===== ADMIN: team / roles =====
@@ -5110,6 +5239,30 @@ function renderJobPrompts(){
   }).join('');
 }
 
+function updateCustomerSuggestions(){
+  const box=document.getElementById('customer-suggestions');if(!box)return;
+  const q=(document.getElementById('customer-search').value||'').trim().toLowerCase();
+  if(!q){box.style.display='none';box.innerHTML='';return;}
+  const matches=data.customers.filter(c=>{
+    const haystack=[c.name,c.phone,c.email].filter(Boolean).join(' ').toLowerCase();
+    return haystack.includes(q);
+  }).sort((a,b)=>a.name.localeCompare(b.name)).slice(0,6);
+  if(matches.length===0){box.innerHTML='<div style="padding:12px;font-size:12px;color:var(--text-muted)">No matches</div>';box.style.display='block';return;}
+  box.innerHTML=matches.map(c=>`<div onmousedown="selectCustomerSuggestion('${c.id}')" style="padding:10px 12px;cursor:pointer;border-bottom:1px solid var(--border)">
+    <div style="font-size:13px;font-weight:700;color:var(--text)">${esc(c.name)}</div>
+    <div style="font-size:11px;color:var(--text-muted)">${esc(c.phone||c.email||'')}</div>
+  </div>`).join('');
+  box.style.display='block';
+}
+window.selectCustomerSuggestion=function(id){
+  const box=document.getElementById('customer-suggestions');if(box){box.style.display='none';box.innerHTML='';}
+  document.getElementById('customer-search').value='';
+  openCustomerDetail(id);
+};
+window.runCustomerSearch=function(){
+  const box=document.getElementById('customer-suggestions');if(box){box.style.display='none';}
+  renderCustomers();
+};
 function renderCustomers(){
   const el=document.getElementById('customer-list');
   if(data.customers.length===0){el.innerHTML=`<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><p>No customers yet.<br>Tap <strong>Add</strong> to create your first one.</p></div>`;return;}
