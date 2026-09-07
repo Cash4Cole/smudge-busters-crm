@@ -1317,6 +1317,12 @@
       <div><div class="toggle-label">Auto-calculate prices</div><div class="toggle-sub">Use rates × quantity to fill job totals</div></div>
       <label class="tswitch"><input type="checkbox" id="set-autoprice"><span class="tslider"></span></label>
     </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-top:14px">
+      <label class="form-label" style="font-size:11px;margin-bottom:6px">Payment methods <span style="color:var(--text-muted);font-weight:400">(optional)</span></label>
+      <div style="font-size:10px;color:var(--text-muted);margin-bottom:8px;line-height:1.4">Add a link for each way you accept payment — a Stripe Payment Link, PayPal.me, Square, Venmo, Zelle, etc. Unpaid payments will show a button for each one.</div>
+      <div id="payment-methods-config-list"></div>
+      <button class="btn-secondary" style="width:100%;justify-content:center;margin-top:4px" onclick="addPaymentMethod()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add a payment method</button>
+    </div>
     <div class="modal-actions"><button class="btn-secondary" onclick="closeModal('set-business')">Back</button><button class="btn-primary" onclick="saveMileageSettings()">Save</button></div>
   </div>
 </div>
@@ -1405,6 +1411,31 @@
   </div>
 </div>
 
+<!-- Stripe invoicing sub-panel -->
+<div class="modal-overlay" id="modal-set-stripe">
+  <div class="modal">
+    <div class="modal-title">Stripe invoicing</div>
+    <div style="font-size:11px;color:var(--text-muted);margin-bottom:14px">Send real invoices customers can pay online with a card. Uses your own Stripe account — the money goes straight to you, nothing routes through us.</div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:14px">
+      <div style="font-size:11px;color:var(--text-muted);line-height:1.6">
+        This one's set up slightly differently than Email, since a Stripe key can never be safely stored in the app itself:
+        <ol style="margin:8px 0 0 16px;padding:0">
+          <li style="margin-bottom:6px">Get a secret key free at <a href="#" onclick="testLink('stripe-dashboard-link');return false" style="color:var(--purple)">dashboard.stripe.com/apikeys</a></li>
+          <li style="margin-bottom:6px">Add it as an environment variable named <code style="background:var(--bg);padding:1px 5px;border-radius:4px">STRIPE_SECRET_KEY</code> in this site's Netlify settings (Site configuration → Environment variables)</li>
+          <li>Redeploy the site — environment variable changes need a fresh deploy</li>
+        </ol>
+      </div>
+      <input type="hidden" id="stripe-dashboard-link" value="https://dashboard.stripe.com/apikeys">
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:14px">
+      <button class="btn-secondary" style="width:100%;justify-content:center" onclick="testStripeConnection()" id="stripe-test-btn">Test connection</button>
+      <div style="font-size:10px;color:var(--text-muted);margin-top:8px;text-align:center" id="stripe-test-result"></div>
+    </div>
+    <div style="font-size:10px;color:var(--text-muted);line-height:1.5">Once connected, a "Send Stripe invoice" button appears on any unpaid payment. It emails the customer a real Stripe invoice they can pay online — you'll still mark it Paid in Flow yourself once you see it's settled.</div>
+    <div class="modal-actions"><button class="btn-secondary" style="width:100%;justify-content:center" onclick="closeModal('set-stripe')">Back</button></div>
+  </div>
+</div>
+
 <!-- Admin sub-panel -->
 <div class="modal-overlay" id="modal-set-admin">
   <div class="modal">
@@ -1476,6 +1507,16 @@
     <div style="font-size:10px;color:var(--text-muted);margin:10px 0;line-height:1.4">Users appear here after they sign in for the first time. Admins can change settings & design; employees use the app.</div>
     <div class="settings-nav-label">More</div>
     <div class="settings-nav-group">
+      <div class="settings-nav-row" onclick="closeModal('set-admin');openSettingsPanel('stripe')">
+        <div class="settings-nav-icon" style="background:var(--purple-dim);color:var(--purple)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        </div>
+        <div class="settings-nav-text">
+          <div class="settings-nav-title">Stripe invoicing</div>
+          <div class="settings-nav-sub">Send real invoices customers can pay online</div>
+        </div>
+        <div class="settings-nav-chevron">›</div>
+      </div>
       <div class="settings-nav-row" onclick="closeModal('set-admin');openModal('emp-pay');renderEmpPay()">
         <div class="settings-nav-icon" style="background:var(--purple-dim);color:var(--purple)">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
@@ -1840,6 +1881,7 @@ const DEFAULT_SERVICES=[
 ];
 let serviceTypes=JSON.parse(JSON.stringify(DEFAULT_SERVICES)); // business-wide service list
 let autoPrice=false; // master toggle: auto-calc job prices from rates
+let paymentMethods=[]; // business-wide list of {name, link} — a job can still override with its own single link
 const DEFAULT_MESSAGES={
   reviewText:"Hi {first}, thank you for choosing us! We'd really appreciate it if you could leave us a quick review — it helps our small business a ton. {link}",
   reviewEmail:"Thank you for choosing us! It was a pleasure serving you. If you have a moment, we'd be incredibly grateful if you'd leave us a quick review — it makes a huge difference for our small business.",
@@ -3022,6 +3064,8 @@ async function loadSettings(){
       if(d.features)features={...features,...d.features};
       if(Array.isArray(d.serviceTypes)&&d.serviceTypes.length)serviceTypes=d.serviceTypes;
       if(typeof d.autoPrice==='boolean')autoPrice=d.autoPrice;
+      if(Array.isArray(d.paymentMethods))paymentMethods=d.paymentMethods;
+      else if(typeof d.defaultPaymentLink==='string'&&d.defaultPaymentLink)paymentMethods=[{name:'Pay online',link:d.defaultPaymentLink}]; // migrate the old single-link field
       if(d.messages)messages={...messages,...d.messages};
       if(Array.isArray(d.cardConfig)&&d.cardConfig.length)cardConfig=d.cardConfig;
       if(d.theme)theme={...theme,...d.theme};
@@ -3544,6 +3588,8 @@ window.openMileageSettings=function(){
   renderCardConfig();
   svcDraft=JSON.parse(JSON.stringify(serviceTypes));
   renderServiceConfig();
+  paymentMethodsDraft=JSON.parse(JSON.stringify(paymentMethods));
+  renderPaymentMethodsConfig();
   const who=document.getElementById('set-user-label');if(who)who.textContent=currentEmail||'this login';
   // Show admin tile only to admins
   const adminTile=document.getElementById('admin-tile');if(adminTile)adminTile.style.display=(myRole==='admin')?'':'none';
@@ -4038,6 +4084,29 @@ window.removeServiceType=function(i){
   svcDraft.splice(i,1);
   renderServiceConfig();
 };
+let paymentMethodsDraft=[];
+function renderPaymentMethodsConfig(){
+  const el=document.getElementById('payment-methods-config-list');if(!el)return;
+  if(paymentMethodsDraft.length===0){el.innerHTML='<div style="font-size:12px;color:var(--text-muted);padding:8px 0">No payment methods yet — add one below.</div>';return;}
+  el.innerHTML=paymentMethodsDraft.map((m,i)=>`
+    <div style="display:flex;gap:6px;align-items:center;margin-bottom:8px">
+      <input class="form-input" style="width:100px;flex-shrink:0;font-size:12px" value="${esc(m.name)}" placeholder="Name" oninput="updatePaymentMethodDraft(${i},'name',this.value)">
+      <input class="form-input" style="flex:1;font-size:12px" type="url" value="${esc(m.link)}" placeholder="https://..." oninput="updatePaymentMethodDraft(${i},'link',this.value)">
+      <button onclick="removePaymentMethod(${i})" style="background:var(--red-dim);border:1px solid var(--red);color:var(--red);border-radius:6px;width:30px;height:30px;font-size:14px;cursor:pointer;flex-shrink:0">✕</button>
+    </div>`).join('');
+}
+window.updatePaymentMethodDraft=function(i,field,val){
+  if(!paymentMethodsDraft[i])return;
+  paymentMethodsDraft[i][field]=val;
+};
+window.addPaymentMethod=function(){
+  paymentMethodsDraft.push({name:'',link:''});
+  renderPaymentMethodsConfig();
+};
+window.removePaymentMethod=function(i){
+  paymentMethodsDraft.splice(i,1);
+  renderPaymentMethodsConfig();
+};
 window.saveMileageSettings=async function(){
   const home=document.getElementById('set-home-address').value.trim();
   const key=document.getElementById('set-maps-key').value.trim();
@@ -4051,6 +4120,7 @@ window.saveMileageSettings=async function(){
   // Clean service draft: drop blank names, keep order
   const cleanedServices=svcDraft.map(s=>({name:(s.name||'').trim(),model:s.model||'custom',rate:parseFloat(s.rate)||0})).filter(s=>s.name);
   const newAutoPrice=document.getElementById('set-autoprice').checked;
+  const cleanedPaymentMethods=paymentMethodsDraft.map(m=>({name:(m.name||'').trim(),link:(m.link||'').trim()})).filter(m=>m.name&&m.link);
   const newMessages={
     reviewText:document.getElementById('msg-review-text').value.trim()||DEFAULT_MESSAGES.reviewText,
     reviewEmail:document.getElementById('msg-review-email').value.trim()||DEFAULT_MESSAGES.reviewEmail,
@@ -4067,10 +4137,11 @@ window.saveMileageSettings=async function(){
     applyA11y();
     applyUserBg();
     // Shared: API key + business default rate + feature flags + services + messages + cards
-    await setDoc(doc(db,'settings','config'),{mapsApiKey:key,mileageRate:rate,features:features,serviceTypes:cleanedServices,autoPrice:newAutoPrice,messages:newMessages,cardConfig:newCardConfig},{merge:true});
+    await setDoc(doc(db,'settings','config'),{mapsApiKey:key,mileageRate:rate,features:features,serviceTypes:cleanedServices,autoPrice:newAutoPrice,messages:newMessages,cardConfig:newCardConfig,paymentMethods:cleanedPaymentMethods},{merge:true});
     sharedSettings.mapsApiKey=key;sharedSettings.mileageRate=rate;
     serviceTypes=cleanedServices.length?cleanedServices:JSON.parse(JSON.stringify(DEFAULT_SERVICES));
     autoPrice=newAutoPrice;
+    paymentMethods=cleanedPaymentMethods;
     messages=newMessages;
     cardConfig=newCardConfig;
     applyEffectiveSettings();
@@ -5384,6 +5455,53 @@ function renderQuotes(){
     </div>`).join('');
 }
 
+async function stripeApiCall(payload){
+  const res=await fetch('/.netlify/functions/create-invoice',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  const json=await res.json().catch(()=>({}));
+  if(!res.ok)throw json;
+  return json;
+}
+window.testStripeConnection=async function(){
+  const btn=document.getElementById('stripe-test-btn');
+  const resultEl=document.getElementById('stripe-test-result');
+  btn.disabled=true;btn.textContent='Testing...';resultEl.textContent='';resultEl.style.color='';
+  try{
+    const r=await stripeApiCall({testConnection:true});
+    resultEl.textContent='✓ Connected'+(r.accountName?' — '+r.accountName:'');
+    resultEl.style.color='var(--green)';
+  }catch(e){
+    resultEl.textContent=e.message||'Not connected yet — add STRIPE_SECRET_KEY in Netlify and redeploy.';
+    resultEl.style.color='var(--red)';
+  }finally{
+    btn.disabled=false;btn.textContent='Test connection';
+  }
+};
+window.sendStripeInvoice=async function(paymentId){
+  const p=data.payments.find(x=>x.id===paymentId);if(!p)return;
+  const cust=data.customers.find(c=>c.id===p.customerId);
+  const email=cust?.email;
+  if(!email){toast('This customer needs an email on file to invoice them');return;}
+  const btn=document.getElementById('stripe-btn-'+paymentId);
+  if(btn){btn.disabled=true;btn.textContent='Sending...';}
+  try{
+    const inv=await stripeApiCall({customerName:p.customerName,customerEmail:email,description:'Payment for services — '+bizName(),amount:p.amount});
+    await fbUpdate('payments',paymentId,{stripeInvoiceId:inv.id,stripeInvoiceUrl:inv.hostedInvoiceUrl});
+    toast('Stripe invoice sent to '+email);
+  }catch(e){
+    if(e.error==='not_connected'){toast('Connect Stripe first in Settings → Admin');}
+    else{toast(e.message||'Could not send that invoice');}
+    if(btn){btn.disabled=false;btn.textContent='Send Stripe invoice';}
+    console.error(e);
+  }
+};
+window.setPaymentLink=async function(paymentId){
+  const p=data.payments.find(x=>x.id===paymentId);if(!p)return;
+  const current=p.paymentLink||'';
+  const url=prompt('Payment link for this invoice (leave blank to use your default link instead):',current);
+  if(url===null)return; // cancelled
+  await fbUpdate('payments',paymentId,{paymentLink:url.trim()});
+  toast(url.trim()?'Payment link saved':'Payment link cleared — will use your default');
+};
 function renderPayments(){
   const el=document.getElementById('payment-list');
   if(data.payments.length===0){el.innerHTML=`<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><p>No payments logged yet.</p></div>`;return;}
@@ -5392,9 +5510,25 @@ function renderPayments(){
       <div class="data-row"><span class="data-row-label">${esc(p.customerName)}</span><span class="data-row-value" style="color:${p.status==='Paid'?'var(--green)':'var(--red)'};text-shadow:0 0 6px ${p.status==='Paid'?'rgba(76,175,128,0.4)':'rgba(229,115,115,0.4)'}">$${(parseFloat(p.amount)||0).toFixed(2)}</span></div>
       <div class="data-row"><span class="data-row-label">${fmtDate(p.date)} · ${esc(p.method)}</span><span class="data-row-value"><span class="badge ${statusBadge(p.status)}">${p.status}</span></span></div>
       ${p.notes?`<div class="data-row"><span class="data-row-label">Note</span><span class="data-row-value" style="font-weight:400;color:var(--text-muted)">${esc(p.notes)}</span></div>`:''}
+      ${p.status!=='Paid'?(()=>{
+        const parts=[];
+        if(p.paymentLink){
+          parts.push(`<a href="${esc(p.paymentLink)}" target="_blank" rel="noopener" style="flex:1;text-align:center;padding:8px;background:var(--surface);border:1px solid var(--green);border-radius:var(--radius-sm);color:var(--green);font-size:11px;font-weight:700;text-decoration:none">Go to invoice ›</a>`);
+        }else{
+          paymentMethods.forEach(m=>{
+            parts.push(`<a href="${esc(m.link)}" target="_blank" rel="noopener" style="flex:1;text-align:center;padding:8px;background:var(--surface);border:1px solid var(--green);border-radius:var(--radius-sm);color:var(--green);font-size:11px;font-weight:700;text-decoration:none">${esc(m.name)} ›</a>`);
+          });
+        }
+        if(p.stripeInvoiceUrl){
+          parts.push(`<a href="${p.stripeInvoiceUrl}" target="_blank" rel="noopener" style="flex:1;text-align:center;padding:8px;background:var(--surface);border:1px solid var(--purple);border-radius:var(--radius-sm);color:var(--purple);font-size:11px;font-weight:700;text-decoration:none">Stripe invoice ›</a>`);
+        }else if(!p.paymentLink&&paymentMethods.length===0){
+          parts.push(`<button class="btn-secondary" style="flex:1;justify-content:center;font-size:11px" onclick="sendStripeInvoice('${p.id}')" id="stripe-btn-${p.id}">Send Stripe invoice</button>`);
+        }
+        return`<div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">${parts.join('')}</div>
+        <button onclick="setPaymentLink('${p.id}')" style="background:none;border:none;color:var(--text-muted);font-size:10px;text-decoration:underline;cursor:pointer;padding:6px 0 0;width:100%;text-align:center">${p.paymentLink?"Edit this invoice link":'Use a specific link for this one'}</button>`;
+      })():''}
     </div>`).join('');
 }
-
 function renderExpenses(){
   const el=document.getElementById('expense-list');
   if(data.expenses.length===0){el.innerHTML=`<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg><p>No expenses logged yet.</p></div>`;return;}
@@ -5699,6 +5833,8 @@ const HELP_INDEX=[
   {title:'Accessibility',keywords:'accessibility a11y text size font contrast motion reduce spacing large print',blurb:'Text size, contrast, reduced motion, and spacing controls.',go:()=>{openMileageSettings();openSettingsPanel('access');}},
   {title:'Business name & branding',keywords:'business name branding logo color topbar bizname',blurb:'Set your business name and its color, shown top-right next to the sync dot.',go:()=>{openMileageSettings();openSettingsPanel('admin');}},
   {title:'Team & admin',keywords:'team admin employee role owner permissions users danger delete all customers add team member',blurb:"Manage who's on your team, their role, and account-wide danger zone actions.",go:()=>{openMileageSettings();openSettingsPanel('admin');}},
+  {title:'Stripe invoicing',keywords:'stripe invoice invoicing payment online card charge bill',blurb:'Send real invoices customers can pay online by card, through your own Stripe account. Found under Admin.',go:()=>{openMileageSettings();openSettingsPanel('admin');}},
+  {title:'Payment methods',keywords:'payment link invoice paypal venmo square stripe pay online go to invoice methods',blurb:'Add links for every way you accept payment so unpaid jobs show "Go to invoice" buttons. Found under Business setup.',go:()=>{openMileageSettings();openSettingsPanel('business');}},
   {title:'Email connection',keywords:'email emailjs brevo connect smtp send quotes reviews campaigns api key',blurb:'Connect your own EmailJS (and optionally Brevo) account so Flow can send emails.',go:()=>{openMileageSettings();openSettingsPanel('email');}},
   {title:'Message templates',keywords:'messages templates review request referral due service text wording',blurb:'Edit the wording Flow uses for review requests, referral asks, and re-engagement texts. Found under Admin.',go:()=>{openMileageSettings();openSettingsPanel('admin');}},
   {title:'Display & theme',keywords:'display theme dark light color scheme font background design customize',blurb:'Switch between dark/light mode, pick an accent theme, or set a custom background. Found under Accessibility.',go:()=>{openMileageSettings();openSettingsPanel('access');}},
