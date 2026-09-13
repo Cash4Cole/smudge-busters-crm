@@ -147,7 +147,7 @@
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
 
   /* NAV */
-  .nav{position:sticky;bottom:0;z-index:100;height:var(--nav-height);background:var(--bg);border-top:1px solid var(--green);box-shadow:0 -1px 12px rgba(76,175,128,0.2);display:flex;padding-bottom:env(safe-area-inset-bottom,0);}
+  .nav{position:fixed;left:0;right:0;bottom:0;z-index:100;height:var(--nav-height);background:var(--bg);border-top:1px solid var(--green);box-shadow:0 -1px 12px rgba(76,175,128,0.2);display:flex;padding-bottom:env(safe-area-inset-bottom,0);}
   .nav-btn{flex:1;border:none;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:8px 2px;color:var(--text-muted);font-size:10px;font-weight:500;}
   .nav-btn svg{width:20px;height:20px;stroke-width:1.8;}
   .nav-btn.active{color:var(--green);text-shadow:0 0 6px rgba(76,175,128,0.6);}
@@ -156,7 +156,7 @@
   .nav-btn.active .nb-line{background:var(--green);box-shadow:0 0 6px var(--green),0 0 12px rgba(76,175,128,0.4);}
 
   /* CONTENT */
-  .content{padding:12px 12px 16px;min-height:calc(100vh - var(--topbar-height) - var(--nav-height));overflow-y:auto;}
+  .content{padding:12px 12px calc(16px + var(--nav-height) + env(safe-area-inset-bottom,0px));min-height:calc(100vh - var(--topbar-height) - var(--nav-height));overflow-y:auto;}
   .section{display:none;}.section.active{display:block;}
 
   /* CARDS */
@@ -170,15 +170,15 @@
 
   /* GAUGE GRID */
   .gauge-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;}
-  .content{padding:12px 12px 16px;min-height:calc(100vh - var(--topbar-height) - var(--nav-height));overflow-y:auto;}
+  .content{padding:12px 12px calc(16px + var(--nav-height) + env(safe-area-inset-bottom,0px));min-height:calc(100vh - var(--topbar-height) - var(--nav-height));overflow-y:auto;}
   @media(min-width:600px){
     .gauge-grid{grid-template-columns:repeat(4,1fr);}
     .quick-grid{grid-template-columns:repeat(4,1fr);}
-    .content{padding:16px 20px 20px;}
+    .content{padding:16px 20px calc(20px + var(--nav-height) + env(safe-area-inset-bottom,0px));}
     .gc{height:110px;}
   }
   @media(min-width:900px){
-    .content{padding:20px 32px 24px;}
+    .content{padding:20px 32px calc(24px + var(--nav-height) + env(safe-area-inset-bottom,0px));}
   }
   .gc{border-radius:var(--radius-md);overflow:hidden;position:relative;height:86px;}
   .gc-rev{background:var(--green-dim);border:1px solid var(--green);box-shadow:var(--glow-green),inset 0 0 12px rgba(76,175,128,0.05);}
@@ -405,6 +405,15 @@
   .settings-nav-title{font-size:13px;font-weight:700;color:var(--text);}
   .settings-nav-sub{font-size:10px;color:var(--text-muted);margin-top:1px;}
   .settings-nav-chevron{color:var(--text-muted);font-size:20px;flex-shrink:0;}
+  /* Dashboard tap-to-edit layout editing */
+  .dash-block{margin-bottom:8px;position:relative;}
+  .dash-block.edit-mode{border-radius:var(--radius-md);}
+  .dash-edit-overlay{display:none;}
+  .dash-block.edit-mode .dash-edit-overlay{display:flex;align-items:center;justify-content:center;position:absolute;inset:0;z-index:10;background:rgba(6,10,8,0.72);border:2px dashed var(--blue);border-radius:var(--radius-md);color:var(--blue);font-weight:800;font-size:13px;text-align:center;padding:8px;cursor:pointer;text-shadow:0 0 8px rgba(74,159,212,0.5)}
+  .dash-block.card-off:not(.edit-mode){display:none;}
+  .dash-block.card-off.edit-mode .dash-edit-overlay{background:rgba(6,10,8,0.85);}
+  .nav.nav-edit-mode .nav-btn{position:relative;}
+  .nav.nav-edit-mode .nav-btn::after{content:'Tap to change';display:flex;align-items:center;justify-content:center;position:absolute;inset:0;background:rgba(6,10,8,0.85);border:1px dashed var(--blue);color:var(--blue);font-size:8px;font-weight:800;text-align:center;padding:2px;}
   .set-tile:active{transform:translateY(1px);}
   .set-tile:active{opacity:0.7;}
   .set-tile svg{width:24px;height:24px;stroke-width:2;}
@@ -598,8 +607,17 @@
       <button class="home-tab" id="htab-money" onclick="switchHomeTab('money')">Money</button>
       <button class="home-tab" id="htab-rev" onclick="switchHomeTab('rev')">Revenue</button>
     </div>
+    <div id="dash-edit-bar" style="position:sticky;top:0;z-index:50;background:var(--blue-dim);border:1px solid var(--blue);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:10px;display:none;flex-direction:column;gap:8px">
+      <span style="font-size:12px;font-weight:700;color:var(--blue)">Tap any section below to change it</span>
+      <div style="display:flex;gap:8px">
+        <button class="btn-secondary" style="flex:1;justify-content:center;padding:7px 10px;font-size:12px;color:var(--red);border-color:var(--red)" onclick="resetDashLayout()">Return to default</button>
+        <button class="btn-primary" style="flex:1;justify-content:center;padding:7px 14px;font-size:12px" onclick="stopDashEdit()">Done</button>
+      </div>
+    </div>
 
     <div id="home-dash-view">
+    <div class="dash-block" id="block-stats" data-card-id="stats">
+    <div class="dash-edit-overlay" onclick="openBlockPicker('stats')"><span>Tap to change this section</span></div>
     <div class="gauge-grid">
       <div class="gc gc-rev" onclick="goToHomeSubTab('rev')" style="cursor:pointer">
         <div class="cash-bg" style="color:var(--green)">$$$$$$</div>
@@ -612,7 +630,7 @@
           </div>
         </div>
       </div>
-      <div class="gc gc-job" onclick="showSection('schedule',document.querySelector('.nav-btn:nth-child(5)'))" style="cursor:pointer">
+      <div class="gc gc-job" onclick="showSection('schedule')" style="cursor:pointer">
         <div class="gi" style="padding:5px 5px 3px">
           <div style="font-size:8px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:0.5px;text-shadow:0 0 5px rgba(74,159,212,0.5)">Jobs/week</div>
           <svg width="100%" height="52" viewBox="0 0 110 56" style="display:block">
@@ -639,7 +657,7 @@
           </div>
         </div>
       </div>
-      <div class="gc gc-cus" onclick="showSection('customers',document.querySelector('.nav-btn:nth-child(2)'))" style="cursor:pointer">
+      <div class="gc gc-cus" onclick="showSection('customers')" style="cursor:pointer">
         <div class="gi">
           <div class="gl" style="color:var(--purple);text-shadow:0 0 5px rgba(179,136,255,0.5)">Customers</div>
           <div class="gv" id="dash-customers" style="color:var(--purple);text-shadow:0 0 12px rgba(179,136,255,0.6)">0</div>
@@ -647,19 +665,28 @@
         </div>
       </div>
     </div>
+    </div>
 
+    <div class="dash-block" id="block-daily" data-card-id="daily">
+    <div class="dash-edit-overlay" onclick="openBlockPicker('daily')"><span>Tap to change this section</span></div>
     <div class="card" id="daily-summary-card" style="display:none;border-color:var(--blue);box-shadow:var(--glow-blue);background:var(--blue-dim)">
       <div style="font-size:11px;font-weight:800;color:var(--blue);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:4px">📋 <span id="daily-summary-title">Today</span></div>
       <div style="font-size:13px;color:var(--text);line-height:1.5" id="daily-summary-text">—</div>
     </div>
+    </div>
 
+    <div class="dash-block" id="block-quickactions" data-card-id="quickactions">
+    <div class="dash-edit-overlay" onclick="openBlockPicker('quickactions')"><span>Tap to change this section</span></div>
     <div class="quick-grid">
       <div class="quick-btn purple" onclick="openModal('customer')"><div class="qicon" style="background:rgba(179,136,255,0.15)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2.5" width="20" height="20"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg></div><span style="color:var(--purple);text-shadow:0 0 8px rgba(179,136,255,0.5)">New customer</span></div>
       <div class="quick-btn blue" onclick="openModal('schedule-job')"><div class="qicon" style="background:rgba(74,159,212,0.15)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2.5" width="20" height="20"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg></div><span style="color:var(--blue);text-shadow:0 0 8px rgba(74,159,212,0.5)">New job</span></div>
       <div class="quick-btn" onclick="openModal('payment')"><div class="qicon" style="background:rgba(76,175,128,0.15)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" width="20" height="20"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div><span style="color:var(--green);text-shadow:0 0 8px rgba(76,175,128,0.5)">Log payment</span></div>
       <div class="quick-btn orange" onclick="openModal('expense')"><div class="qicon" style="background:rgba(240,160,96,0.15)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2.5" width="20" height="20"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><span style="color:var(--orange);text-shadow:0 0 8px rgba(240,160,96,0.5)">Log expense</span></div>
     </div>
+    </div>
 
+    <div class="dash-block" id="block-recurring" data-card-id="recurring">
+    <div class="dash-edit-overlay" onclick="openBlockPicker('recurring')"><span>Tap to change this section</span></div>
     <div class="card" id="recurring-revenue-card" style="display:none;border-color:var(--green);box-shadow:var(--glow-green)">
       <div style="display:flex;justify-content:space-between;align-items:center">
         <div>
@@ -673,7 +700,10 @@
         </div>
       </div>
     </div>
+    </div>
 
+    <div class="dash-block" id="block-due" data-card-id="due">
+    <div class="dash-edit-overlay" onclick="openBlockPicker('due')"><span>Tap to change this section</span></div>
     <div class="card" id="due-service-card" style="display:none;border-color:var(--orange);box-shadow:var(--glow-orange)">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
         <div style="font-size:12px;font-weight:800;color:var(--orange);text-shadow:0 0 6px rgba(240,160,96,0.4)">⏰ Due for service</div>
@@ -681,7 +711,10 @@
       </div>
       <div id="due-service-list"></div>
     </div>
+    </div>
 
+    <div class="dash-block" id="block-tools" data-card-id="tools">
+    <div class="dash-edit-overlay" onclick="openBlockPicker('tools')"><span>Tap to change this section</span></div>
     <div class="tool-grid" id="home-tools-tile">
       <div class="tool-tile" onclick="showSection('tools',null)">
         <svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
@@ -694,7 +727,10 @@
         <span class="tt-sub">Design & options</span>
       </div>
     </div>
+    </div>
 
+    <div class="dash-block" id="block-messages" data-card-id="messages">
+    <div class="dash-edit-overlay" onclick="openBlockPicker('messages')"><span>Tap to change this section</span></div>
     <div class="card" id="messages-card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
         <div style="font-size:13px;font-weight:800;color:var(--blue);text-shadow:0 0 6px rgba(74,159,212,0.4)">Messages</div>
@@ -705,10 +741,14 @@
       </div>
       <div id="messages-list"><div class="empty-state" style="padding:16px"><p>No messages yet.</p></div></div>
     </div>
+    </div>
 
+    <div class="dash-block" id="block-activity" data-card-id="activity">
+    <div class="dash-edit-overlay" onclick="openBlockPicker('activity')"><span>Tap to change this section</span></div>
     <div class="card">
       <div style="font-size:13px;font-weight:800;color:var(--green);margin-bottom:10px;text-shadow:0 0 6px rgba(76,175,128,0.4)">Recent activity</div>
       <div id="dash-activity"><div class="empty-state" style="padding:16px"><p>No activity yet.</p></div></div>
+    </div>
     </div>
     </div>
 
@@ -845,6 +885,7 @@
       <button class="money-tab active-pay" id="tab-leads" onclick="switchPipelineTab('leads')">Leads</button>
       <button class="money-tab" id="tab-camp" onclick="switchPipelineTab('campaigns')">Campaigns</button>
       <button class="money-tab" id="tab-giveback" onclick="switchPipelineTab('giveback')">Give Back</button>
+      <button class="money-tab" id="tab-bookings" onclick="switchPipelineTab('bookings')">Bookings<span id="booking-badge" style="display:none;background:var(--red);color:#fff;border-radius:10px;padding:1px 6px;font-size:10px;font-weight:800;margin-left:5px"></span></button>
     </div>
 
     <!-- LEADS VIEW -->
@@ -921,6 +962,18 @@
         </button>
       </div>
       <div id="giveback-list"></div>
+    </div>
+
+    <!-- BOOKINGS VIEW -->
+    <div id="bookings-view" style="display:none">
+      <div class="sec-header" style="margin-bottom:10px">
+        <div style="font-size:13px;font-weight:700;color:var(--text-muted)">Booking requests</div>
+        <button class="btn-secondary" style="font-size:11px;padding:7px 11px" onclick="closeModal('set-business');openMileageSettings();openSettingsPanel('booking')">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4z"/></svg>
+          Settings
+        </button>
+      </div>
+      <div id="bookings-list"></div>
     </div>
   </div>
 
@@ -1008,27 +1061,27 @@
 
 <!-- NAV -->
 <nav class="nav">
-  <button class="nav-btn active" onclick="showSection('dashboard',this)">
+  <button class="nav-btn active" data-section="dashboard" onclick="showSection('dashboard')">
     <div class="nb-line"></div>
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
     Home
   </button>
-  <button class="nav-btn" onclick="showSection('customers',this)">
+  <button class="nav-btn" data-section="customers" onclick="showSection('customers')">
     <div class="nb-line"></div>
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
     Customers
   </button>
-  <button class="nav-btn" onclick="showSection('quotes',this)">
+  <button class="nav-btn" data-section="quotes" onclick="showSection('quotes')">
     <div class="nb-line"></div>
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
     Quotes
   </button>
-  <button class="nav-btn" onclick="showSection('payments',this)">
+  <button class="nav-btn" data-section="payments" onclick="showSection('payments')">
     <div class="nb-line"></div>
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
     Pipeline
   </button>
-  <button class="nav-btn" onclick="showSection('schedule',this)">
+  <button class="nav-btn" data-section="schedule" onclick="showSection('schedule')">
     <div class="nb-line"></div>
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
     Schedule
@@ -1300,6 +1353,16 @@
         </div>
         <div class="settings-nav-chevron">›</div>
       </div>
+      <div class="settings-nav-row" onclick="startDashEdit()">
+        <div class="settings-nav-icon" style="background:var(--blue-dim);color:var(--blue)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4z"/></svg>
+        </div>
+        <div class="settings-nav-text">
+          <div class="settings-nav-title">Edit dashboard layout</div>
+          <div class="settings-nav-sub">Tap sections on your Home screen to swap them</div>
+        </div>
+        <div class="settings-nav-chevron">›</div>
+      </div>
     </div>
     <div class="modal-actions"><button class="btn-secondary" onclick="closeModal('set-access')">Back</button><button class="btn-primary" onclick="saveMileageSettings()">Save</button></div>
   </div>
@@ -1323,7 +1386,70 @@
       <div id="payment-methods-config-list"></div>
       <button class="btn-secondary" style="width:100%;justify-content:center;margin-top:4px" onclick="addPaymentMethod()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add a payment method</button>
     </div>
+    <div class="settings-nav-label">More</div>
+    <div class="settings-nav-group">
+      <div class="settings-nav-row" onclick="closeModal('set-business');openSettingsPanel('booking')">
+        <div class="settings-nav-icon" style="background:var(--blue-dim);color:var(--blue)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <div class="settings-nav-text">
+          <div class="settings-nav-title">Public booking page</div>
+          <div class="settings-nav-sub">Let customers book themselves online</div>
+        </div>
+        <div class="settings-nav-chevron">›</div>
+      </div>
+    </div>
     <div class="modal-actions"><button class="btn-secondary" onclick="closeModal('set-business')">Back</button><button class="btn-primary" onclick="saveMileageSettings()">Save</button></div>
+  </div>
+</div>
+
+<!-- Public booking sub-panel -->
+<div class="modal-overlay" id="modal-set-booking">
+  <div class="modal" style="max-height:80vh;overflow-y:auto">
+    <div class="modal-title">Public booking page</div>
+    <div style="font-size:11px;color:var(--text-muted);margin-bottom:14px">A page customers can visit to see your open slots and request an appointment — no login needed for them. It automatically blocks off times you're already booked.</div>
+    <div class="toggle-row">
+      <div><div class="toggle-label">Enable booking page</div><div class="toggle-sub">Turn your link on or off</div></div>
+      <label class="tswitch"><input type="checkbox" id="booking-enabled" onchange="document.getElementById('booking-link-box').style.display=this.checked?'':'none'"><span class="tslider"></span></label>
+    </div>
+    <div id="booking-link-box" style="background:var(--surface);border:1px solid var(--blue);border-radius:var(--radius-sm);padding:12px;margin:10px 0;display:none">
+      <label class="form-label" style="font-size:11px;margin-bottom:6px">Your booking link</label>
+      <div style="display:flex;gap:6px">
+        <input class="form-input" id="booking-link-display" readonly style="flex:1;font-size:12px" onclick="this.select()">
+        <button class="btn-secondary" style="flex-shrink:0" onclick="copyBookingLink()">Copy</button>
+      </div>
+      <div style="font-size:10px;color:var(--text-muted);margin-top:6px">Share this on your website, texts, or social media.</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label" style="font-size:11px">Appointment length</label>
+      <select class="form-input" id="booking-slot-minutes">
+        <option value="30">30 minutes</option>
+        <option value="60">1 hour</option>
+        <option value="90">1.5 hours</option>
+        <option value="120">2 hours</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label" style="font-size:11px">Buffer between appointments</label>
+      <select class="form-input" id="booking-buffer-minutes">
+        <option value="0">None</option>
+        <option value="15">15 minutes</option>
+        <option value="30">30 minutes</option>
+        <option value="60">1 hour</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label" style="font-size:11px">How far ahead can people book?</label>
+      <select class="form-input" id="booking-days-ahead">
+        <option value="7">1 week</option>
+        <option value="14">2 weeks</option>
+        <option value="30">1 month</option>
+        <option value="60">2 months</option>
+      </select>
+    </div>
+    <label class="form-label" style="font-size:11px;margin:14px 0 6px">Business hours</label>
+    <div id="booking-hours-list"></div>
+    <div class="modal-actions"><button class="btn-secondary" onclick="closeModal('set-booking')">Back</button><button class="btn-primary" onclick="saveBookingSettings()">Save</button></div>
   </div>
 </div>
 
@@ -1834,7 +1960,7 @@ let BREVO_API_KEY="xkeysib-267b482e462d11df5ef1a96e4e15967b8293a3612e36dc1d71d44
 const app=initializeApp(firebaseConfig);
 const db=getFirestore(app);
 const auth=getAuth(app);
-let data={customers:[],jobs:[],payments:[],expenses:[],quotes:[],activity:[],leads:[],campaigns:[],givebacks:[],mileage:[],pending:[],messages:[]};
+let data={customers:[],jobs:[],payments:[],expenses:[],quotes:[],activity:[],leads:[],campaigns:[],givebacks:[],mileage:[],pending:[],messages:[],bookingRequests:[]};
 let appSettings={mapsApiKey:'',homeAddress:'',mileageRate:0.725}; // effective merged settings
 let sharedSettings={mapsApiKey:'',mileageRate:0.725}; // business-wide (key + default rate)
 let userSettings={homeAddress:'',mileageRate:null}; // per-login (home base, optional rate override)
@@ -1882,6 +2008,23 @@ const DEFAULT_SERVICES=[
 let serviceTypes=JSON.parse(JSON.stringify(DEFAULT_SERVICES)); // business-wide service list
 let autoPrice=false; // master toggle: auto-calc job prices from rates
 let paymentMethods=[]; // business-wide list of {name, link} — a job can still override with its own single link
+const DEFAULT_BOOKING_SETTINGS={
+  enabled:false,
+  slotMinutes:60,
+  bufferMinutes:15,
+  daysAhead:14,
+  hours:{
+    sun:{on:false,open:'09:00',close:'17:00'},
+    mon:{on:true,open:'09:00',close:'17:00'},
+    tue:{on:true,open:'09:00',close:'17:00'},
+    wed:{on:true,open:'09:00',close:'17:00'},
+    thu:{on:true,open:'09:00',close:'17:00'},
+    fri:{on:true,open:'09:00',close:'17:00'},
+    sat:{on:false,open:'09:00',close:'17:00'}
+  }
+};
+let bookingSettings=JSON.parse(JSON.stringify(DEFAULT_BOOKING_SETTINGS));
+let bookingSettingsDraft=JSON.parse(JSON.stringify(DEFAULT_BOOKING_SETTINGS));
 const DEFAULT_MESSAGES={
   reviewText:"Hi {first}, thank you for choosing us! We'd really appreciate it if you could leave us a quick review — it helps our small business a ton. {link}",
   reviewEmail:"Thank you for choosing us! It was a pleasure serving you. If you have a moment, we'd be incredibly grateful if you'd leave us a quick review — it makes a huge difference for our small business.",
@@ -1889,11 +2032,18 @@ const DEFAULT_MESSAGES={
 };
 let messages=JSON.parse(JSON.stringify(DEFAULT_MESSAGES));
 const DEFAULT_CARDS=[
+  {id:'stats',label:'Stats overview',on:true},
   {id:'daily',label:'Daily summary',on:true},
+  {id:'quickactions',label:'Quick actions',on:true},
   {id:'recurring',label:'Recurring revenue',on:true},
-  {id:'due',label:'Due for service',on:true}
+  {id:'due',label:'Due for service',on:true},
+  {id:'tools',label:'More tools tile',on:true},
+  {id:'messages',label:'Messages',on:true},
+  {id:'activity',label:'Recent activity',on:true}
 ];
 let cardConfig=JSON.parse(JSON.stringify(DEFAULT_CARDS));
+let navOrder=['dashboard','customers','quotes','payments','schedule'];
+let dashEditMode=false;
 let currentUid=null;
 let currentEmail=null;
 let currentCustomerId=null,currentJobId=null,currentQuoteId=null,currentLeadId=null;
@@ -1921,7 +2071,7 @@ async function fbUpdate(col,id,obj){setSyncDot('syncing');try{await updateDoc(do
 async function fbDelete(col,id){setSyncDot('syncing');try{await deleteDoc(doc(db,col,id));setSyncDot('ok');}catch(e){setSyncDot('error');}}
 
 function startListeners(){
-  const cols={customers:'customers',jobs:'jobs',payments:'payments',expenses:'expenses',quotes:'quotes',activity:'activity',leads:'leads',campaigns:'campaigns',givebacks:'givebacks',mileage:'mileage',pending:'pending'};
+  const cols={customers:'customers',jobs:'jobs',payments:'payments',expenses:'expenses',quotes:'quotes',activity:'activity',leads:'leads',campaigns:'campaigns',givebacks:'givebacks',mileage:'mileage',pending:'pending',bookingRequests:'bookingRequests'};
   for(const[col,key] of Object.entries(cols)){
     onSnapshot(collection(db,col),snap=>{
       data[key]=snap.docs.map(d=>({id:d.id,...d.data()}));
@@ -1936,6 +2086,7 @@ function startListeners(){
       if(key==='givebacks')renderGivebacks();
       if(key==='pending'||key==='activity')renderDashboard();
       if(key==='mileage')renderMileage();
+      if(key==='bookingRequests'){renderBookingRequests();renderDashboard();}
     });
   }
   // Messages listener (separate, since it drives the messages card + thread)
@@ -2114,7 +2265,8 @@ window.showSection=function(id,btn){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('sec-'+id).classList.add('active');
-  if(btn)btn.classList.add('active');
+  const targetBtn=btn||document.querySelector('.nav-btn[data-section="'+id+'"]');
+  if(targetBtn)targetBtn.classList.add('active');
   if(id==='dashboard'&&typeof switchHomeTab==='function')switchHomeTab('dash');
   if(id==='schedule')renderSchedule();
   if(id==='quotes')renderQuotes();
@@ -2131,16 +2283,19 @@ window.switchMoneyTab=function(tab){
 };
 
 window.switchPipelineTab=function(tab){
-  const isLeads=tab==='leads', isCamp=tab==='campaigns', isGive=tab==='giveback';
+  const isLeads=tab==='leads', isCamp=tab==='campaigns', isGive=tab==='giveback', isBook=tab==='bookings';
   document.getElementById('pipeline-leads-view').style.display=isLeads?'':'none';
   document.getElementById('campaign-list').style.display=isCamp?'':'none';
   document.getElementById('giveback-view').style.display=isGive?'':'none';
+  document.getElementById('bookings-view').style.display=isBook?'':'none';
   document.getElementById('tab-leads').className='money-tab'+(isLeads?' active-pay':'');
   document.getElementById('tab-camp').className='money-tab'+(isCamp?' active-pay':'');
   document.getElementById('tab-giveback').className='money-tab'+(isGive?' active-pay':'');
+  document.getElementById('tab-bookings').className='money-tab'+(isBook?' active-pay':'');
   if(isLeads)renderLeads();
   else if(isCamp){updateCampRecipients();renderCampaignHistory();}
   else if(isGive)renderGivebacks();
+  else if(isBook)renderBookingRequests();
 };
 
 window.toggleCheck=function(btn){
@@ -2548,6 +2703,9 @@ window.openCustomerDetail=function(id){
         <button class="btn-secondary" style="flex:1;justify-content:center${email?'':';opacity:0.4'}" ${email?'':'disabled'} onclick="reviewEmailCustomer('${id}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Email link</button>
       </div>
     </div>
+    <div class="detail-section"><div class="detail-section-title">Invoice</div>
+      <button class="btn-secondary" style="width:100%;justify-content:center" onclick="sendInvoiceFromCustomer('${id}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Send invoice</button>
+    </div>
     <div class="detail-section"><div class="detail-section-title">Edit info</div>
       <div class="detail-field"><span class="detail-field-label">Name</span><input class="edit-input" id="edit-cust-name" value="${esc(c.name)}" style="max-width:190px"></div>
       <div class="detail-field"><span class="detail-field-label">Phone</span><input class="edit-input" id="edit-cust-phone" type="tel" value="${esc(phone)}" style="max-width:190px"></div>
@@ -2638,16 +2796,16 @@ window.switchHomeTab=function(tab){
 
 // QUICK NAV FROM GAUGES
 window.goToHomeSubTab=function(tab){
-  showSection('dashboard',document.querySelector('.nav-btn:nth-child(1)'));
+  showSection('dashboard');
   switchHomeTab(tab);
 };
 window.goToMoneyTab=function(tab){
-  showSection('dashboard',document.querySelector('.nav-btn:nth-child(1)'));
+  showSection('dashboard');
   switchHomeTab('money');
   switchMoneyTab(tab);
 };
 window.goToPipeline=function(tab){
-  showSection('payments',document.querySelector('.nav-btn:nth-child(4)'));
+  showSection('payments');
   switchPipelineTab(tab||'leads');
 };
 
@@ -3065,9 +3223,18 @@ async function loadSettings(){
       if(Array.isArray(d.serviceTypes)&&d.serviceTypes.length)serviceTypes=d.serviceTypes;
       if(typeof d.autoPrice==='boolean')autoPrice=d.autoPrice;
       if(Array.isArray(d.paymentMethods))paymentMethods=d.paymentMethods;
+      if(d.bookingSettings)bookingSettings={...JSON.parse(JSON.stringify(DEFAULT_BOOKING_SETTINGS)),...d.bookingSettings,hours:{...DEFAULT_BOOKING_SETTINGS.hours,...(d.bookingSettings.hours||{})}};
       else if(typeof d.defaultPaymentLink==='string'&&d.defaultPaymentLink)paymentMethods=[{name:'Pay online',link:d.defaultPaymentLink}]; // migrate the old single-link field
       if(d.messages)messages={...messages,...d.messages};
-      if(Array.isArray(d.cardConfig)&&d.cardConfig.length)cardConfig=d.cardConfig;
+      if(Array.isArray(d.cardConfig)&&d.cardConfig.length){
+        // Merge in any new card types added since this business last saved their layout
+        const known=new Set(d.cardConfig.map(c=>c.id));
+        cardConfig=[...d.cardConfig,...DEFAULT_CARDS.filter(c=>!known.has(c.id))];
+      }
+      if(Array.isArray(d.navOrder)&&d.navOrder.length){
+        const knownNav=new Set(d.navOrder);
+        navOrder=[...d.navOrder,...['dashboard','customers','quotes','payments','schedule'].filter(s=>!knownNav.has(s))];
+      }
       if(d.theme)theme={...theme,...d.theme};
       if(typeof d.globalFont==='string')globalFont=d.globalFont;
       if(typeof d.businessName==='string')businessName=d.businessName;
@@ -3119,6 +3286,7 @@ async function loadSettings(){
   applyUserBg();
   applyBusinessName();
   renderServiceCheckboxes();
+  applyNavOrder();
 }
 
 // Apply the business's own name (set by the admin) to the small badge
@@ -3621,6 +3789,16 @@ window.openSettingsPanel=function(panel){
     document.getElementById('set-biz-email').value=BIZ_EMAIL||'';
     document.getElementById('set-brevo-key').value=BREVO_API_KEY||'';
   }
+  if(panel==='booking'){
+    bookingSettingsDraft=JSON.parse(JSON.stringify(bookingSettings));
+    document.getElementById('booking-enabled').checked=!!bookingSettingsDraft.enabled;
+    document.getElementById('booking-slot-minutes').value=bookingSettingsDraft.slotMinutes;
+    document.getElementById('booking-buffer-minutes').value=bookingSettingsDraft.bufferMinutes;
+    document.getElementById('booking-days-ahead').value=bookingSettingsDraft.daysAhead;
+    document.getElementById('booking-link-box').style.display=bookingSettingsDraft.enabled?'':'none';
+    document.getElementById('booking-link-display').value=window.location.origin+'/book.html';
+    renderBookingHours();
+  }
   openModal('set-'+panel);
 };
 window.saveEmailConfig=async function(){
@@ -4107,6 +4285,46 @@ window.removePaymentMethod=function(i){
   paymentMethodsDraft.splice(i,1);
   renderPaymentMethodsConfig();
 };
+
+// ===== PUBLIC BOOKING SETTINGS =====
+const BOOKING_DAY_LABELS={sun:'Sunday',mon:'Monday',tue:'Tuesday',wed:'Wednesday',thu:'Thursday',fri:'Friday',sat:'Saturday'};
+function renderBookingHours(){
+  const el=document.getElementById('booking-hours-list');if(!el)return;
+  el.innerHTML=Object.keys(BOOKING_DAY_LABELS).map(day=>{
+    const h=bookingSettingsDraft.hours[day];
+    return`<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+      <label class="tswitch" style="flex-shrink:0"><input type="checkbox" ${h.on?'checked':''} onchange="updateBookingHoursDraft('${day}','on',this.checked)"><span class="tslider"></span></label>
+      <span style="font-size:12px;color:var(--text);width:70px;flex-shrink:0">${BOOKING_DAY_LABELS[day].slice(0,3)}</span>
+      <input type="time" class="form-input" style="flex:1;font-size:12px;${h.on?'':'opacity:0.4'}" value="${h.open}" ${h.on?'':'disabled'} onchange="updateBookingHoursDraft('${day}','open',this.value)">
+      <span style="color:var(--text-muted);font-size:11px">to</span>
+      <input type="time" class="form-input" style="flex:1;font-size:12px;${h.on?'':'opacity:0.4'}" value="${h.close}" ${h.on?'':'disabled'} onchange="updateBookingHoursDraft('${day}','close',this.value)">
+    </div>`;
+  }).join('');
+}
+window.updateBookingHoursDraft=function(day,field,val){
+  if(!bookingSettingsDraft.hours[day])return;
+  bookingSettingsDraft.hours[day][field]=val;
+  if(field==='on')renderBookingHours();
+};
+window.copyBookingLink=function(){
+  const input=document.getElementById('booking-link-display');
+  input.select();
+  navigator.clipboard?.writeText(input.value).then(()=>toast('Link copied')).catch(()=>toast('Could not copy — select and copy manually'));
+};
+window.saveBookingSettings=async function(){
+  bookingSettingsDraft.enabled=document.getElementById('booking-enabled').checked;
+  bookingSettingsDraft.slotMinutes=parseInt(document.getElementById('booking-slot-minutes').value);
+  bookingSettingsDraft.bufferMinutes=parseInt(document.getElementById('booking-buffer-minutes').value);
+  bookingSettingsDraft.daysAhead=parseInt(document.getElementById('booking-days-ahead').value);
+  setSyncDot('syncing');
+  try{
+    await setDoc(doc(db,'settings','config'),{bookingSettings:bookingSettingsDraft},{merge:true});
+    bookingSettings=JSON.parse(JSON.stringify(bookingSettingsDraft));
+    setSyncDot('ok');toast('Booking settings saved');
+    closeModal('set-booking');
+  }catch(e){setSyncDot('error');toast('Could not save');console.error(e);}
+};
+
 window.saveMileageSettings=async function(){
   const home=document.getElementById('set-home-address').value.trim();
   const key=document.getElementById('set-maps-key').value.trim();
@@ -4569,6 +4787,49 @@ window.jobReasonCancel=async function(){
 // ===== GIVE BACK =====
 const GIVEBACK_STATUSES=['New','Reviewing','Shortlisted','Winner','Passed'];
 function givebackStatusColor(s){const m={'New':'blue','Reviewing':'orange','Shortlisted':'purple','Winner':'green','Passed':'red'};return m[s]||'blue';}
+
+// ===== PUBLIC BOOKING REQUESTS =====
+function renderBookingRequests(){
+  const el=document.getElementById('bookings-list');if(!el)return;
+  const pending=data.bookingRequests.filter(b=>b.status==='Pending');
+  const badge=document.getElementById('booking-badge');
+  if(badge){
+    if(pending.length){badge.style.display='';badge.textContent=pending.length;}
+    else badge.style.display='none';
+  }
+  const all=[...data.bookingRequests].sort((a,b)=>new Date(b.created)-new Date(a.created));
+  if(all.length===0){el.innerHTML=`<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><p>No booking requests yet.<br>Share your booking link to start getting them.</p></div>`;return;}
+  el.innerHTML=all.map(b=>`
+    <div class="card ${b.status==='Pending'?'blue':''}">
+      <div class="data-row"><span class="data-row-label">${esc(b.name)}</span><span class="data-row-value"><span class="badge ${statusBadge(b.status)}">${b.status}</span></span></div>
+      <div class="data-row"><span class="data-row-label">${fmtDate(b.date)} · ${b.time?fmtTime(b.time):''}</span><span class="data-row-value" style="font-weight:400;color:var(--text-muted)">${esc(b.service||'')}</span></div>
+      ${b.phone?`<div class="data-row"><span class="data-row-label">Phone</span><span class="data-row-value" style="font-weight:400">${esc(b.phone)}</span></div>`:''}
+      ${b.email?`<div class="data-row"><span class="data-row-label">Email</span><span class="data-row-value" style="font-weight:400">${esc(b.email)}</span></div>`:''}
+      ${b.notes?`<div class="data-row"><span class="data-row-label">Notes</span><span class="data-row-value" style="font-weight:400;color:var(--text-muted)">${esc(b.notes)}</span></div>`:''}
+      ${b.status==='Pending'?`<div style="display:flex;gap:6px;margin-top:8px">
+        <button class="btn-primary" style="flex:1;justify-content:center;font-size:11px" onclick="confirmBooking('${b.id}')">Confirm & schedule</button>
+        <button class="btn-secondary" style="flex:1;justify-content:center;font-size:11px;color:var(--red);border-color:var(--red)" onclick="declineBooking('${b.id}')">Decline</button>
+      </div>`:''}
+    </div>`).join('');
+}
+window.confirmBooking=async function(id){
+  const b=data.bookingRequests.find(x=>x.id===id);if(!b)return;
+  let cust=data.customers.find(c=>(b.email&&c.email&&c.email===b.email)||(b.phone&&c.phone&&c.phone===b.phone));
+  let custId;
+  if(cust){custId=cust.id;}
+  else{
+    custId=await fbAdd('customers',{name:b.name,phone:b.phone||'',email:b.email||'',address:'',services:b.service?[b.service]:[],notes:'Booked online.',created:new Date().toISOString()});
+  }
+  await fbAdd('jobs',{customerId:custId,customerName:b.name,services:b.service?[b.service]:[],status:'Scheduled',date:b.date,time:b.time,price:0,notes:b.notes||'Booked via online scheduler.',photoCount:0,created:new Date().toISOString()});
+  await fbUpdate('bookingRequests',id,{status:'Confirmed'});
+  toast('Booking confirmed and added to your schedule');
+};
+window.declineBooking=async function(id){
+  const ok=await askConfirm("This lets the customer's request go unconfirmed. You can still reach out to them yourself if you'd like.",{title:'Decline this booking?',okLabel:'Decline'});
+  if(!ok)return;
+  await fbUpdate('bookingRequests',id,{status:'Declined'});
+  toast('Booking declined');
+};
 
 function renderGivebacks(){
   const el=document.getElementById('giveback-list');if(!el)return;
@@ -5035,6 +5296,7 @@ window.openCalDay=function(year,month,day){
         <div class="detail-field" style="padding:4px 0"><span class="detail-field-label">Time</span><span class="detail-field-value" style="color:var(--blue);text-shadow:0 0 6px rgba(74,159,212,0.4)">${j.time?fmtTime(j.time):'Not set'}</span></div>
         <div class="detail-field" style="padding:4px 0;border-bottom:none"><span class="detail-field-label">Services</span><span class="detail-field-value">${esc(services.join(', ')||'—')}</span></div>
         <button class="btn-secondary" onclick="closeSheet('calday');openJobNotes('${j.id}')" style="width:100%;justify-content:center;margin-top:2px">View job details ›</button>
+        <button class="btn-secondary" onclick="sendInvoiceFromJob('${j.id}')" style="width:100%;justify-content:center"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Send invoice</button>
       </div>`;
     }).join('');
     el.innerHTML=`<div style="font-size:12px;font-weight:900;color:var(--green);text-transform:uppercase;letter-spacing:0.8px;margin:14px 0 10px;text-shadow:0 0 6px rgba(76,175,128,0.4)">Jobs (${dayJobs.length})</div>`+rows;
@@ -5180,19 +5442,148 @@ function renderDashboard(){
   applyCardConfig();
 }
 
-// Apply on/off + order to the dashboard cards
+// Apply on/off + order to the dashboard blocks
 function applyCardConfig(){
-  const map={daily:'daily-summary-card',recurring:'recurring-revenue-card',due:'due-service-card'};
-  const anchor=document.getElementById('home-tools-tile');
-  if(!anchor||!anchor.parentNode)return;
-  // Reorder: insert each enabled card (in config order) right before the tools tile
+  const map={stats:'block-stats',daily:'block-daily',quickactions:'block-quickactions',recurring:'block-recurring',due:'block-due',tools:'block-tools',messages:'block-messages',activity:'block-activity'};
+  const container=document.getElementById('home-dash-view');
+  if(!container)return;
   cardConfig.forEach(c=>{
     const el=document.getElementById(map[c.id]);if(!el)return;
-    if(!c.on){el.dataset.cardOff='1';el.style.display='none';return;}
-    delete el.dataset.cardOff;
-    anchor.parentNode.insertBefore(el,anchor); // move into order
+    el.classList.toggle('card-off',!c.on);
+    container.appendChild(el); // repeated append walks every block into cardConfig's order
   });
 }
+async function saveCardOrder(){
+  setSyncDot('syncing');
+  try{
+    await setDoc(doc(db,'settings','config'),{cardConfig},{merge:true});
+    setSyncDot('ok');
+  }catch(e){setSyncDot('error');console.error(e);}
+}
+async function saveNavOrder(){
+  setSyncDot('syncing');
+  try{
+    await setDoc(doc(db,'settings','config'),{navOrder},{merge:true});
+    setSyncDot('ok');
+  }catch(e){setSyncDot('error');console.error(e);}
+}
+function applyNavOrder(){
+  const nav=document.querySelector('nav.nav');if(!nav)return;
+  navOrder.forEach(sectionId=>{
+    const btn=nav.querySelector('.nav-btn[data-section="'+sectionId+'"]');
+    if(btn)nav.appendChild(btn);
+  });
+}
+
+// ===== DASHBOARD LAYOUT EDITING (tap a section, pick what replaces it) =====
+// Entry point lives in Settings > Accessibility ("Edit dashboard layout").
+window.startDashEdit=function(){
+  closeModal('set-access');closeModal('mileage-settings');
+  showSection('dashboard');
+  dashEditMode=true;
+  document.querySelectorAll('.dash-block').forEach(el=>el.classList.add('edit-mode'));
+  const nav=document.querySelector('nav.nav');if(nav)nav.classList.add('nav-edit-mode');
+  const bar=document.getElementById('dash-edit-bar');if(bar)bar.style.display='flex';
+};
+window.stopDashEdit=function(){
+  dashEditMode=false;
+  document.querySelectorAll('.dash-block').forEach(el=>el.classList.remove('edit-mode'));
+  const nav=document.querySelector('nav.nav');if(nav)nav.classList.remove('nav-edit-mode');
+  const bar=document.getElementById('dash-edit-bar');if(bar)bar.style.display='none';
+  toast('Layout saved');
+};
+window.resetDashLayout=async function(){
+  const ok=await askConfirm("This puts your dashboard cards and bottom nav tabs back to their original order and visibility. Any custom layout you've set up will be lost.",{title:'Return to default layout?',okLabel:'Reset'});
+  if(!ok)return;
+  cardConfig=JSON.parse(JSON.stringify(DEFAULT_CARDS));
+  navOrder=['dashboard','customers','quotes','payments','schedule'];
+  applyCardConfig();
+  applyNavOrder();
+  document.querySelectorAll('.dash-block').forEach(el=>el.classList.add('edit-mode'));
+  const nav=document.querySelector('nav.nav');if(nav)nav.classList.add('nav-edit-mode');
+  renderRecurringRevenue();renderDueForService();renderDailySummary();
+  await saveCardOrder();
+  await saveNavOrder();
+  toast('Layout reset to default');
+};
+
+let pickerTargetId=null; // which card/section slot is currently being edited
+window.openBlockPicker=function(cardId){
+  if(!dashEditMode)return;
+  pickerTargetId=cardId;
+  const el=document.getElementById('block-picker-list');
+  el.innerHTML=cardConfig.map(c=>`
+    <div class="settings-nav-row" onclick="pickBlockFor('${c.id}')">
+      <div class="settings-nav-text">
+        <div class="settings-nav-title">${esc(c.label)}${c.id===cardId?' <span style="color:var(--blue)">(currently here)</span>':''}</div>
+        <div class="settings-nav-sub">${c.on?'Currently visible':'Currently hidden'}</div>
+      </div>
+      <div class="settings-nav-chevron">${c.id===cardId?'✓':'›'}</div>
+    </div>`).join('');
+  document.getElementById('block-picker-title').textContent='What goes here?';
+  document.getElementById('block-picker-hide-btn').style.display='';
+  openModal('block-picker');
+};
+window.pickBlockFor=function(chosenId){
+  closeModal('block-picker');
+  if(!pickerTargetId||chosenId===pickerTargetId)return;
+  const iTarget=cardConfig.findIndex(c=>c.id===pickerTargetId);
+  const iChosen=cardConfig.findIndex(c=>c.id===chosenId);
+  if(iTarget===-1||iChosen===-1)return;
+  // Swap positions — whatever was in the chosen spot moves to where we tapped, and vice versa
+  [cardConfig[iTarget],cardConfig[iChosen]]=[cardConfig[iChosen],cardConfig[iTarget]];
+  cardConfig[iTarget].on=true; // the one you just picked to show here should actually show
+  applyCardConfig();
+  document.querySelectorAll('.dash-block').forEach(el=>el.classList.add('edit-mode'));
+  renderRecurringRevenue();renderDueForService();renderDailySummary();
+  saveCardOrder();
+  toast('Swapped');
+};
+window.hideCurrentBlock=function(){
+  if(!pickerTargetId)return;
+  const c=cardConfig.find(x=>x.id===pickerTargetId);
+  if(c)c.on=false;
+  closeModal('block-picker');
+  applyCardConfig();
+  document.querySelectorAll('.dash-block').forEach(el=>el.classList.add('edit-mode'));
+  saveCardOrder();
+};
+
+let navPickerTarget=null;
+window.openNavPicker=function(sectionId){
+  if(!dashEditMode)return;
+  navPickerTarget=sectionId;
+  const labels={dashboard:'Home',customers:'Customers',quotes:'Quotes',payments:'Pipeline',schedule:'Schedule'};
+  const el=document.getElementById('block-picker-list');
+  el.innerHTML=navOrder.map(s=>`
+    <div class="settings-nav-row" onclick="pickNavFor('${s}')">
+      <div class="settings-nav-text"><div class="settings-nav-title">${esc(labels[s]||s)}${s===sectionId?' <span style="color:var(--blue)">(currently here)</span>':''}</div></div>
+      <div class="settings-nav-chevron">${s===sectionId?'✓':'›'}</div>
+    </div>`).join('');
+  document.getElementById('block-picker-title').textContent='What goes in this tab?';
+  document.getElementById('block-picker-hide-btn').style.display='none';
+  openModal('block-picker');
+};
+window.pickNavFor=function(chosenSection){
+  closeModal('block-picker');
+  if(!navPickerTarget||chosenSection===navPickerTarget)return;
+  const iTarget=navOrder.indexOf(navPickerTarget);
+  const iChosen=navOrder.indexOf(chosenSection);
+  if(iTarget===-1||iChosen===-1)return;
+  [navOrder[iTarget],navOrder[iChosen]]=[navOrder[iChosen],navOrder[iTarget]];
+  applyNavOrder();
+  const nav=document.querySelector('nav.nav');if(nav)nav.classList.add('nav-edit-mode');
+  saveNavOrder();
+  toast('Swapped');
+};
+// While editing, tapping the nav opens the picker instead of navigating away
+document.querySelector('nav.nav').addEventListener('click',e=>{
+  if(!dashEditMode)return;
+  const btn=e.target.closest('.nav-btn');
+  if(!btn)return;
+  e.preventDefault();e.stopPropagation();
+  openNavPicker(btn.dataset.section);
+},true);
 
 // ===== RECURRING REVENUE =====
 // Normalize each recurring series to a monthly dollar figure
@@ -5475,6 +5866,44 @@ window.testStripeConnection=async function(){
   }finally{
     btn.disabled=false;btn.textContent='Test connection';
   }
+};
+window.sendInvoiceFromJob=async function(jobId){
+  const j=data.jobs.find(x=>x.id===jobId);if(!j)return;
+  const c=data.customers.find(x=>x.id===j.customerId);
+  if(!c){toast('No customer found for this job');return;}
+  const amount=parseFloat(j.price)||0;
+  if(!amount){
+    const amountStr=prompt(`Invoice amount for ${c.name} ($):`,'');
+    if(amountStr===null)return;
+    const parsed=parseFloat(amountStr);
+    if(!parsed||parsed<=0){toast('Enter a valid amount');return;}
+    return sendInvoiceAmount(c,parsed,(j.services||[]).join(', ')||'Services rendered');
+  }
+  return sendInvoiceAmount(c,amount,(j.services||[]).join(', ')||'Services rendered');
+};
+async function sendInvoiceAmount(c,amount,description){
+  const paymentId=await fbAdd('payments',{customerId:c.id,customerName:c.name,amount,date:new Date().toISOString().split('T')[0],method:'Invoice',status:'Unpaid',notes:description,created:new Date().toISOString()});
+  if(c.email){
+    try{
+      const inv=await stripeApiCall({customerName:c.name,customerEmail:c.email,description,amount});
+      await fbUpdate('payments',paymentId,{stripeInvoiceId:inv.id,stripeInvoiceUrl:inv.hostedInvoiceUrl});
+      toast('Invoice sent to '+c.email);
+      return;
+    }catch(e){
+      if(e.error!=='not_connected'){toast(e.message||'Could not send that invoice');console.error(e);return;}
+    }
+  }
+  if(paymentMethods.length>0){toast('Added to Payments — use a payment method link to send it to '+c.name);}
+  else{toast('Added to Payments as unpaid. Add an email or a payment method to send it.');}
+}
+window.sendInvoiceFromCustomer=async function(customerId){
+  const c=data.customers.find(x=>x.id===customerId);if(!c)return;
+  const amountStr=prompt(`Invoice amount for ${c.name} ($):`,'');
+  if(amountStr===null)return;
+  const amount=parseFloat(amountStr);
+  if(!amount||amount<=0){toast('Enter a valid amount');return;}
+  const desc=prompt("What's this invoice for? (optional)",'')||'';
+  return sendInvoiceAmount(c,amount,desc||('Payment for services — '+bizName()));
 };
 window.sendStripeInvoice=async function(paymentId){
   const p=data.payments.find(x=>x.id===paymentId);if(!p)return;
@@ -5791,7 +6220,7 @@ function renderSchedule(){
       <div style="display:flex;align-items:flex-start">
         <div class="jdot ${j.date===todayStr?'':'blue'}"></div>
         <div>
-          <div class="jname">${esc(j.customerName)}</div>
+          <div class="jname" onclick="event.stopPropagation();openCustomerDetail('${j.customerId}')" style="text-decoration:underline;text-decoration-color:rgba(74,159,212,0.4);text-underline-offset:2px;cursor:pointer">${esc(j.customerName)}</div>
           <div class="jdet">${fmtDate(j.date)}${j.time?' · <span style="color:var(--blue);font-weight:700;text-shadow:0 0 5px rgba(74,159,212,0.4)">'+fmtTime(j.time)+'</span>':''}</div>
           <div style="margin-top:3px">${services.map(svcTag).join('')}</div>
         </div>
@@ -5835,6 +6264,9 @@ const HELP_INDEX=[
   {title:'Team & admin',keywords:'team admin employee role owner permissions users danger delete all customers add team member',blurb:"Manage who's on your team, their role, and account-wide danger zone actions.",go:()=>{openMileageSettings();openSettingsPanel('admin');}},
   {title:'Stripe invoicing',keywords:'stripe invoice invoicing payment online card charge bill',blurb:'Send real invoices customers can pay online by card, through your own Stripe account. Found under Admin.',go:()=>{openMileageSettings();openSettingsPanel('admin');}},
   {title:'Payment methods',keywords:'payment link invoice paypal venmo square stripe pay online go to invoice methods',blurb:'Add links for every way you accept payment so unpaid jobs show "Go to invoice" buttons. Found under Business setup.',go:()=>{openMileageSettings();openSettingsPanel('business');}},
+  {title:'Send invoice',keywords:'send invoice bill customer profile calendar job amount',blurb:'Invoice a customer directly from their profile, a job, or the calendar — no need to already have an unpaid payment on file.',go:()=>{showSection('customers');}},
+  {title:'Rearrange dashboard',keywords:'rearrange reorder drag drop layout customize move cards nav tabs edit layout',blurb:"Tap the pencil icon next to Home/Money/Revenue to drag your dashboard cards and bottom nav tabs into any order, or hide ones you don't use.",go:()=>{showSection('dashboard');}},
+  {title:'Public booking page',keywords:'booking book online scheduler calendly public link appointment self book',blurb:'Turn on a public link where customers can see your open times and request an appointment themselves. Found under Business setup.',go:()=>{openMileageSettings();openSettingsPanel('business');}},
   {title:'Email connection',keywords:'email emailjs brevo connect smtp send quotes reviews campaigns api key',blurb:'Connect your own EmailJS (and optionally Brevo) account so Flow can send emails.',go:()=>{openMileageSettings();openSettingsPanel('email');}},
   {title:'Message templates',keywords:'messages templates review request referral due service text wording',blurb:'Edit the wording Flow uses for review requests, referral asks, and re-engagement texts. Found under Admin.',go:()=>{openMileageSettings();openSettingsPanel('admin');}},
   {title:'Display & theme',keywords:'display theme dark light color scheme font background design customize',blurb:'Switch between dark/light mode, pick an accent theme, or set a custom background. Found under Accessibility.',go:()=>{openMileageSettings();openSettingsPanel('access');}},
@@ -5842,10 +6274,10 @@ const HELP_INDEX=[
   {title:'Mileage & tax settings',keywords:'mileage tax rate deduction cents per mile maps api key',blurb:'Set your mileage deduction rate and connect a Maps API key for auto trip distance.',go:()=>{openMileageSettings();openSettingsPanel('mileage');}},
   {title:'Service types & pricing',keywords:'service types services pricing auto price rate quantity add service business setup',blurb:'Add or edit the services you offer, and turn on auto-priced quotes.',go:()=>{openMileageSettings();openSettingsPanel('business');}},
   {title:'Home cards',keywords:'home cards dashboard reorder toggle widgets',blurb:'Toggle on/off and reorder the cards on your home screen. Found under Accessibility.',go:()=>{openMileageSettings();openSettingsPanel('access');}},
-  {title:'Customers',keywords:'customers add edit contact address services notes csv import export',blurb:'Your full customer list — add, edit, import or export as a CSV.',go:()=>{showSection('customers',document.querySelector('.nav-btn:nth-child(2)'));}},
-  {title:'Quotes',keywords:'quotes estimate builder send price total',blurb:'Build and send price quotes to customers by email.',go:()=>{showSection('quotes',document.querySelector('.nav-btn:nth-child(3)'));}},
-  {title:'Payments & expenses',keywords:'payments expenses money revenue invoice unpaid receipts',blurb:'Log payments and expenses, and track revenue.',go:()=>{showSection('payments',document.querySelector('.nav-btn:nth-child(4)'));}},
-  {title:'Schedule & calendar',keywords:'schedule calendar jobs upcoming book appointment',blurb:'See jobs by day, month, or list, and schedule new ones.',go:()=>{showSection('schedule',document.querySelector('.nav-btn:nth-child(5)'));}},
+  {title:'Customers',keywords:'customers add edit contact address services notes csv import export',blurb:'Your full customer list — add, edit, import or export as a CSV.',go:()=>{showSection('customers');}},
+  {title:'Quotes',keywords:'quotes estimate builder send price total',blurb:'Build and send price quotes to customers by email.',go:()=>{showSection('quotes');}},
+  {title:'Payments & expenses',keywords:'payments expenses money revenue invoice unpaid receipts',blurb:'Log payments and expenses, and track revenue.',go:()=>{showSection('payments');}},
+  {title:'Schedule & calendar',keywords:'schedule calendar jobs upcoming book appointment',blurb:'See jobs by day, month, or list, and schedule new ones.',go:()=>{showSection('schedule');}},
   {title:'Leads',keywords:'leads referral calls follow up pipeline',blurb:'Track referral leads and their call status through to close.',go:()=>{showSection('tools',null);switchPipelineTab('leads');}},
   {title:'Campaigns',keywords:'campaigns marketing blast email bulk',blurb:'Send a marketing email blast to a group of customers.',go:()=>{showSection('tools',null);switchPipelineTab('campaigns');}},
   {title:'Giveback program',keywords:'giveback community nominate winner free job',blurb:'Run a community giveback program — collect nominations and pick a winner.',go:()=>{showSection('tools',null);switchPipelineTab('giveback');}},
@@ -5899,6 +6331,15 @@ window.HELP_INDEX_GO=function(i){
       <button class="btn-secondary" onclick="__confirmModalResolve(false)">Go back</button>
       <button class="btn-danger" id="confirm-modal-ok" onclick="__confirmModalResolve(true)">Delete</button>
     </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-block-picker" style="z-index:10000">
+  <div class="modal" style="max-height:75vh;overflow-y:auto">
+    <div class="modal-title" id="block-picker-title">What goes here?</div>
+    <div id="block-picker-list"></div>
+    <button class="btn-secondary" id="block-picker-hide-btn" style="width:100%;justify-content:center;margin-top:10px;color:var(--red);border-color:var(--red)" onclick="hideCurrentBlock()">Hide this section instead</button>
+    <div class="modal-actions"><button class="btn-secondary" style="width:100%;justify-content:center" onclick="closeModal('block-picker')">Cancel</button></div>
   </div>
 </div>
 </div>
